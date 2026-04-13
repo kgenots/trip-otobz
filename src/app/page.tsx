@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import SidePanel from "@/components/SidePanel";
+import FlightSearch from "@/components/FlightSearch";
 import type { FlightPrice } from "@/lib/api";
 
 const WorldMap = dynamic(() => import("@/components/WorldMap"), { ssr: false });
@@ -42,6 +43,39 @@ export default function Home() {
     },
     []
   );
+
+  // 검색 폼에서 검색 시 호출
+  const handleSearch = async (params: {
+    depCityCd: string;
+    arrCityCd: string;
+    departureDate: string;
+    returnDate?: string;
+    period: number;
+  }) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/flights", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "window",
+          depCityCd: params.depCityCd,
+          arrCityCd: params.arrCityCd,
+          period: params.period,
+        }),
+      });
+      const json = await res.json();
+      setFlightData(json.data || []);
+      // 지도를 검색 결과 도시로 이동
+      if (params.arrCityCd) {
+        // 지도에서 해당 도시에 위치할 수 있도록 처리 필요
+      }
+    } catch (e) {
+      setFlightData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <main className="h-screen w-screen overflow-hidden bg-gray-950 relative">
@@ -100,6 +134,9 @@ export default function Home() {
 
       {/* 지도 */}
       <WorldMap flightData={flightData} onCountryClick={handleCountryClick} />
+
+      {/* 항공권 검색 폼 */}
+      <FlightSearch onSearch={handleSearch} />
 
       {/* 사이드패널 */}
       {selectedCountry && (
