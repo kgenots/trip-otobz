@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { cityCountryMap } from "@/data/city-country-map";
 
 interface AirportOption {
@@ -17,13 +17,15 @@ const AIRPORTS: AirportOption[] = Object.entries(cityCountryMap).map(([code, inf
 
 const PERIODS = [3, 4, 5, 6, 7] as const;
 
-export default function FlightSearch({ onSearch }: { onSearch: (params: {
-  depCityCd: string;
-  arrCityCd: string;
-  departureDate: string;
-  returnDate?: string;
-  period: number;
-}) => void }) {
+export default function FlightSearch({ onSearch }: {
+  onSearch: (params: {
+    depCityCd: string;
+    arrCityCd: string;
+    departureDate: string;
+    returnDate?: string;
+    period: number;
+  }) => Promise<void>
+}) {
   const [depCity, setDepCity] = useState("");
   const [arrCity, setArrCity] = useState("");
   const [departureDate, setDepartureDate] = useState("");
@@ -54,14 +56,13 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
     }
 
     setLoading(true);
-    onSearch({
+    await onSearch({
       depCityCd: depCity,
       arrCityCd: arrCity,
       departureDate: departureDate,
       returnDate: returnDate,
       period: daysDiff,
-    })
-      .finally(() => setLoading(false));
+    }).finally(() => setLoading(false));
   };
 
   // 날짜 선택 시 유효성 검사
@@ -84,7 +85,7 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
   // 도시 자동 완성
   const [filter, setFilter] = useState("");
   const [isDepCity, setIsDepCity] = useState(true);
-  
+
   const filteredAirports = filter
     ? AIRPORTS.filter(a =>
         a.name.includes(filter) ||
@@ -162,7 +163,7 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
                   onClick={() => selectAirport(airport.code)}
                   className="w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors text-xs text-white"
                 >
-                  {airport.cityKo} ({airport.code}) - {airport.countryKo}
+                  {airport.name} ({airport.code}) - {airport.countryKo}
                 </button>
               ))
             ) : (
@@ -205,7 +206,7 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
                   onClick={() => selectAirport(airport.code)}
                   className="w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors text-xs text-white"
                 >
-                  {airport.cityKo} ({airport.code}) - {airport.countryKo}
+                  {airport.name} ({airport.code}) - {airport.countryKo}
                 </button>
               ))
             ) : (
