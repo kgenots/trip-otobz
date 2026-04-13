@@ -66,10 +66,6 @@ export default function Home() {
       });
       const json = await res.json();
       setFlightData(json.data || []);
-      // 지도를 검색 결과 도시로 이동
-      if (params.arrCityCd) {
-        // 지도에서 해당 도시에 위치할 수 있도록 처리 필요
-      }
     } catch (e) {
       setFlightData([]);
     } finally {
@@ -80,29 +76,39 @@ export default function Home() {
   return (
     <main className="h-screen w-screen overflow-hidden bg-gray-950 relative">
       {/* 상단 컨트롤 */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center justify-between px-6 py-4 bg-gradient-to-b from-gray-950 via-gray-950/90 to-transparent">
-        <div className="flex items-center gap-3">
-          <h1 className="text-xl font-bold text-white tracking-tight">
-            ✈️ Trip OTOBZ
-          </h1>
-          <span className="text-gray-500 text-sm hidden sm:inline">ICN 출발</span>
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center px-6 py-4 bg-gradient-to-b from-gray-950 via-gray-950/90 to-transparent">
+        {/* 왼쪽:FlightSearch 폼 */}
+        <div className="flex-1">
+          <FlightSearch onSearch={handleSearch} />
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-gray-400 text-sm mr-1">여행기간</span>
-          {PERIODS.map((p) => (
-            <button
-              key={p}
-              onClick={() => setPeriod(p)}
-              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
-                period === p
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-400 hover:bg-gray-700"
-              }`}
-            >
-              {p}일
-            </button>
-          ))}
+        {/* 오른쪽:로고 + 여행기간 */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <h1 className="text-xl font-bold text-white tracking-tight">
+              ✈️ Trip OTOBZ
+            </h1>
+            <span className="text-gray-500 text-sm hidden sm:inline">ICN 출발</span>
+          </div>
+
+          <div className="w-px h-6 bg-gray-700 hidden sm:block" />
+
+          <div className="flex items-center gap-2">
+            <span className="text-gray-400 text-sm">여행기간</span>
+            {PERIODS.map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
+                  period === p
+                    ? "bg-blue-600 text-white"
+                    : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                }`}
+              >
+                {p}일
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -134,9 +140,6 @@ export default function Home() {
 
       {/* 지도 */}
       <WorldMap flightData={flightData} onCountryClick={handleCountryClick} />
-
-      {/* 항공권 검색 폼 */}
-      <FlightSearch onSearch={handleSearch} />
 
       {/* 사이드패널 */}
       {selectedCountry && (

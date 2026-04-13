@@ -31,32 +31,10 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
   const [tripType, setTripType] = useState<"round" | "oneway">("round");
   const [period, setPeriod] = useState(5);
   const [showDropdown, setShowDropdown] = useState(false);
-
-  // 항공권 검색 조건 변경 시 API 호출
-  useEffect(() => {
-    if (!depCity || !arrCity || !departureDate) return;
-
-    const startDate = new Date(departureDate);
-    const endDate = tripType === "round" && returnDate
-      ? new Date(returnDate)
-      : undefined;
-
-    if (!endDate || endDate <= startDate) return;
-
-    const daysDiff = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
-    if (daysDiff < 3 || daysDiff > 7) return;
-
-    onSearch({
-      depCityCd: depCity,
-      arrCityCd: arrCity,
-      departureDate: departureDate,
-      returnDate: returnDate,
-      period: daysDiff,
-    });
-  }, [depCity, arrCity, departureDate, returnDate, tripType, period, onSearch]);
+  const [loading, setLoading] = useState(false);
 
   // 검색 버튼 클릭 시 API 호출
-  const handleSearch = () => {
+  const handleSearch = async () => {
     if (!depCity || !arrCity || !departureDate) return;
 
     const startDate = new Date(departureDate);
@@ -64,7 +42,10 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
       ? new Date(returnDate)
       : undefined;
 
-    if (!endDate || endDate <= startDate) return;
+    if (!endDate || endDate <= startDate) {
+      alert("귀국일은 출발일 이후여야 합니다");
+      return;
+    }
 
     const daysDiff = Math.round((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
     if (daysDiff < 3 || daysDiff > 7) {
@@ -72,13 +53,15 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
       return;
     }
 
+    setLoading(true);
     onSearch({
       depCityCd: depCity,
       arrCityCd: arrCity,
       departureDate: departureDate,
       returnDate: returnDate,
       period: daysDiff,
-    });
+    })
+      .finally(() => setLoading(false));
   };
 
   // 날짜 선택 시 유효성 검사
@@ -100,30 +83,33 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
 
   // 도시 자동 완성
   const [filter, setFilter] = useState("");
+  const [isDepCity, setIsDepCity] = useState(true);
+  
   const filteredAirports = filter
     ? AIRPORTS.filter(a =>
-      a.name.includes(filter) ||
-      a.code.includes(filter.toUpperCase()) ||
-      a.countryKo.includes(filter)
-    ).slice(0, 10)
+        a.name.includes(filter) ||
+        a.code.includes(filter.toUpperCase()) ||
+        a.countryKo.includes(filter)
+      ).slice(0, 10)
     : [];
 
   const selectAirport = (code: string) => {
-    setDepCity(code);
+    if (isDepCity) {
+      setDepCity(code);
+    } else {
+      setArrCity(code);
+    }
     setFilter("");
     setShowDropdown(false);
   };
 
   return (
-    <div className="absolute bottom-6 left-6 z-30 bg-gray-900/95 backdrop-blur rounded-xl p-5 border border-gray-800 w-[420px] shadow-2xl">
-      {/* 타이틀 */}
-      <h2 className="text-lg font-bold text-white mb-4">✈️ 항공권 검색</h2>
-
+    <div className="flex items-center gap-4 bg-gray-900/95 backdrop-blur rounded-xl px-4 py-3 border border-gray-800">
       {/* 왕복/편도 */}
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-1">
         <button
           onClick={() => setTripType("round")}
-          className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             tripType === "round"
               ? "bg-blue-600 text-white"
               : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -133,7 +119,7 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
         </button>
         <button
           onClick={() => setTripType("oneway")}
-          className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             tripType === "oneway"
               ? "bg-blue-600 text-white"
               : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -143,9 +129,11 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
         </button>
       </div>
 
+      <div className="w-px h-6 bg-gray-700" />
+
       {/* 출발지 */}
-      <div className="mb-3 relative">
-        <label className="block text-gray-400 text-xs mb-1">출발지</label>
+      <div className="relative">
+        <label className="block text-gray-500 text-xs mb-0.5">출발지</label>
         <input
           type="text"
           value={
@@ -153,37 +141,42 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
               ? `${cityCountryMap[depCity].cityKo} (${depCity})`
               : ""
           }
-          placeholder="도쿄 (TYO) 검색"
+          placeholder="출발지 검색"
           onChange={(e) => {
             setFilter(e.target.value);
             setShowDropdown(true);
+            setIsDepCity(true);
           }}
-          onFocus={() => setShowDropdown(true)}
-          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-          className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onFocus={() => {
+            setShowDropdown(true);
+            setIsDepCity(true);
+          }}
+          className="w-40 bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        {showDropdown && (
-          <div className="absolute bottom-full left-0 right-0 mb-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        {showDropdown && isDepCity && (
+          <div className="absolute bottom-full left-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto w-56 z-50">
             {filteredAirports.length > 0 ? (
               filteredAirports.map((airport) => (
                 <button
                   key={airport.code}
                   onClick={() => selectAirport(airport.code)}
-                  className="w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors text-sm text-white"
+                  className="w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors text-xs text-white"
                 >
                   {airport.cityKo} ({airport.code}) - {airport.countryKo}
                 </button>
               ))
             ) : (
-              <div className="px-3 py-2 text-gray-500 text-sm">조회된 공항이 없습니다</div>
+              <div className="px-3 py-2 text-gray-500 text-xs">조회된 공항이 없습니다</div>
             )}
           </div>
         )}
       </div>
 
+      <div className="w-px h-6 bg-gray-700" />
+
       {/* 도착지 */}
-      <div className="mb-3 relative">
-        <label className="block text-gray-400 text-xs mb-1">도착지</label>
+      <div className="relative">
+        <label className="block text-gray-500 text-xs mb-0.5">도착지</label>
         <input
           type="text"
           value={
@@ -191,73 +184,71 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
               ? `${cityCountryMap[arrCity].cityKo} (${arrCity})`
               : ""
           }
-          placeholder="방콕 (BKK) 검색"
+          placeholder="도착지 검색"
           onChange={(e) => {
             setFilter(e.target.value);
             setShowDropdown(true);
+            setIsDepCity(false);
           }}
-          onFocus={() => setShowDropdown(true)}
-          onBlur={() => setTimeout(() => setShowDropdown(false), 200)}
-          className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onFocus={() => {
+            setShowDropdown(true);
+            setIsDepCity(false);
+          }}
+          className="w-40 bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        {showDropdown && (
-          <div className="absolute bottom-full left-0 right-0 mb-1 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto">
+        {showDropdown && !isDepCity && (
+          <div className="absolute bottom-full left-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto w-56 z-50">
             {filteredAirports.length > 0 ? (
-              filteredAirports.map((airport) => (
+              filteredAirports.filter(a => a.code !== depCity).map((airport) => (
                 <button
                   key={airport.code}
-                  onClick={() => {
-                    if (airport.code !== depCity) {
-                      setArrCity(airport.code);
-                      setFilter("");
-                      setShowDropdown(false);
-                    }
-                  }}
-                  className="w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors text-sm text-white"
+                  onClick={() => selectAirport(airport.code)}
+                  className="w-full px-3 py-2 text-left hover:bg-gray-700 transition-colors text-xs text-white"
                 >
                   {airport.cityKo} ({airport.code}) - {airport.countryKo}
                 </button>
               ))
             ) : (
-              <div className="px-3 py-2 text-gray-500 text-sm">조회된 공항이 없습니다</div>
+              <div className="px-3 py-2 text-gray-500 text-xs">조회된 공항이 없습니다</div>
             )}
           </div>
         )}
       </div>
 
-      {/* 날짜 선택 */}
-      <div className="grid grid-cols-2 gap-3 mb-4">
-        <div>
-          <label className="block text-gray-400 text-xs mb-1"> 출발일</label>
+      <div className="w-px h-6 bg-gray-700" />
+
+      {/* 날짜 */}
+      <div className="flex flex-col">
+        <label className="block text-gray-500 text-xs mb-0.5">날짜</label>
+        <div className="flex items-center gap-2">
           <input
             type="date"
             value={departureDate}
             onChange={handleDepartureChange}
-            className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
-        </div>
-        {tripType === "round" && (
-          <div>
-            <label className="block text-gray-400 text-xs mb-1"> 귀국일</label>
+          {tripType === "round" && (
             <input
               type="date"
               value={returnDate}
               onChange={handleReturnChange}
-              className="w-full px-3 py-2 bg-gray-800 text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
+      <div className="w-px h-6 bg-gray-700" />
+
       {/* 여행기간 */}
-      <div className="mb-4">
-        <label className="block text-gray-400 text-xs mb-2">여행기간</label>
-        <div className="flex gap-2">
+      <div>
+        <label className="block text-gray-500 text-xs mb-0.5">여행기간</label>
+        <div className="flex gap-1">
           {PERIODS.map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className={`flex-1 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+              className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                 period === p
                   ? "bg-blue-600 text-white"
                   : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -269,13 +260,15 @@ export default function FlightSearch({ onSearch }: { onSearch: (params: {
         </div>
       </div>
 
+      <div className="w-px h-6 bg-gray-700" />
+
       {/* 검색 버튼 */}
       <button
         onClick={handleSearch}
-        disabled={!depCity || !arrCity || !departureDate}
-        className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg transition-colors"
+        disabled={loading || !depCity || !arrCity || !departureDate}
+        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg text-sm transition-colors whitespace-nowrap"
       >
-        검색
+        {loading ? "로딩..." : "검색"}
       </button>
     </div>
   );
