@@ -22,7 +22,7 @@ jobs:
       - name: Build image with nerdctl
         run: |
           mkdir -p $HOME/.docker && echo '{}' > $HOME/.docker/config.json 2>/dev/null || true
-          sudo nerdctl --namespace k8s.io build -t trip-otobz:latest .
+          sudo NERDCTL_NAMESPACE=k8s.io nerdctl --address /run/k3s/containerd/containerd.sock build -t trip-otobz:latest .
 
       - name: Rollout restart
         run: |
