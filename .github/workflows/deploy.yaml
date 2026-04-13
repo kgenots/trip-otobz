@@ -19,13 +19,11 @@ jobs:
             echo "nameserver 1.1.1.1" | sudo tee -a /etc/resolv.conf > /dev/null
           fi
 
-      - name: Build image with commit hash tag
+      - name: Build image with latest tag
         run: |
           mkdir -p $HOME/.docker && echo '{}' > $HOME/.docker/config.json 2>/dev/null || true
-          COMMIT_HASH=$(git rev-parse --short HEAD)
-          # K3s containerd 에서 빌드 (commit hash 태그 추가)
+          # K3s containerd 에서 빌드 (latest 태그만 사용)
           sudo nerdctl --address /run/k3s/containerd/containerd.sock build \
-            -t trip-otobz:$COMMIT_HASH \
             -t trip-otobz:latest \
             .
           # 이미지 확인
