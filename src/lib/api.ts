@@ -104,6 +104,29 @@ export interface TnaCategory {
   value: string;
 }
 
+// 마이링크 생성 API
+export async function createMyLink(targetUrl: string): Promise<string> {
+  return apiRequest("/v1/mylink", { targetUrl });
+}
+
+// URL 파라미터 기반 어필리에이트 링크 생성 (API 불필요)
+export function generateAffiliateLink(
+  baseUrl: string,
+  mylinkId: string,
+  utmContent?: string,
+  openInApp?: boolean
+): string {
+  const url = new URL(baseUrl);
+  url.searchParams.set("mylink_id", mylinkId);
+  if (utmContent) {
+    url.searchParams.set("utm_content", utmContent);
+  }
+  if (openInApp) {
+    url.searchParams.set("open_in_app", "true");
+  }
+  return url.toString();
+}
+
 export async function getTnaCategories(city: string): Promise<{ categories: TnaCategory[]; totalCount: number }> {
   return apiRequest("/v1/products/tna/categories", { city });
 }
@@ -132,6 +155,44 @@ export interface TnaSearchResult {
 }
 
 export async function searchTna(params: {
+  keyword: string;
+  category?: string;
+  city?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  sort?: string;
+  page?: number;
+  perPage?: number;
+}): Promise<TnaSearchResult> {
+  return apiRequest("/v1/products/tna/search", params as Record<string, unknown>);
+}
+
+// 어필리에이트 링크 생성 (API 없이 URL 파라미터 사용)
+export function createAffiliateFlightLink(params: {
+  depCityCd: string;
+  arrCityCd: string;
+  departureDate: string;
+  returnDate?: string;
+  period: number;
+  mylinkId: string;
+  utmContent?: string;
+  openInApp?: boolean;
+}): string {
+  const url = new URL("https://www.myrealtrip.com/offers");
+  Object.entries(params).forEach(([key, value]) => {
+    if (key !== "mylinkId" && key !== "utmContent" && value !== undefined) {
+      url.searchParams.set(key, String(value));
+    }
+  });
+  url.searchParams.set("mylink_id", params.mylinkId);
+  if (params.utmContent) {
+    url.searchParams.set("utm_content", params.utmContent);
+  }
+  if (params.openInApp) {
+    url.searchParams.set("open_in_app", "true");
+  }
+  return url.toString();
+}
   keyword: string;
   category?: string;
   city?: string;
