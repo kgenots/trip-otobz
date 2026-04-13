@@ -26,8 +26,8 @@ jobs:
 
       - name: Rollout restart
         run: |
-          kubectl rollout restart deployment/trip-otobz -n worker
-          kubectl rollout status deployment/trip-otobz -n worker --timeout=120s
+          kubectl --kubeconfig $HOME/.kube/config rollout restart deployment/trip-otobz -n worker
+          kubectl --kubeconfig $HOME/.kube/config rollout status deployment/trip-otobz -n worker --timeout=120s
 
       - name: Verify
         run: |
