@@ -11,9 +11,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Fix DNS if needed
+        run: |
+          if ! nslookup registry-1.docker.io > /dev/null 2>&1; then
+            echo "DNS issue detected, adding fallback"
+            echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
+            echo "nameserver 1.1.1.1" | sudo tee -a /etc/resolv.conf > /dev/null
+          fi
+
       - name: Build image with nerdctl
         run: |
-          nerdctl --namespace k8s.io build -t trip-otobz:latest .
+          mkdir -p $HOME/.docker && echo '{}' > $HOME/.docker/config.json 2>/dev/null || true
+          sudo nerdctl --namespace k8s.io build -t trip-otobz:latest .
 
       - name: Rollout restart
         run: |
