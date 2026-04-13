@@ -75,12 +75,10 @@ export default function Home() {
 
   return (
     <main className="h-screen w-screen overflow-hidden bg-gray-950 relative">
-      {/* 상단 컨트롤 */}
-      <div className="absolute top-0 left-0 right-0 z-30 flex items-center px-6 py-4 bg-gradient-to-b from-gray-950 via-gray-950/90 to-transparent">
+      {/* 상단 컨트롤 - 헤더 전체 폭 */}
+      <div className="absolute top-0 left-0 right-0 z-30 flex items-center px-6 py-4 bg-gradient-to-b from-gray-950 via-gray-950/90 to-transparent gap-6">
         {/* 왼쪽:FlightSearch 폼 */}
-        <div className="flex-1">
-          <FlightSearch onSearch={handleSearch} />
-        </div>
+        <FlightSearch onSearch={handleSearch} />
 
         {/* 오른쪽:로고 + 여행기간 */}
         <div className="flex items-center gap-4">
@@ -91,10 +89,10 @@ export default function Home() {
             <span className="text-gray-500 text-sm hidden sm:inline">ICN 출발</span>
           </div>
 
-          <div className="w-px h-6 bg-gray-700 hidden sm:block" />
+          <div className="hidden sm:block w-px h-6 bg-gray-700" />
 
           <div className="flex items-center gap-2">
-            <span className="text-gray-400 text-sm">여행기간</span>
+            <span className="text-gray-400 text-sm hidden sm:inline">여행기간</span>
             {PERIODS.map((p) => (
               <button
                 key={p}
