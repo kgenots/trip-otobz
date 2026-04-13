@@ -7,9 +7,9 @@ export interface CityInfo {
 
 export const cityCountryMap: Record<string, CityInfo> = {
   // 일본
-  NRT: { country: "JP", cityKo: "도쿄(나리타)", countryKo: "일본" },
+  NRT: { country: "JP", cityKo: "도쿄 (나리타)", countryKo: "일본" },
   TYO: { country: "JP", cityKo: "도쿄", countryKo: "일본" },
-  HND: { country: "JP", cityKo: "도쿄(하네다)", countryKo: "일본" },
+  HND: { country: "JP", cityKo: "도쿄 (하네다)", countryKo: "일본" },
   KIX: { country: "JP", cityKo: "오사카", countryKo: "일본" },
   FUK: { country: "JP", cityKo: "후쿠오카", countryKo: "일본" },
   CTS: { country: "JP", cityKo: "삿포로", countryKo: "일본" },
@@ -130,6 +130,10 @@ export const cityCountryMap: Record<string, CityInfo> = {
   TUN: { country: "TN", cityKo: "튀니스", countryKo: "튀니지" },
   DAR: { country: "TZ", cityKo: "다르에스살람", countryKo: "탄자니아" },
   MRU: { country: "MU", cityKo: "모리셔스", countryKo: "모리셔스" },
+  // 한국
+  ICN: { country: "KR", cityKo: "서울 (인천)", countryKo: "한국" },
+  TAE: { country: "KR", cityKo: "대구", countryKo: "한국" },
+  PUS: { country: "KR", cityKo: "부산", countryKo: "한국" },
 };
 
 // 국가코드 → 대표 도시코드 (지도에서 국가 클릭 시 사용)

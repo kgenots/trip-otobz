@@ -8,7 +8,7 @@ import {
   ZoomableGroup,
 } from "react-simple-maps";
 import { Tooltip } from "./Tooltip";
-import { cityCountryMap, getCountryName } from "@/data/city-country-map";
+import { cityCountryMap, getCountryCities, getCountryName } from "@/data/city-country-map";
 import type { FlightPrice } from "@/lib/api";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -31,11 +31,6 @@ const numericToAlpha2: Record<string, string> = {
   "834": "TZ", "480": "MU", "410": "KR",
 };
 
-interface CountryPriceData {
-  lowestPrice: number;
-  cities: { code: string; name: string; price: number }[];
-}
-
 interface WorldMapProps {
   flightData: FlightPrice[];
   onCountryClick: (countryCode: string, countryName: string, cities: { code: string; name: string; price: number }[]) => void;
@@ -45,9 +40,9 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
   const [tooltipContent, setTooltipContent] = useState("");
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
-  // 국가별 최저가 집계
-  const countryPrices = useMemo(() => {
-    const map: Record<string, CountryPriceData> = {};
+  // 국가별 최저가 집계 - 해당 국가의 모든 도시들
+  const countryData = useMemo(() => {
+    const map: Record<string, { cities: { code: string; name: string; price: number }[]; lowestPrice: number }> = {};
 
     for (const flight of flightData) {
       const cityInfo = cityCountryMap[flight.toCity];
@@ -55,9 +50,10 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
       const cc = cityInfo.country;
 
       if (!map[cc]) {
-        map[cc] = { lowestPrice: Infinity, cities: [] };
+        map[cc] = { cities: [], lowestPrice: Infinity };
       }
 
+      // 도시 추가 (중복 체크)
       const existing = map[cc].cities.find(c => c.code === flight.toCity);
       if (!existing) {
         map[cc].cities.push({
@@ -74,7 +70,7 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
       }
     }
 
-    // 도시별 가격 정렬
+    // 도시별 가격 정렬 (낮은 순)
     for (const cc in map) {
       map[cc].cities.sort((a, b) => a.price - b.price);
     }
@@ -84,7 +80,7 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
 
   // 가격 → 색상 (초록=저렴, 노랑=중간, 빨강=비쌈)
   const priceToColor = useCallback((price: number) => {
-    const prices = Object.values(countryPrices).map(d => d.lowestPrice);
+    const prices = Object.values(countryData).map(d => d.lowestPrice);
     if (prices.length === 0) return "#1e293b";
     const min = Math.min(...prices);
     const max = Math.max(...prices);
@@ -104,7 +100,7 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
       const b = Math.round(8 + t * (68 - 8));
       return `rgb(${r},${g},${b})`;
     }
-  }, [countryPrices]);
+  }, [countryData]);
 
   const formatPrice = (price: number) =>
     `₩${price.toLocaleString("ko-KR")}`;
@@ -122,7 +118,7 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
               geographies.map((geo) => {
                 const numericId = geo.id;
                 const alpha2 = numericToAlpha2[numericId];
-                const priceData = alpha2 ? countryPrices[alpha2] : null;
+                const priceData = alpha2 ? countryData[alpha2] : null;
                 const isKorea = alpha2 === "KR";
 
                 return (
@@ -131,7 +127,7 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
                     geography={geo}
                     onMouseEnter={(e) => {
                       const name = getCountryName(alpha2 || "") || geo.properties.name;
-                      if (priceData) {
+                      if (priceData && priceData.cities.length > 0) {
                         const cheapest = priceData.cities[0];
                         setTooltipContent(
                           `${name} · ${cheapest.name} ${formatPrice(cheapest.price)}~`
@@ -146,7 +142,7 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
                     }}
                     onMouseLeave={() => setTooltipContent("")}
                     onClick={() => {
-                      if (priceData && alpha2) {
+                      if (priceData && priceData.cities.length > 0 && alpha2) {
                         const name = getCountryName(alpha2) || geo.properties.name;
                         onCountryClick(alpha2, name, priceData.cities);
                       }
@@ -155,24 +151,25 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
                       default: {
                         fill: isKorea
                           ? "#3b82f6"
-                          : priceData
+                          : priceData && priceData.cities.length > 0
                             ? priceToColor(priceData.lowestPrice)
                             : "#1e293b",
                         stroke: "#334155",
                         strokeWidth: 0.5,
                         outline: "none",
-                        cursor: priceData ? "pointer" : "default",
+                        cursor: priceData && priceData.cities.length > 0 ? "pointer" : "default",
+                        transition: "fill 0.3s ease",
                       },
                       hover: {
                         fill: isKorea
                           ? "#60a5fa"
-                          : priceData
+                          : priceData && priceData.cities.length > 0
                             ? "#f59e0b"
                             : "#334155",
                         stroke: "#94a3b8",
                         strokeWidth: 0.75,
                         outline: "none",
-                        cursor: priceData ? "pointer" : "default",
+                        cursor: priceData && priceData.cities.length > 0 ? "pointer" : "default",
                       },
                       pressed: {
                         fill: "#f59e0b",
