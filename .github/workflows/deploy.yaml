@@ -19,14 +19,16 @@ jobs:
             echo "nameserver 1.1.1.1" | sudo tee -a /etc/resolv.conf > /dev/null
           fi
 
-      - name: Build image with nerdctl
+      - name: Build image into K3s containerd
         run: |
           mkdir -p $HOME/.docker && echo '{}' > $HOME/.docker/config.json 2>/dev/null || true
-          sudo NERDCTL_NAMESPACE=k8s.io nerdctl --address /run/k3s/containerd/containerd.sock build -t trip-otobz:latest .
+          # K3s containerd 에서 직접 빌드 (로컬에 이미지 생성)
+          sudo nerdctl --address /run/k3s/containerd/containerd.sock build -t trip-otobz:latest .
 
       - name: Rollout restart
         run: |
           kubectl --kubeconfig $HOME/.kube/config rollout restart deployment/trip-otobz -n worker
+          # imagePullPolicy: IfNotPresent 이므로 로컬 이미지가 있어야 함
           kubectl --kubeconfig $HOME/.kube/config rollout status deployment/trip-otobz -n worker --timeout=120s
 
       - name: Verify
