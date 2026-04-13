@@ -128,6 +128,8 @@ export const cityCountryMap: Record<string, CityInfo> = {
   ADD: { country: "ET", cityKo: "아디스아바바", countryKo: "에티오피아" },
   CMN: { country: "MA", cityKo: "카사블랑카", countryKo: "모로코" },
   TUN: { country: "TN", cityKo: "튀니스", countryKo: "튀니지" },
+  // 몰디브
+  MLE: { country: "MV", cityKo: "말레", countryKo: "몰디브" },
   DAR: { country: "TZ", cityKo: "다르에스살람", countryKo: "탄자니아" },
   MRU: { country: "MU", cityKo: "모리셔스", countryKo: "모리셔스" },
   // 한국

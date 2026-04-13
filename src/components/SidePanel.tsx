@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { cityCountryMap } from "@/data/city-country-map";
 import FlightTab from "./FlightTab";
 import AccommodationTab from "./AccommodationTab";
 import TourTab from "./TourTab";
@@ -12,8 +13,6 @@ interface CityData {
 }
 
 interface SidePanelProps {
-  countryCode: string;
-  countryName: string;
   cities: CityData[];
   onClose: () => void;
 }
@@ -26,14 +25,20 @@ const tabs = [
 
 type TabId = (typeof tabs)[number]["id"];
 
-export default function SidePanel({ countryCode, countryName, cities, onClose }: SidePanelProps) {
+export default function SidePanel({ cities, onClose }: SidePanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>("flight");
+  const city = cities[0];
+  const cityInfo = city ? cityCountryMap[city.code] : null;
+  const countryName = cityInfo?.countryKo || "";
 
   return (
     <div className="fixed right-0 top-0 h-full w-full sm:w-[480px] bg-gray-950 border-l border-gray-800 shadow-2xl z-40 flex flex-col animate-slide-in">
       {/* 헤더 */}
       <div className="flex items-center justify-between px-5 py-4 border-b border-gray-800">
-        <h2 className="text-xl font-bold text-white">{countryName}</h2>
+        <div>
+          <h2 className="text-xl font-bold text-white">{city?.name || "선택된 도시"}</h2>
+          <p className="text-sm text-gray-500 mt-0.5">{countryName}</p>
+        </div>
         <button
           onClick={onClose}
           className="text-gray-400 hover:text-white transition-colors text-2xl leading-none"

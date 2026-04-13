@@ -14,10 +14,10 @@ export default function Home() {
   const [flightData, setFlightData] = useState<FlightPrice[]>([]);
   const [period, setPeriod] = useState(5);
   const [loading, setLoading] = useState(true);
-  const [selectedCountry, setSelectedCountry] = useState<{
+  const [selectedCity, setSelectedCity] = useState<{
     code: string;
     name: string;
-    cities: { code: string; name: string; price: number }[];
+    price: number;
   } | null>(null);
 
   useEffect(() => {
@@ -37,9 +37,9 @@ export default function Home() {
       .finally(() => setLoading(false));
   }, [period]);
 
-  const handleCountryClick = useCallback(
-    (code: string, name: string, cities: { code: string; name: string; price: number }[]) => {
-      setSelectedCountry({ code, name, cities });
+  const handleCityClick = useCallback(
+    (code: string, name: string, price: number) => {
+      setSelectedCity({ code, name, price });
     },
     []
   );
@@ -137,15 +137,13 @@ export default function Home() {
       )}
 
       {/* 지도 */}
-      <WorldMap flightData={flightData} onCountryClick={handleCountryClick} />
+      <WorldMap flightData={flightData} onCityClick={handleCityClick} />
 
       {/* 사이드패널 */}
-      {selectedCountry && (
+      {selectedCity && (
         <SidePanel
-          countryCode={selectedCountry.code}
-          countryName={selectedCountry.name}
-          cities={selectedCountry.cities}
-          onClose={() => setSelectedCountry(null)}
+          cities={[{ code: selectedCity.code, name: selectedCity.name, price: selectedCity.price }]}
+          onClose={() => setSelectedCity(null)}
         />
       )}
     </main>

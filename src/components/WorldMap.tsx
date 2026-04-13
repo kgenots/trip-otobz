@@ -1,109 +1,248 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import {
-  ComposableMap,
-  Geographies,
-  Geography,
-  ZoomableGroup,
-} from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
 import { Tooltip } from "./Tooltip";
-import { cityCountryMap, getCountryCities, getCountryName } from "@/data/city-country-map";
+import { cityCountryMap } from "@/data/city-country-map";
+import { getCountryName as getCountryNameKo } from "@/data/country-names";
 import type { FlightPrice } from "@/lib/api";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-// ISO numeric → ISO alpha-2 매핑 (주요국)
-const numericToAlpha2: Record<string, string> = {
-  "392": "JP", "156": "CN", "158": "TW", "344": "HK", "446": "MO",
-  "764": "TH", "704": "VN", "702": "SG", "458": "MY", "608": "PH",
-  "360": "ID", "116": "KH", "104": "MM", "418": "LA", "356": "IN",
-  "144": "LK", "524": "NP", "784": "AE", "792": "TR", "376": "IL",
-  "634": "QA", "398": "KZ", "860": "UZ", "250": "FR", "826": "GB",
-  "380": "IT", "724": "ES", "276": "DE", "528": "NL", "756": "CH",
-  "040": "AT", "203": "CZ", "348": "HU", "616": "PL", "620": "PT",
-  "300": "GR", "246": "FI", "208": "DK", "578": "NO", "752": "SE",
-  "372": "IE", "056": "BE", "191": "HR", "642": "RO", "100": "BG",
-  "643": "RU", "840": "US", "316": "GU", "580": "MP", "124": "CA",
-  "484": "MX", "076": "BR", "604": "PE", "152": "CL", "170": "CO",
-  "032": "AR", "036": "AU", "554": "NZ", "242": "FJ", "818": "EG",
-  "710": "ZA", "404": "KE", "231": "ET", "504": "MA", "788": "TN",
-  "834": "TZ", "480": "MU", "410": "KR",
+// 도시별 좌표 (경도, 위도) - 지도 레이아웃에서 정확한 위치 표시용
+const cityCoordinates: Record<string, { lat: number; lng: number }> = {
+  // 일본
+  NRT: { lat: 35.7720, lng: 140.3929 },
+  TYO: { lat: 35.6762, lng: 139.6503 },
+  HND: { lat: 35.5494, lng: 139.7798 },
+  KIX: { lat: 34.6517, lng: 135.1600 },
+  FUK: { lat: 33.5904, lng: 130.4017 },
+  CTS: { lat: 43.0642, lng: 141.3469 },
+  NGO: { lat: 35.1815, lng: 136.9066 },
+  OKA: { lat: 26.2124, lng: 127.6790 },
+  // 중국
+  PEK: { lat: 39.9042, lng: 116.4074 },
+  PVG: { lat: 31.2304, lng: 121.4737 },
+  CAN: { lat: 23.1291, lng: 113.2644 },
+  SZX: { lat: 22.7067, lng: 114.0428 },
+  CTU: { lat: 30.5728, lng: 104.0668 },
+  HGH: { lat: 30.2741, lng: 120.1551 },
+  CSX: { lat: 28.2282, lng: 112.9388 },
+  TAO: { lat: 36.0986, lng: 120.3719 },
+  DLC: { lat: 38.9140, lng: 121.6147 },
+  // 대만
+  TPE: { lat: 25.0330, lng: 121.5654 },
+  KHH: { lat: 22.6273, lng: 120.3014 },
+  // 홍콩/마카오
+  HKG: { lat: 22.3193, lng: 114.1694 },
+  MFM: { lat: 22.1987, lng: 113.5439 },
+  // 동남아
+  BKK: { lat: 13.7563, lng: 100.5018 },
+  CNX: { lat: 18.7883, lng: 98.9853 },
+  HKT: { lat: 7.9519, lng: 98.3381 },
+  SGN: { lat: 10.8231, lng: 106.6297 },
+  HAN: { lat: 21.0285, lng: 105.8542 },
+  DAD: { lat: 16.0544, lng: 108.2022 },
+  SIN: { lat: 1.3521, lng: 103.8198 },
+  KUL: { lat: 3.1390, lng: 101.6869 },
+  BKI: { lat: 5.9804, lng: 116.0675 },
+  MNL: { lat: 14.5995, lng: 120.9842 },
+  CEB: { lat: 10.3157, lng: 123.8854 },
+  CGK: { lat: -6.2088, lng: 106.8456 },
+  DPS: { lat: -8.7467, lng: 115.1669 },
+  PNH: { lat: 11.5564, lng: 104.9282 },
+  REP: { lat: 13.3671, lng: 103.8448 },
+  RGN: { lat: 16.8661, lng: 96.1951 },
+  VTE: { lat: 17.9757, lng: 102.6331 },
+  // 남아시아
+  DEL: { lat: 28.6139, lng: 77.2090 },
+  BOM: { lat: 19.0760, lng: 72.8777 },
+  CMB: { lat: 6.9271, lng: 79.8612 },
+  KTM: { lat: 27.7172, lng: 85.3240 },
+  // 중앙아시아/중동
+  DXB: { lat: 25.2048, lng: 55.2708 },
+  AUH: { lat: 24.4539, lng: 54.3773 },
+  IST: { lat: 41.0082, lng: 28.9784 },
+  TLV: { lat: 32.0853, lng: 34.7818 },
+  DOH: { lat: 25.2854, lng: 51.5310 },
+  NQZ: { lat: 51.1603, lng: 71.4791 },
+  ALA: { lat: 43.2220, lng: 76.8512 },
+  TAS: { lat: 41.2995, lng: 69.2401 },
+  // 몰디브
+  MLE: { lat: 4.1755, lng: 73.5093 },
+  // 유럽
+  CDG: { lat: 48.8566, lng: 2.3522 },
+  LHR: { lat: 51.5074, lng: -0.1278 },
+  FCO: { lat: 41.9028, lng: 12.4964 },
+  MXP: { lat: 45.4642, lng: 9.1900 },
+  BCN: { lat: 41.3851, lng: 2.1734 },
+  MAD: { lat: 40.4168, lng: -3.7038 },
+  FRA: { lat: 50.1109, lng: 8.6821 },
+  MUC: { lat: 48.1351, lng: 11.5820 },
+  AMS: { lat: 52.3676, lng: 4.9041 },
+  ZRH: { lat: 47.3769, lng: 8.5417 },
+  VIE: { lat: 48.2082, lng: 16.3738 },
+  PRG: { lat: 50.0755, lng: 14.4378 },
+  BUD: { lat: 47.4979, lng: 19.0402 },
+  WAW: { lat: 52.2297, lng: 21.0122 },
+  LIS: { lat: 38.7223, lng: -9.1393 },
+  ATH: { lat: 37.9838, lng: 23.7275 },
+  HEL: { lat: 60.1699, lng: 24.9384 },
+  CPH: { lat: 55.6761, lng: 12.5683 },
+  OSL: { lat: 59.9139, lng: 10.7522 },
+  ARN: { lat: 59.3293, lng: 18.0686 },
+  DUB: { lat: 53.3498, lng: -6.2603 },
+  BRU: { lat: 50.8503, lng: 4.3517 },
+  ZAG: { lat: 45.8150, lng: 15.9819 },
+  OTP: { lat: 44.4268, lng: 26.1025 },
+  SOF: { lat: 42.6977, lng: 23.3219 },
+  // 러시아/CIS
+  SVO: { lat: 55.7558, lng: 37.6173 },
+  LED: { lat: 59.9311, lng: 30.3609 },
+  // 북미
+  LAX: { lat: 34.0522, lng: -118.2437 },
+  JFK: { lat: 40.7128, lng: -74.0060 },
+  SFO: { lat: 37.7749, lng: -122.4194 },
+  HNL: { lat: 21.3099, lng: -157.8581 },
+  LAS: { lat: 36.1699, lng: -115.1398 },
+  SEA: { lat: 47.6062, lng: -122.3321 },
+  ORD: { lat: 41.8781, lng: -87.6298 },
+  ATL: { lat: 33.7490, lng: -84.3880 },
+  DFW: { lat: 32.7767, lng: -96.7970 },
+  GUM: { lat: 13.4443, lng: 144.7937 },
+  SPN: { lat: 15.1965, lng: 145.7350 },
+  YVR: { lat: 49.2827, lng: -123.1207 },
+  YYZ: { lat: 43.6532, lng: -79.3832 },
+  // 중남미
+  CUN: { lat: 21.1619, lng: -86.8515 },
+  MEX: { lat: 19.4326, lng: -99.1332 },
+  GRU: { lat: -23.5505, lng: -46.6333 },
+  LIM: { lat: -12.0464, lng: -77.0428 },
+  SCL: { lat: -33.4489, lng: -70.6693 },
+  BOG: { lat: 4.7110, lng: -74.0721 },
+  EZE: { lat: -34.6037, lng: -58.3816 },
+  // 오세아니아
+  SYD: { lat: -33.8688, lng: 151.2093 },
+  MEL: { lat: -37.8136, lng: 144.9631 },
+  BNE: { lat: -27.4698, lng: 153.0251 },
+  AKL: { lat: -36.8485, lng: 174.7633 },
+  NAN: { lat: -17.7995, lng: 177.4165 },
+  // 아프리카
+  CAI: { lat: 30.0444, lng: 31.2357 },
+  CPT: { lat: -33.9249, lng: 18.4241 },
+  JNB: { lat: -26.2041, lng: 28.0473 },
+  NBO: { lat: -1.2921, lng: 36.8219 },
+  ADD: { lat: 9.0054, lng: 38.7636 },
+  CMN: { lat: 33.5731, lng: -7.5898 },
+  TUN: { lat: 36.8065, lng: 10.1815 },
+  DAR: { lat: -6.7924, lng: 39.2083 },
+  MRU: { lat: -20.1609, lng: 57.5089 },
+  // 한국
+  ICN: { lat: 37.4602, lng: 126.4407 },
+  TAE: { lat: 35.8714, lng: 128.6011 },
+  PUS: { lat: 35.1796, lng: 129.0756 },
 };
 
 interface WorldMapProps {
   flightData: FlightPrice[];
-  onCountryClick: (countryCode: string, countryName: string, cities: { code: string; name: string; price: number }[]) => void;
+  onCityClick: (cityCode: string, cityName: string, price: number) => void;
 }
 
-export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) {
-  const [tooltipContent, setTooltipContent] = useState("");
+export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
+  const [tooltipContent, setTooltipContent] = useState<string>("");
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
-  // 국가별 최저가 집계 - 해당 국가의 모든 도시들
-  const countryData = useMemo(() => {
-    const map: Record<string, { cities: { code: string; name: string; price: number }[]; lowestPrice: number }> = {};
+  // 도시별 최저가 집계
+  const cityData = useMemo(() => {
+    const map: Record<string, { name: string; country: string; price: number }> = {};
 
     for (const flight of flightData) {
       const cityInfo = cityCountryMap[flight.toCity];
       if (!cityInfo) continue;
-      const cc = cityInfo.country;
 
-      if (!map[cc]) {
-        map[cc] = { cities: [], lowestPrice: Infinity };
-      }
-
-      // 도시 추가 (중복 체크)
-      const existing = map[cc].cities.find(c => c.code === flight.toCity);
+      const existing = map[flight.toCity];
       if (!existing) {
-        map[cc].cities.push({
-          code: flight.toCity,
+        map[flight.toCity] = {
           name: cityInfo.cityKo,
+          country: cityInfo.countryKo,
           price: flight.totalPrice,
-        });
+        };
       } else if (flight.totalPrice < existing.price) {
         existing.price = flight.totalPrice;
       }
-
-      if (flight.totalPrice < map[cc].lowestPrice) {
-        map[cc].lowestPrice = flight.totalPrice;
-      }
-    }
-
-    // 도시별 가격 정렬 (낮은 순)
-    for (const cc in map) {
-      map[cc].cities.sort((a, b) => a.price - b.price);
     }
 
     return map;
   }, [flightData]);
 
-  // 가격 → 색상 (초록=저렴, 노랑=중간, 빨강=비쌈)
+  // 가격 → 색상 (파랑=저렴, 노랑=중간, 빨강=비쌈)
   const priceToColor = useCallback((price: number) => {
-    const prices = Object.values(countryData).map(d => d.lowestPrice);
-    if (prices.length === 0) return "#1e293b";
+    const prices = Object.values(cityData).map(d => d.price);
+    if (prices.length === 0) return "#3b82f6";
     const min = Math.min(...prices);
     const max = Math.max(...prices);
     const ratio = max === min ? 0 : (price - min) / (max - min);
 
-    // 초록(0) → 노랑(0.5) → 빨강(1)
-    if (ratio <= 0.5) {
-      const t = ratio * 2;
-      const r = Math.round(34 + t * (234 - 34));
-      const g = Math.round(197 + t * (179 - 197));
-      const b = Math.round(94 + t * (8 - 94));
+    if (ratio <= 0.33) {
+      // 파랑 → 초록 (저렴)
+      const t = ratio / 0.33;
+      const r = Math.round(59 + t * (34 - 59));
+      const g = Math.round(130 + t * (197 - 130));
+      const b = Math.round(247 + t * (94 - 247));
+      return `rgb(${r},${g},${b})`;
+    } else if (ratio <= 0.66) {
+      // 초록 → 노랑 (중간)
+      const t = (ratio - 0.33) / 0.33;
+      const r = Math.round(34 + t * (245 - 34));
+      const g = Math.round(197 - t * (197 - 251));
+      const b = Math.round(94 + t * (251 - 94));
       return `rgb(${r},${g},${b})`;
     } else {
-      const t = (ratio - 0.5) * 2;
-      const r = Math.round(234 + t * (239 - 234));
-      const g = Math.round(179 - t * 179);
-      const b = Math.round(8 + t * (68 - 8));
+      // 노랑 → 빨강 (비쌈)
+      const t = (ratio - 0.66) / 0.34;
+      const r = Math.round(245 + t * (239 - 245));
+      const g = Math.round(251 - t * (251 - 63));
+      const b = Math.round(251 - t * (251 - 100));
       return `rgb(${r},${g},${b})`;
     }
-  }, [countryData]);
+  }, [cityData]);
 
   const formatPrice = (price: number) =>
     `₩${price.toLocaleString("ko-KR")}`;
+
+  const citiesList = Object.entries(cityData).map(([code, data]) => {
+    const coords = cityCoordinates[code];
+    if (!coords) return null;
+
+    const cityInfo = cityCountryMap[code];
+    const fillColor = priceToColor(data.price);
+    const formattedPrice = formatPrice(data.price);
+
+    return (
+      <circle
+        key={code}
+        cx={(coords.lng + 180) * 0.45}
+        cy={(90 - coords.lat) * 0.45}
+        r="6"
+        fill={fillColor}
+        stroke="#1e293b"
+        strokeWidth="2"
+        style={{
+          cursor: "pointer",
+          transition: "fill 0.3s ease, r 0.3s ease",
+        }}
+        onMouseEnter={(e: any) => {
+          setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
+          setTooltipPos({ x: e.clientX, y: e.clientY });
+        }}
+        onMouseMove={(e: any) => {
+          setTooltipPos({ x: e.clientX, y: e.clientY });
+        }}
+        onMouseLeave={() => setTooltipContent("")}
+        onClick={() => onCityClick(code, data.name, data.price)}
+      />
+    );
+  }).filter(Boolean);
 
   return (
     <div className="relative w-full h-full">
@@ -113,74 +252,38 @@ export default function WorldMap({ flightData, onCountryClick }: WorldMapProps) 
         className="w-full h-full"
       >
         <ZoomableGroup zoom={1} minZoom={1} maxZoom={8}>
+          {/* 배경 지도 */}
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>
-              geographies.map((geo) => {
-                const numericId = geo.id;
-                const alpha2 = numericToAlpha2[numericId];
-                const priceData = alpha2 ? countryData[alpha2] : null;
-                const isKorea = alpha2 === "KR";
-
-                return (
-                  <Geography
-                    key={geo.rsmKey}
-                    geography={geo}
-                    onMouseEnter={(e) => {
-                      const name = getCountryName(alpha2 || "") || geo.properties.name;
-                      if (priceData && priceData.cities.length > 0) {
-                        const cheapest = priceData.cities[0];
-                        setTooltipContent(
-                          `${name} · ${cheapest.name} ${formatPrice(cheapest.price)}~`
-                        );
-                      } else if (!isKorea) {
-                        setTooltipContent(name || "");
-                      }
-                      setTooltipPos({ x: e.clientX, y: e.clientY });
-                    }}
-                    onMouseMove={(e) => {
-                      setTooltipPos({ x: e.clientX, y: e.clientY });
-                    }}
-                    onMouseLeave={() => setTooltipContent("")}
-                    onClick={() => {
-                      if (priceData && priceData.cities.length > 0 && alpha2) {
-                        const name = getCountryName(alpha2) || geo.properties.name;
-                        onCountryClick(alpha2, name, priceData.cities);
-                      }
-                    }}
-                    style={{
-                      default: {
-                        fill: isKorea
-                          ? "#3b82f6"
-                          : priceData && priceData.cities.length > 0
-                            ? priceToColor(priceData.lowestPrice)
-                            : "#1e293b",
-                        stroke: "#334155",
-                        strokeWidth: 0.5,
-                        outline: "none",
-                        cursor: priceData && priceData.cities.length > 0 ? "pointer" : "default",
-                        transition: "fill 0.3s ease",
-                      },
-                      hover: {
-                        fill: isKorea
-                          ? "#60a5fa"
-                          : priceData && priceData.cities.length > 0
-                            ? "#f59e0b"
-                            : "#334155",
-                        stroke: "#94a3b8",
-                        strokeWidth: 0.75,
-                        outline: "none",
-                        cursor: priceData && priceData.cities.length > 0 ? "pointer" : "default",
-                      },
-                      pressed: {
-                        fill: "#f59e0b",
-                        outline: "none",
-                      },
-                    }}
-                  />
-                );
-              })
+              geographies.map((geo) => (
+                <Geography
+                  key={geo.rsmKey}
+                  geography={geo}
+                  style={{
+                    default: {
+                      fill: "#0f172a",
+                      stroke: "#334155",
+                      strokeWidth: 0.5,
+                      outline: "none",
+                    },
+                    hover: {
+                      fill: "#1e293b",
+                      stroke: "#475569",
+                      strokeWidth: 0.75,
+                      outline: "none",
+                    },
+                    pressed: {
+                      fill: "#334155",
+                      outline: "none",
+                    },
+                  }}
+                />
+              ))
             }
           </Geographies>
+
+          {/* 도시 포인트 */}
+          {citiesList}
         </ZoomableGroup>
       </ComposableMap>
 
