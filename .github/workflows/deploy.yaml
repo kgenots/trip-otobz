@@ -1,0 +1,26 @@
+name: Build & Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-deploy:
+    runs-on: [self-hosted, Linux, X64]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image with nerdctl
+        run: |
+          nerdctl --namespace k8s.io build -t trip-otobz:latest .
+
+      - name: Rollout restart
+        run: |
+          kubectl rollout restart deployment/trip-otobz -n worker
+          kubectl rollout status deployment/trip-otobz -n worker --timeout=120s
+
+      - name: Verify
+        run: |
+          kubectl get pods -n worker -l app=trip-otobz
+          echo "✅ trip-otobz deployed"
