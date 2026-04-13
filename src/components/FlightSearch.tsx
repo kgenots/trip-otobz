@@ -17,14 +17,16 @@ const AIRPORTS: AirportOption[] = Object.entries(cityCountryMap).map(([code, inf
 
 const PERIODS = [3, 4, 5, 6, 7] as const;
 
-export default function FlightSearch({ onSearch }: {
+export default function FlightSearch({ 
+  onSearch 
+}: { 
   onSearch: (params: {
     depCityCd: string;
     arrCityCd: string;
     departureDate: string;
     returnDate?: string;
     period: number;
-  }) => Promise<void>
+  }) => void
 }) {
   const [depCity, setDepCity] = useState("");
   const [arrCity, setArrCity] = useState("");
@@ -62,7 +64,8 @@ export default function FlightSearch({ onSearch }: {
       departureDate: departureDate,
       returnDate: returnDate,
       period: daysDiff,
-    }).finally(() => setLoading(false));
+    });
+    setLoading(false);
   };
 
   // 날짜 선택 시 유효성 검사
