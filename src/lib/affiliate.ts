@@ -35,10 +35,19 @@ export function appendAffiliate(
 
 export function flightUrl(
   mylinkId: string,
-  params: { depCityCd: string; arrCityCd: string; departDate: string; returnDate?: string }
+  params: { depCityCd: string; arrCityCd: string; departDate: string; returnDate?: string; period?: number }
 ): string {
-  const base = `https://www.myrealtrip.com/flights?depCityCd=${params.depCityCd}&arrCityCd=${params.arrCityCd}&departDate=${params.departDate}${params.returnDate ? `&returnDate=${params.returnDate}` : ""}`;
-  return appendAffiliate(base, mylinkId, "flight");
+  const url = new URL("https://www.myrealtrip.com/offers");
+  url.searchParams.set("depCityCd", params.depCityCd);
+  url.searchParams.set("arrCityCd", params.arrCityCd);
+  url.searchParams.set("departureDate", params.departDate);
+  if (params.returnDate) {
+    url.searchParams.set("returnDate", params.returnDate);
+  }
+  if (params.period) {
+    url.searchParams.set("period", String(params.period));
+  }
+  return appendAffiliate(url.toString(), mylinkId, "flight");
 }
 
 export function accommodationUrl(mylinkId: string, itemId: number): string {
