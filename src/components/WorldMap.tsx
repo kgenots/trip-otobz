@@ -196,7 +196,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
     const markerR = 5.5 * s;
 
     // pill 라벨 사이즈
-    const fs = 9 * s;
+    const fs = 11 * s;
     const px = 6 * s;
     const py = 3.5 * s;
     const gap = 6 * s;
