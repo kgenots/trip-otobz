@@ -86,6 +86,25 @@ function renderMarkdown(content: string) {
         </ol>
       );
       continue;
+    } else if (/^!\[.*\]\(.+\)$/.test(line.trim())) {
+      const match = line.trim().match(/^!\[(.*)?\]\((.+)\)$/);
+      if (match) {
+        elements.push(
+          <figure key={i} className="my-6">
+            <img
+              src={match[2]}
+              alt={match[1] || ""}
+              className="w-full h-56 sm:h-72 object-cover rounded-xl"
+              loading="lazy"
+            />
+            {match[1] && (
+              <figcaption className="text-xs text-[#999] text-center mt-2">
+                {match[1]}
+              </figcaption>
+            )}
+          </figure>
+        );
+      }
     } else if (line.trim() === "") {
       // skip empty lines
     } else {
