@@ -11,23 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Fix DNS if needed
-        run: |
-          if ! nslookup registry-1.docker.io > /dev/null 2>&1; then
-            echo "DNS issue detected, adding fallback"
-            echo "nameserver 8.8.8.8" | sudo tee /etc/resolv.conf > /dev/null
-            echo "nameserver 1.1.1.1" | sudo tee -a /etc/resolv.conf > /dev/null
-          fi
-
       - name: Build image with latest tag
         run: |
-          mkdir -p $HOME/.docker && echo '{}' > $HOME/.docker/config.json 2>/dev/null || true
-          # K3s containerd 에서 빌드 (latest 태그만 사용)
+          # K3s containerd 에서 빌드 (로컬에만 저장, Docker Hub 푸시 안 함)
           sudo nerdctl --address /run/k3s/containerd/containerd.sock build \
             -t trip-otobz:latest \
             .
           # 이미지 확인
-          sudo nerdctl --address /run/k3s/containerd/containerd.sock images trip-otobz
+          sudo nerdctl --address /run/k3s/containerd/containerd.sock images trip-otobz:latest
 
       - name: Rollout restart
         run: |

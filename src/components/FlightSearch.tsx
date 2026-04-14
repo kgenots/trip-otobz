@@ -108,12 +108,12 @@ export default function FlightSearch({
   };
 
   return (
-    <div className="flex items-center gap-4 bg-gray-900/95 backdrop-blur rounded-xl px-4 py-3 border border-gray-800">
+    <div className="flex flex-wrap items-center gap-2 sm:gap-4 bg-gray-900/95 backdrop-blur rounded-xl px-3 sm:px-4 py-2.5 sm:py-3 border border-gray-800 w-full sm:w-auto">
       {/* 왕복/편도 */}
-      <div className="flex gap-1">
+      <div className="flex gap-1 flex-shrink-0">
         <button
           onClick={() => setTripType("round")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+          className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             tripType === "round"
               ? "bg-blue-600 text-white"
               : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -123,7 +123,7 @@ export default function FlightSearch({
         </button>
         <button
           onClick={() => setTripType("oneway")}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+          className={`px-2 sm:px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
             tripType === "oneway"
               ? "bg-blue-600 text-white"
               : "bg-gray-800 text-gray-400 hover:bg-gray-700"
@@ -133,11 +133,11 @@ export default function FlightSearch({
         </button>
       </div>
 
-      <div className="w-px h-6 bg-gray-700" />
+      <div className="hidden sm:block w-px h-6 bg-gray-700" />
 
-      {/* 출발지 */}
-      <div className="relative">
-        <label className="block text-gray-500 text-xs mb-0.5">출발지</label>
+      {/* 출발지 - 모바일에서 축소 */}
+      <div className="relative min-w-[120px] sm:min-w-0">
+        <label className="block text-gray-500 text-[10px] sm:text-xs mb-0.5">출발</label>
         <input
           type="text"
           value={
@@ -145,7 +145,7 @@ export default function FlightSearch({
               ? `${cityCountryMap[depCity].cityKo} (${depCity})`
               : ""
           }
-          placeholder="출발지 검색"
+          placeholder="출발"
           onChange={(e) => {
             setFilter(e.target.value);
             setShowDropdown(true);
@@ -155,10 +155,10 @@ export default function FlightSearch({
             setShowDropdown(true);
             setIsDepCity(true);
           }}
-          className="w-40 bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:w-40 bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 truncate"
         />
         {showDropdown && isDepCity && (
-          <div className="absolute bottom-full left-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto w-56 z-50">
+          <div className="absolute bottom-full left-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-48 sm:max-h-60 overflow-y-auto w-56 z-50">
             {filteredAirports.length > 0 ? (
               filteredAirports.map((airport) => (
                 <button
@@ -176,11 +176,11 @@ export default function FlightSearch({
         )}
       </div>
 
-      <div className="w-px h-6 bg-gray-700" />
+      <div className="hidden sm:block w-px h-6 bg-gray-700" />
 
-      {/* 도착지 */}
-      <div className="relative">
-        <label className="block text-gray-500 text-xs mb-0.5">도착지</label>
+      {/* 도착지 - 모바일에서 축소 */}
+      <div className="relative min-w-[120px] sm:min-w-0">
+        <label className="block text-gray-500 text-[10px] sm:text-xs mb-0.5">도착</label>
         <input
           type="text"
           value={
@@ -188,7 +188,7 @@ export default function FlightSearch({
               ? `${cityCountryMap[arrCity].cityKo} (${arrCity})`
               : ""
           }
-          placeholder="도착지 검색"
+          placeholder="도착"
           onChange={(e) => {
             setFilter(e.target.value);
             setShowDropdown(true);
@@ -198,10 +198,10 @@ export default function FlightSearch({
             setShowDropdown(true);
             setIsDepCity(false);
           }}
-          className="w-40 bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full sm:w-40 bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500 truncate"
         />
         {showDropdown && !isDepCity && (
-          <div className="absolute bottom-full left-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-60 overflow-y-auto w-56 z-50">
+          <div className="absolute bottom-full left-0 bg-gray-800 border border-gray-700 rounded-lg shadow-lg max-h-48 sm:max-h-60 overflow-y-auto w-56 z-50">
             {filteredAirports.length > 0 ? (
               filteredAirports.filter(a => a.code !== depCity).map((airport) => (
                 <button
@@ -219,61 +219,61 @@ export default function FlightSearch({
         )}
       </div>
 
-      <div className="w-px h-6 bg-gray-700" />
+      <div className="hidden sm:block w-px h-6 bg-gray-700" />
 
-      {/* 날짜 */}
-      <div className="flex flex-col">
-        <label className="block text-gray-500 text-xs mb-0.5">날짜</label>
-        <div className="flex items-center gap-2">
+      {/* 날짜 - 모바일에서 간소화 */}
+      <div className="flex flex-col flex-shrink-0">
+        <label className="block text-gray-500 text-[10px] sm:text-xs mb-0.5">날짜</label>
+        <div className="flex items-center gap-1 sm:gap-2">
           <input
             type="date"
             value={departureDate}
             onChange={handleDepartureChange}
-            className="bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="bg-gray-800 text-white rounded-lg text-[10px] sm:text-xs px-1.5 sm:px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           {tripType === "round" && (
             <input
               type="date"
               value={returnDate}
               onChange={handleReturnChange}
-              className="bg-gray-800 text-white rounded-lg text-xs px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="bg-gray-800 text-white rounded-lg text-[10px] sm:text-xs px-1.5 sm:px-2 py-1 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           )}
         </div>
       </div>
 
-      <div className="w-px h-6 bg-gray-700" />
+      <div className="hidden sm:block w-px h-6 bg-gray-700" />
 
-      {/* 여행기간 */}
-      <div>
-        <label className="block text-gray-500 text-xs mb-0.5">여행기간</label>
-        <div className="flex gap-1">
+      {/* 여행기간 - 모바일에서 축소 */}
+      <div className="flex-shrink-0">
+        <label className="block text-gray-500 text-[10px] sm:text-xs mb-0.5">기간</label>
+        <div className="flex gap-0.5 sm:gap-1">
           {PERIODS.map((p) => (
             <button
               key={p}
               onClick={() => setPeriod(p)}
-              className={`px-2 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+              className={`px-1.5 sm:px-2 py-1 rounded-lg text-[10px] sm:text-xs font-medium transition-colors ${
                 period === p
                   ? "bg-blue-600 text-white"
                   : "bg-gray-800 text-gray-400 hover:bg-gray-700"
               }`}
             >
-              {p}일
+              {p}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="w-px h-6 bg-gray-700" />
-
-      {/* 검색 버튼 */}
-      <button
-        onClick={handleSearch}
-        disabled={loading || !depCity || !arrCity || !departureDate}
-        className="px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg text-sm transition-colors whitespace-nowrap"
-      >
-        {loading ? "로딩..." : "검색"}
-      </button>
+      {/* 검색 버튼 - 항상 표시 */}
+      <div className="flex-shrink-0">
+        <button
+          onClick={handleSearch}
+          disabled={loading || !depCity || !arrCity || !departureDate}
+          className="px-3 sm:px-4 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-gray-700 disabled:cursor-not-allowed text-white font-medium rounded-lg text-sm transition-colors whitespace-nowrap w-full sm:w-auto"
+        >
+          {loading ? "로딩..." : "검색"}
+        </button>
+      </div>
     </div>
   );
 }

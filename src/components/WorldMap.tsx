@@ -223,7 +223,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
         key={code}
         cx={(coords.lng + 180) * 0.45}
         cy={(90 - coords.lat) * 0.45}
-        r="6"
+        r="8"
         fill={fillColor}
         stroke="#1e293b"
         strokeWidth="2"
@@ -231,14 +231,16 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
           cursor: "pointer",
           transition: "fill 0.3s ease, r 0.3s ease",
         }}
-        onMouseEnter={(e: any) => {
-          setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
-          setTooltipPos({ x: e.clientX, y: e.clientY });
-        }}
-        onMouseMove={(e: any) => {
-          setTooltipPos({ x: e.clientX, y: e.clientY });
-        }}
+        onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
         onMouseLeave={() => setTooltipContent("")}
+        onTouchStart={(e: any) => {
+          e.preventDefault();
+          setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
+        }}
+        onTouchEnd={(e: any) => {
+          e.preventDefault();
+          onCityClick(code, data.name, data.price);
+        }}
         onClick={() => onCityClick(code, data.name, data.price)}
       />
     );
@@ -282,13 +284,18 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
             }
           </Geographies>
 
-          {/* 도시 포인트 */}
+          {/* 도시 포인트 - 모바일 터치 지원 */}
           {citiesList}
         </ZoomableGroup>
       </ComposableMap>
 
+      {/* 모바일용 툴팁 - 화면 중앙 상단에 표시 */}
       {tooltipContent && (
-        <Tooltip content={tooltipContent} x={tooltipPos.x} y={tooltipPos.y} />
+        <div
+          className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none px-3 py-2 bg-gray-900 text-white text-xs sm:text-sm rounded-lg shadow-lg border border-gray-700 whitespace-nowrap animate-fade-in"
+        >
+          {tooltipContent}
+        </div>
       )}
     </div>
   );
