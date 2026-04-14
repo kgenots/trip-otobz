@@ -183,13 +183,13 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <main className="min-h-screen bg-white">
-      <header className="border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-4">
-        <div className="max-w-3xl mx-auto flex items-center gap-3">
+      <header className="border-b border-gray-100 px-3 sm:px-6 lg:px-8 py-2 sm:py-3">
+        <div className="max-w-3xl mx-auto flex items-center gap-2 sm:gap-3">
           <Link
             href="/"
-            className="text-lg font-bold text-[#222222] tracking-tight hover:text-sky-600 transition-colors"
+            className="text-base sm:text-xl font-bold text-[#222222] tracking-tight hover:text-sky-600 transition-colors"
           >
-            Trip OTOBZ
+            Trip<span className="hidden sm:inline"> OTOBZ</span>
           </Link>
           <span className="text-gray-300">/</span>
           <Link
