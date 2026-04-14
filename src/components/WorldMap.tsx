@@ -210,28 +210,43 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
   const formatPrice = (price: number) =>
     `₩${price.toLocaleString("ko-KR")}`;
 
-  const citiesList = Object.entries(cityData).map(([code, data]) => {
+  const shortPrice = (price: number) => {
+    if (price >= 1000000) return `${(price / 10000).toFixed(0)}만`;
+    if (price >= 10000) return `${(price / 10000).toFixed(0)}만`;
+    return `${price.toLocaleString()}`;
+  };
+
+  // 가격순 정렬 + 라벨 표시 개수 (줌 레벨에 따라)
+  const sortedCities = useMemo(() => {
+    const entries = Object.entries(cityData)
+      .filter(([code]) => cityCoordinates[code])
+      .sort((a, b) => a[1].price - b[1].price);
+    return entries;
+  }, [cityData]);
+
+  // 줌에 따라 라벨 표시 개수 조절
+  const labelCount = zoom < 1.5 ? 15 : zoom < 3 ? 30 : zoom < 5 ? 60 : sortedCities.length;
+
+  const citiesList = sortedCities.map(([code, data], idx) => {
     const coords = cityCoordinates[code];
     if (!coords) return null;
 
     const fillColor = priceToColor(data.price);
     const formattedPrice = formatPrice(data.price);
+    const showLabel = idx < labelCount;
 
     const markerR = 4 / zoom;
     const markerStroke = 1.5 / zoom;
+    const fontSize = Math.max(7, 10 / zoom);
+    const labelY = -(6 / zoom);
+    const pillPx = 3 / zoom;
+    const pillPy = 1.5 / zoom;
+    const pillR = 4 / zoom;
 
     return (
       <Marker key={code} coordinates={[coords.lng, coords.lat]}>
-        <circle
-          r={markerR}
-          fill={fillColor}
-          stroke="#ffffff"
-          strokeWidth={markerStroke}
-          style={{
-            cursor: "pointer",
-            transition: "fill 0.3s ease, r 0.3s ease",
-            filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
-          }}
+        <g
+          style={{ cursor: "pointer" }}
           onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
           onMouseLeave={() => setTooltipContent("")}
           onTouchStart={(e: any) => {
@@ -243,7 +258,45 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
             onCityClick(code, data.name, data.price);
           }}
           onClick={() => onCityClick(code, data.name, data.price)}
-        />
+        >
+          <circle
+            r={markerR}
+            fill={fillColor}
+            stroke="#ffffff"
+            strokeWidth={markerStroke}
+            style={{
+              transition: "fill 0.3s ease",
+              filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
+            }}
+          />
+          {showLabel && (
+            <g transform={`translate(0, ${labelY})`}>
+              <rect
+                x={-(shortPrice(data.price).length * fontSize * 0.32 + pillPx)}
+                y={-(fontSize * 0.6 + pillPy)}
+                width={(shortPrice(data.price).length * fontSize * 0.64 + pillPx * 2)}
+                height={(fontSize * 1.2 + pillPy * 2)}
+                rx={pillR}
+                fill="white"
+                stroke="rgba(0,0,0,0.08)"
+                strokeWidth={0.5 / zoom}
+                style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.1))" }}
+              />
+              <text
+                textAnchor="middle"
+                y={fontSize * 0.35}
+                style={{
+                  fontSize: `${fontSize}px`,
+                  fontWeight: 600,
+                  fill: "#222222",
+                  fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+                }}
+              >
+                {shortPrice(data.price)}
+              </text>
+            </g>
+          )}
+        </g>
       </Marker>
     );
   }).filter(Boolean);
