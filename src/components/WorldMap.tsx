@@ -210,10 +210,6 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
           style={{ cursor: "pointer" }}
           onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
           onMouseLeave={() => setTooltipContent("")}
-          onTouchStart={(e: any) => {
-            e.preventDefault();
-            setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
-          }}
           onTouchEnd={(e: any) => {
             e.preventDefault();
             onCityClick(code, data.name, data.price);
@@ -307,7 +303,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
       {/* 툴팁 */}
       {tooltipContent && (
         <div
-          className="fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none px-4 py-2.5 bg-white text-[#222222] text-sm rounded-2xl whitespace-nowrap font-medium transition-opacity duration-150"
+          className="hidden md:block fixed top-16 left-1/2 -translate-x-1/2 z-50 pointer-events-none px-4 py-2.5 bg-white text-[#222222] text-sm rounded-2xl whitespace-nowrap font-medium transition-opacity duration-150"
           style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px" }}
         >
           {tooltipContent}
