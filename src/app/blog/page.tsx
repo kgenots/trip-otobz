@@ -47,15 +47,24 @@ export default function BlogListPage() {
             <Link
               key={post.slug}
               href={`/blog/${post.slug}`}
-              className="block p-5 rounded-2xl border border-gray-100 hover:border-sky-200 hover:shadow-md transition-all"
+              className="block rounded-2xl border border-gray-100 hover:border-sky-200 hover:shadow-md transition-all overflow-hidden"
             >
-              <time className="text-xs text-[#6a6a6a]">{post.date}</time>
-              <h2 className="text-lg font-semibold text-[#222222] mt-1 mb-2">
-                {post.title}
-              </h2>
-              <p className="text-sm text-[#6a6a6a] line-clamp-2">
-                {post.description}
-              </p>
+              {post.coverImage ? (
+                <div className="h-48 sm:h-56 bg-cover bg-center" style={{ backgroundImage: `url(${post.coverImage})` }} />
+              ) : (
+                <div className={`h-48 sm:h-56 bg-gradient-to-br ${post.coverGradient} flex items-center justify-center`}>
+                  <span className="text-7xl">{post.coverEmoji}</span>
+                </div>
+              )}
+              <div className="p-5">
+                <time className="text-xs text-[#6a6a6a]">{post.date}</time>
+                <h2 className="text-lg font-semibold text-[#222222] mt-1 mb-2">
+                  {post.title}
+                </h2>
+                <p className="text-sm text-[#6a6a6a] line-clamp-2">
+                  {post.description}
+                </p>
+              </div>
             </Link>
           ))}
         </div>

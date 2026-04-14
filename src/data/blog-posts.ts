@@ -4,6 +4,9 @@ export interface BlogPost {
   description: string;
   date: string;
   keywords: string[];
+  coverImage?: string;
+  coverGradient: string;
+  coverEmoji: string;
   content: string;
 }
 
@@ -14,6 +17,8 @@ export const blogPosts: BlogPost[] = [
     description: "올여름 일본 여행을 계획 중이라면? 도쿄·오사카·후쿠오카 항공권 가격 추이와 최저가 예약 팁을 정리했습니다.",
     date: "2026-04-15",
     keywords: ["일본 항공권 최저가", "2026 여름 일본", "도쿄 항공권", "오사카 항공권", "일본 여행 팁"],
+    coverGradient: "from-rose-400 via-pink-300 to-sky-400",
+    coverEmoji: "🗼",
     content: `## 올여름 일본, 언제 예약해야 가장 쌀까?
 
 매년 여름은 일본 여행 성수기입니다. 하지만 항공권 가격은 **예약 시점**에 따라 최대 2배까지 차이가 나죠. Trip OTOBZ 데이터를 기반으로 2026년 여름 일본 항공권 트렌드를 분석해봤습니다.

@@ -137,6 +137,14 @@ export default async function BlogPostPage({ params }: Props) {
         </div>
       </header>
 
+      {post.coverImage ? (
+        <div className="h-64 sm:h-80 bg-cover bg-center" style={{ backgroundImage: `url(${post.coverImage})` }} />
+      ) : (
+        <div className={`h-64 sm:h-80 bg-gradient-to-br ${post.coverGradient} flex items-center justify-center`}>
+          <span className="text-8xl sm:text-9xl">{post.coverEmoji}</span>
+        </div>
+      )}
+
       <article className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <time className="text-sm text-[#6a6a6a]">{post.date}</time>
         <h1 className="text-2xl sm:text-3xl font-bold text-[#222222] mt-2 mb-6 leading-tight">
