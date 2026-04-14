@@ -193,7 +193,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
     const label = showPrice ? `${data.name} ${shortPrice(data.price)}` : data.name;
 
     const s = 1 / zoom; // 스케일 팩터
-    const markerR = 3.5 * s;
+    const markerR = 5.5 * s;
 
     // pill 라벨 사이즈
     const fs = 9 * s;
