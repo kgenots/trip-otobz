@@ -56,6 +56,9 @@ export const metadata: Metadata = {
     },
   },
   verification: {},
+  other: {
+    "agd-partner-manual-verification": "",
+  },
 };
 
 export default function RootLayout({
