@@ -5,9 +5,9 @@ import "./globals.css";
 
 const SITE_URL = "https://trip.otobz.com";
 const SITE_NAME = "Trip OTOBZ";
-const TITLE = "Trip OTOBZ - 세계 항공권·숙소·투어 최저가 지도";
+const TITLE = "Trip OTOBZ - 여행지에서 뭐하지? 도시별 베스트 액티비티·투어";
 const DESCRIPTION =
-  "SVG 세계지도에서 클릭 한 번으로 전 세계 항공권, 숙소, 투어·티켓 최저가를 비교하세요. 마이리얼트립 기반 실시간 가격 정보.";
+  "도쿄에서 뭐하지? 방콕에서 할 것? 전 세계 인기 도시의 베스트 액티비티, 투어, 티켓을 한눈에 비교하고 최저가로 예약하세요.";
 
 export const metadata: Metadata = {
   title: {
@@ -16,15 +16,15 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   keywords: [
-    "항공권 최저가",
-    "해외여행",
-    "숙소 비교",
-    "투어 티켓",
+    "여행지에서 뭐하지",
+    "도시 액티비티",
+    "해외여행 할 것",
+    "투어 추천",
+    "여행 액티비티",
+    "해외 투어 티켓",
+    "여행지 체험",
+    "베스트 액티비티",
     "마이리얼트립",
-    "여행 지도",
-    "세계 항공권",
-    "최저가 검색",
-    "해외 숙소",
     "여행 최저가 비교",
   ],
   metadataBase: new URL(SITE_URL),

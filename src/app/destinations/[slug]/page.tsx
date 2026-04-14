@@ -16,8 +16,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const dest = destinationBySlug[slug];
   if (!dest) return {};
 
-  const title = `${dest.cityKo} 항공권·숙소·투어 최저가 | Trip OTOBZ`;
-  const description = dest.description;
+  const title = `${dest.cityKo}에서 뭐하지? 베스트 액티비티·투어 추천`;
+  const description = `${dest.cityKo} 여행에서 꼭 해봐야 할 액티비티, 투어, 티켓을 한눈에! ${dest.description}`;
 
   return {
     title,
