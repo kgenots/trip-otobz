@@ -37,7 +37,7 @@ export default function PriceChart({ city }: { city: string }) {
     );
   }
 
-  if (data.length < 2) {
+  if (data.length === 0) {
     return (
       <div className="bg-white rounded-xl p-4 mb-4 border border-gray-100 text-center" style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}>
         <p className="text-[#6a6a6a] text-sm">가격 추이 데이터 수집 중...</p>
@@ -47,10 +47,24 @@ export default function PriceChart({ city }: { city: string }) {
   }
 
   const formatPrice = (v: number) => `₩${(v / 10000).toFixed(0)}만`;
+  const formatPriceFull = (v: number) => `₩${v.toLocaleString("ko-KR")}`;
   const formatDate = (d: string) => {
     const date = new Date(d);
     return `${date.getMonth() + 1}/${date.getDate()}`;
   };
+
+  if (data.length === 1) {
+    return (
+      <div className="bg-white rounded-xl p-4 mb-4 border border-gray-100" style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}>
+        <h3 className="text-[#6a6a6a] text-xs mb-2 font-medium">최저가 추이 (최근 90일)</h3>
+        <div className="flex items-baseline gap-2">
+          <span className="text-sky-600 text-xl font-bold">{formatPriceFull(data[0].price)}</span>
+          <span className="text-gray-400 text-xs">{formatDate(data[0].date)} 기준</span>
+        </div>
+        <p className="text-gray-400 text-xs mt-1">데이터가 쌓이면 그래프가 표시됩니다</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white rounded-xl p-4 mb-4 border border-gray-100" style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}>

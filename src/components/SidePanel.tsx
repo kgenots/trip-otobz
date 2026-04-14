@@ -38,7 +38,7 @@ export default function SidePanel({ cities, onClose }: SidePanelProps) {
   }, []);
 
   return (
-    <div className="fixed right-0 bottom-0 sm:top-0 h-full sm:h-[calc(100vh-180px)] w-full sm:w-[480px] max-w-full bg-white border-t sm:border-l border-gray-200 z-40 flex flex-col animate-slide-up sm:animate-slide-in"
+    <div className="fixed right-0 bottom-0 sm:top-0 h-full w-full sm:w-[480px] max-w-full bg-white border-t sm:border-l border-gray-200 z-40 flex flex-col animate-slide-up sm:animate-slide-in"
       style={{ boxShadow: "rgba(0,0,0,0.04) -4px 0px 12px, rgba(0,0,0,0.08) -2px 0px 6px" }}
     >
       {/* 헤더 */}
