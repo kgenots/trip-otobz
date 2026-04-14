@@ -19,9 +19,9 @@ interface SidePanelProps {
 }
 
 const tabs = [
-  { id: "flight", label: "✈️ 항공권" },
-  { id: "accommodation", label: "🏨 숙소" },
-  { id: "tour", label: "🎫 투어·티켓" },
+  { id: "flight", label: "항공권" },
+  { id: "accommodation", label: "숙소" },
+  { id: "tour", label: "투어·티켓" },
 ] as const;
 
 type TabId = (typeof tabs)[number]["id"];
@@ -38,32 +38,34 @@ export default function SidePanel({ cities, onClose }: SidePanelProps) {
   }, []);
 
   return (
-    <div className="fixed right-0 sm:right-auto bottom-0 sm:top-0 h-full sm:h-[calc(100vh-180px)] w-full sm:w-[480px] max-w-full bg-gray-950 border-t sm:border-l border-gray-800 shadow-2xl z-40 flex flex-col animate-slide-up sm:animate-slide-in">
+    <div className="fixed right-0 bottom-0 sm:top-0 h-full sm:h-[calc(100vh-180px)] w-full sm:w-[480px] max-w-full bg-white border-t sm:border-l border-gray-200 z-40 flex flex-col animate-slide-up sm:animate-slide-in"
+      style={{ boxShadow: "rgba(0,0,0,0.04) -4px 0px 12px, rgba(0,0,0,0.08) -2px 0px 6px" }}
+    >
       {/* 헤더 */}
-      <div className="flex items-center justify-between px-4 sm:px-5 py-3 sm:py-4 border-b border-gray-800 shrink-0">
+      <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 shrink-0">
         <div className="flex-1 min-w-0">
-          <h2 className="text-lg sm:text-xl font-bold text-white truncate">{city?.name || "선택된 도시"}</h2>
-          <p className="text-xs sm:text-sm text-gray-500 mt-0.5 truncate">{countryName}</p>
+          <h2 className="text-lg sm:text-xl font-bold text-[#222222] truncate">{city?.name || "선택된 도시"}</h2>
+          <p className="text-sm text-[#6a6a6a] mt-0.5 truncate">{countryName}</p>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-white transition-colors text-2xl leading-none ml-2 sm:ml-0 flex-shrink-0"
+          className="w-8 h-8 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 text-[#6a6a6a] hover:text-[#222222] transition-all text-lg leading-none ml-2 flex-shrink-0"
           aria-label="닫기"
         >
-          ×
+          x
         </button>
       </div>
 
-      {/* 탭 - 모바일에서 스크롤 가능 */}
-      <div className="flex border-b border-gray-800 shrink-0 overflow-x-auto">
+      {/* 탭 */}
+      <div className="flex border-b border-gray-100 shrink-0 overflow-x-auto">
         {tabs.map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors flex-shrink-0 ${
+            className={`px-5 py-3 text-sm font-medium whitespace-nowrap transition-all flex-shrink-0 ${
               activeTab === tab.id
-                ? "text-white border-b-2 border-blue-500 bg-gray-900"
-                : "text-gray-400 hover:text-gray-200"
+                ? "text-sky-600 border-b-2 border-sky-500"
+                : "text-[#6a6a6a] hover:text-[#222222]"
             }`}
           >
             {tab.label}
@@ -71,8 +73,8 @@ export default function SidePanel({ cities, onClose }: SidePanelProps) {
         ))}
       </div>
 
-      {/* 컨텐츠 - 모바일에서 터치 스크롤 최적화 */}
-      <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-4 sm:p-5">
+      {/* 컨텐츠 */}
+      <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-5">
         {activeTab === "flight" && <FlightTab cities={cities} mylinkId={mylinkId} />}
         {activeTab === "accommodation" && (
           <AccommodationTab countryName={countryName} cities={cities} mylinkId={mylinkId} />

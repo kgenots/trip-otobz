@@ -84,10 +84,10 @@ export default function TourTab({ cities, mylinkId }: { cities: CityData[]; myli
             <button
               key={c.code}
               onClick={() => setSelectedCity(c.name)}
-              className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                 selectedCity === c.name
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  ? "bg-sky-500 text-white"
+                  : "bg-gray-100 text-[#6a6a6a] hover:bg-gray-200"
               }`}
             >
               {c.name}
@@ -103,10 +103,10 @@ export default function TourTab({ cities, mylinkId }: { cities: CityData[]; myli
             <button
               key={cat.value}
               onClick={() => setSelectedCategory(cat.value)}
-              className={`px-2.5 py-1 rounded text-xs transition-colors ${
+              className={`px-2.5 py-1 rounded-lg text-xs font-medium transition-all ${
                 selectedCategory === cat.value
-                  ? "bg-purple-600 text-white"
-                  : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                  ? "bg-sky-100 text-sky-700 border border-sky-200"
+                  : "bg-gray-50 text-[#6a6a6a] border border-gray-100 hover:bg-gray-100"
               }`}
             >
               {cat.name}
@@ -117,10 +117,10 @@ export default function TourTab({ cities, mylinkId }: { cities: CityData[]; myli
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-sky-200 border-t-sky-500" />
         </div>
       ) : items.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">투어·티켓 정보가 없습니다</p>
+        <p className="text-[#6a6a6a] text-center py-8">투어·티켓 정보가 없습니다</p>
       ) : (
         <div className="space-y-3">
           {items.map((item) => (
@@ -129,7 +129,8 @@ export default function TourTab({ cities, mylinkId }: { cities: CityData[]; myli
               href={tourUrl(mylinkId, item.productUrl)}
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"
+              className="block bg-white rounded-xl overflow-hidden transition-all border border-gray-100 hover:border-sky-200 card-shadow-hover"
+              style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}
             >
               <div className="flex">
                 {item.imageUrl && (
@@ -142,25 +143,25 @@ export default function TourTab({ cities, mylinkId }: { cities: CityData[]; myli
                   </div>
                 )}
                 <div className="flex-1 p-3 min-w-0">
-                  <h3 className="text-white text-sm font-medium line-clamp-2">
+                  <h3 className="text-[#222222] text-sm font-medium line-clamp-2">
                     {item.itemName}
                   </h3>
                   <div className="flex items-center gap-2 mt-1">
                     {item.reviewScore > 0 && (
-                      <span className="text-gray-400 text-xs">
-                        ⭐ {item.reviewScore} ({item.reviewCount})
+                      <span className="text-[#6a6a6a] text-xs">
+                        {item.reviewScore} ({item.reviewCount})
                       </span>
                     )}
                     {item.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="text-xs px-1.5 py-0.5 bg-blue-900 text-blue-300 rounded"
+                        className="text-xs px-1.5 py-0.5 bg-sky-50 text-sky-600 rounded-md font-medium"
                       >
                         {tag}
                       </span>
                     ))}
                   </div>
-                  <div className="text-emerald-400 font-bold mt-1">
+                  <div className="text-sky-600 font-bold mt-1">
                     {formatPrice(item.salePrice)}~
                   </div>
                 </div>

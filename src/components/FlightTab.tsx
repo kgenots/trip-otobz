@@ -73,10 +73,10 @@ export default function FlightTab({ cities, mylinkId }: { cities: CityData[]; my
             <button
               key={c.code}
               onClick={() => setSelectedCity(c.code)}
-              className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                 selectedCity === c.code
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  ? "bg-sky-500 text-white"
+                  : "bg-gray-100 text-[#6a6a6a] hover:bg-gray-200"
               }`}
             >
               {c.name}
@@ -89,10 +89,10 @@ export default function FlightTab({ cities, mylinkId }: { cities: CityData[]; my
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-sky-200 border-t-sky-500" />
         </div>
       ) : flights.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">항공편 정보가 없습니다</p>
+        <p className="text-[#6a6a6a] text-center py-8">항공편 정보가 없습니다</p>
       ) : (
         <div className="space-y-2">
           {flights.map((f, i) => (
@@ -101,17 +101,18 @@ export default function FlightTab({ cities, mylinkId }: { cities: CityData[]; my
               href={flightUrl(mylinkId, { arrCityCd: f.toCity, duration: f.period || undefined, destinationName: cityCountryMap[f.toCity]?.cityKo })}
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"
+              className="block bg-white rounded-xl p-4 transition-all border border-gray-100 hover:border-sky-200 card-shadow-hover"
+              style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}
             >
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="text-white font-medium">
+                  <div className="text-[#222222] font-medium">
                     {formatDate(f.departureDate)}
                     {f.returnDate && (
-                      <span className="text-gray-400"> → {formatDate(f.returnDate)}</span>
+                      <span className="text-[#6a6a6a]"> → {formatDate(f.returnDate)}</span>
                     )}
                   </div>
-                  <div className="text-gray-400 text-sm mt-1">
+                  <div className="text-[#6a6a6a] text-sm mt-1">
                     {f.airline || "다양한 항공사"}
                     {f.transfer !== null && f.transfer > 0
                       ? ` · 경유 ${f.transfer}회`
@@ -122,7 +123,7 @@ export default function FlightTab({ cities, mylinkId }: { cities: CityData[]; my
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="text-lg font-bold text-emerald-400">
+                  <div className="text-lg font-bold text-sky-600">
                     {formatPrice(f.totalPrice)}
                   </div>
                 </div>

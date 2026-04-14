@@ -82,44 +82,44 @@ export default function DestinationClient({ destination }: { destination: Destin
   const formatPrice = (n: number) => n.toLocaleString("ko-KR") + "원";
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
+    <div className="min-h-screen bg-white text-[#222222]">
       {/* 헤더 */}
-      <header className="border-b border-gray-800 px-4 sm:px-8 py-4">
+      <header className="border-b border-gray-100 px-4 sm:px-8 py-4 bg-white/95 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
-          <Link href="/" className="text-lg font-bold hover:text-blue-400 transition-colors">
-            ✈️ Trip OTOBZ
+          <Link href="/" className="text-lg font-bold hover:text-sky-500 transition-colors">
+            Trip OTOBZ
           </Link>
           <Link
             href="/"
-            className="text-sm text-gray-400 hover:text-white transition-colors"
+            className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors"
           >
-            🗺️ 세계지도로 돌아가기
+            세계지도로 돌아가기
           </Link>
         </div>
       </header>
 
       {/* 히어로 */}
-      <section className="px-4 sm:px-8 py-8 sm:py-12 border-b border-gray-800">
+      <section className="px-4 sm:px-8 py-8 sm:py-12 border-b border-gray-100">
         <div className="max-w-6xl mx-auto">
-          <p className="text-blue-400 text-sm font-medium mb-2">{destination.countryKo}</p>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-4">
+          <p className="text-sky-500 text-sm font-semibold mb-2">{destination.countryKo}</p>
+          <h1 className="text-3xl sm:text-4xl font-bold mb-4 text-[#222222]">
             {destination.cityKo} 여행 최저가
           </h1>
-          <p className="text-gray-400 text-lg max-w-2xl">{destination.description}</p>
+          <p className="text-[#6a6a6a] text-lg max-w-2xl">{destination.description}</p>
         </div>
       </section>
 
       {loading ? (
         <div className="flex items-center justify-center py-20">
-          <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-500" />
+          <div className="animate-spin rounded-full h-10 w-10 border-2 border-sky-200 border-t-sky-500" />
         </div>
       ) : (
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8 space-y-12">
           {/* 항공권 */}
           <section>
-            <h2 className="text-xl font-bold mb-4">✈️ {destination.cityKo} 항공권 최저가</h2>
+            <h2 className="text-xl font-bold mb-4 text-[#222222]">{destination.cityKo} 항공권 최저가</h2>
             {flights.length === 0 ? (
-              <p className="text-gray-500">항공권 정보를 불러올 수 없습니다.</p>
+              <p className="text-[#6a6a6a]">항공권 정보를 불러올 수 없습니다.</p>
             ) : (
               <div className="grid gap-3">
                 {flights.map((f, i) => (
@@ -128,15 +128,16 @@ export default function DestinationClient({ destination }: { destination: Destin
                     href={flightUrl(mylinkId, { arrCityCd: destination.cityCode, duration: f.period, destinationName: destination.cityKo })}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-between bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"
+                    className="flex items-center justify-between bg-white rounded-xl p-4 transition-all border border-gray-100 hover:border-sky-200 card-shadow-hover"
+                    style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}
                   >
                     <div>
-                      <span className="text-sm text-gray-400">{f.departureDate} → {f.returnDate}</span>
-                      <div className="text-sm text-gray-500 mt-1">{f.airline} · {f.transfer === 0 ? "직항" : `경유 ${f.transfer}회`}</div>
+                      <span className="text-sm text-[#6a6a6a]">{f.departureDate} → {f.returnDate}</span>
+                      <div className="text-sm text-gray-400 mt-1">{f.airline} · {f.transfer === 0 ? "직항" : `경유 ${f.transfer}회`}</div>
                     </div>
                     <div className="text-right">
-                      <div className="text-lg font-bold text-blue-400">{formatPrice(f.totalPrice)}</div>
-                      <div className="text-xs text-gray-500">왕복</div>
+                      <div className="text-lg font-bold text-sky-600">{formatPrice(f.totalPrice)}</div>
+                      <div className="text-xs text-gray-400">왕복</div>
                     </div>
                   </a>
                 ))}
@@ -146,9 +147,9 @@ export default function DestinationClient({ destination }: { destination: Destin
 
           {/* 숙소 */}
           <section>
-            <h2 className="text-xl font-bold mb-4">🏨 {destination.cityKo} 인기 숙소</h2>
+            <h2 className="text-xl font-bold mb-4 text-[#222222]">{destination.cityKo} 인기 숙소</h2>
             {accommodations.length === 0 ? (
-              <p className="text-gray-500">숙소 정보를 불러올 수 없습니다.</p>
+              <p className="text-[#6a6a6a]">숙소 정보를 불러올 수 없습니다.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {accommodations.map((a) => (
@@ -157,21 +158,22 @@ export default function DestinationClient({ destination }: { destination: Destin
                     href={accommodationUrl(mylinkId, a.itemId)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"
+                    className="bg-white rounded-xl p-4 transition-all border border-gray-100 hover:border-sky-200 card-shadow-hover"
+                    style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}
                   >
-                    <h3 className="font-medium text-sm line-clamp-2 mb-2">{a.itemName}</h3>
+                    <h3 className="font-medium text-sm line-clamp-2 mb-2 text-[#222222]">{a.itemName}</h3>
                     <div className="flex items-center gap-2 mb-2">
-                      {a.starRating && <span className="text-xs text-yellow-400">⭐ {a.starRating}</span>}
+                      {a.starRating && <span className="text-xs text-amber-500">{a.starRating}</span>}
                       {a.reviewScore > 0 && (
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-[#6a6a6a]">
                           {a.reviewScore.toFixed(1)} ({a.reviewCount})
                         </span>
                       )}
                     </div>
                     <div className="flex items-baseline gap-2">
-                      <span className="text-lg font-bold text-blue-400">{formatPrice(a.salePrice)}</span>
+                      <span className="text-lg font-bold text-sky-600">{formatPrice(a.salePrice)}</span>
                       {a.originalPrice > a.salePrice && (
-                        <span className="text-xs text-gray-500 line-through">{formatPrice(a.originalPrice)}</span>
+                        <span className="text-xs text-gray-400 line-through">{formatPrice(a.originalPrice)}</span>
                       )}
                     </div>
                   </a>
@@ -182,9 +184,9 @@ export default function DestinationClient({ destination }: { destination: Destin
 
           {/* 투어 */}
           <section>
-            <h2 className="text-xl font-bold mb-4">🎫 {destination.cityKo} 투어·티켓</h2>
+            <h2 className="text-xl font-bold mb-4 text-[#222222]">{destination.cityKo} 투어·티켓</h2>
             {tours.length === 0 ? (
-              <p className="text-gray-500">투어 정보를 불러올 수 없습니다.</p>
+              <p className="text-[#6a6a6a]">투어 정보를 불러올 수 없습니다.</p>
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {tours.map((t) => (
@@ -193,19 +195,20 @@ export default function DestinationClient({ destination }: { destination: Destin
                     href={tourUrl(mylinkId, t.productUrl)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"
+                    className="bg-white rounded-xl overflow-hidden transition-all border border-gray-100 hover:border-sky-200 card-shadow-hover"
+                    style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}
                   >
                     {t.imageUrl && (
                       <img src={t.imageUrl} alt={t.itemName} className="w-full h-36 object-cover" />
                     )}
                     <div className="p-4">
-                      <span className="text-xs text-blue-400 mb-1 block">{t.category}</span>
-                      <h3 className="font-medium text-sm line-clamp-2 mb-2">{t.itemName}</h3>
+                      <span className="text-xs text-sky-500 mb-1 block font-medium">{t.category}</span>
+                      <h3 className="font-medium text-sm line-clamp-2 mb-2 text-[#222222]">{t.itemName}</h3>
                       <div className="flex items-center justify-between">
-                        <span className="text-lg font-bold text-blue-400">{t.priceDisplay || formatPrice(t.salePrice)}</span>
+                        <span className="text-lg font-bold text-sky-600">{t.priceDisplay || formatPrice(t.salePrice)}</span>
                         {t.reviewScore > 0 && (
-                          <span className="text-xs text-gray-400">
-                            ⭐ {t.reviewScore.toFixed(1)} ({t.reviewCount})
+                          <span className="text-xs text-[#6a6a6a]">
+                            {t.reviewScore.toFixed(1)} ({t.reviewCount})
                           </span>
                         )}
                       </div>
@@ -220,9 +223,9 @@ export default function DestinationClient({ destination }: { destination: Destin
           <section className="text-center py-8">
             <Link
               href="/"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-medium px-8 py-3 rounded-lg transition-colors"
+              className="inline-block bg-sky-500 hover:bg-sky-600 text-white font-medium px-8 py-3 rounded-xl transition-all"
             >
-              🗺️ 세계지도에서 더 많은 여행지 보기
+              세계지도에서 더 많은 여행지 보기
             </Link>
           </section>
         </div>

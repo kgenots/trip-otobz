@@ -150,7 +150,6 @@ interface WorldMapProps {
 
 export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
   const [tooltipContent, setTooltipContent] = useState<string>("");
-  const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
 
   // 도시별 최저가 집계
   const cityData = useMemo(() => {
@@ -175,34 +174,34 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
     return map;
   }, [flightData]);
 
-  // 가격 → 색상 (파랑=저렴, 노랑=중간, 빨강=비쌈)
+  // 가격 → 색상 (스카이블루=저렴, 노랑=중간, 빨강=비쌈)
   const priceToColor = useCallback((price: number) => {
     const prices = Object.values(cityData).map(d => d.price);
-    if (prices.length === 0) return "#3b82f6";
+    if (prices.length === 0) return "#0EA5E9";
     const min = Math.min(...prices);
     const max = Math.max(...prices);
     const ratio = max === min ? 0 : (price - min) / (max - min);
 
     if (ratio <= 0.33) {
-      // 파랑 → 초록 (저렴)
+      // 스카이블루 → 초록 (저렴)
       const t = ratio / 0.33;
-      const r = Math.round(59 + t * (34 - 59));
-      const g = Math.round(130 + t * (197 - 130));
-      const b = Math.round(247 + t * (94 - 247));
+      const r = Math.round(14 + t * (34 - 14));
+      const g = Math.round(165 + t * (197 - 165));
+      const b = Math.round(233 + t * (94 - 233));
       return `rgb(${r},${g},${b})`;
     } else if (ratio <= 0.66) {
       // 초록 → 노랑 (중간)
       const t = (ratio - 0.33) / 0.33;
-      const r = Math.round(34 + t * (245 - 34));
-      const g = Math.round(197 - t * (197 - 251));
-      const b = Math.round(94 + t * (251 - 94));
+      const r = Math.round(34 + t * (251 - 34));
+      const g = Math.round(197 + t * (191 - 197));
+      const b = Math.round(94 + t * (36 - 94));
       return `rgb(${r},${g},${b})`;
     } else {
       // 노랑 → 빨강 (비쌈)
       const t = (ratio - 0.66) / 0.34;
-      const r = Math.round(245 + t * (239 - 245));
-      const g = Math.round(251 - t * (251 - 63));
-      const b = Math.round(251 - t * (251 - 100));
+      const r = Math.round(251 + t * (239 - 251));
+      const g = Math.round(191 - t * (191 - 68));
+      const b = Math.round(36 + t * (68 - 36));
       return `rgb(${r},${g},${b})`;
     }
   }, [cityData]);
@@ -214,7 +213,6 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
     const coords = cityCoordinates[code];
     if (!coords) return null;
 
-    const cityInfo = cityCountryMap[code];
     const fillColor = priceToColor(data.price);
     const formattedPrice = formatPrice(data.price);
 
@@ -223,11 +221,12 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
         <circle
           r={4}
           fill={fillColor}
-          stroke="#1e293b"
-          strokeWidth={1}
+          stroke="#ffffff"
+          strokeWidth={1.5}
           style={{
             cursor: "pointer",
             transition: "fill 0.3s ease, r 0.3s ease",
+            filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
           }}
           onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
           onMouseLeave={() => setTooltipContent("")}
@@ -246,7 +245,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
   }).filter(Boolean);
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative w-full h-full" style={{ backgroundColor: "#f0f7fc" }}>
       <ComposableMap
         projection="geoMercator"
         projectionConfig={{ scale: 140, center: [0, 20] }}
@@ -262,19 +261,19 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
                   geography={geo}
                   style={{
                     default: {
-                      fill: "#0f172a",
-                      stroke: "#334155",
+                      fill: "#e2e8f0",
+                      stroke: "#cbd5e1",
                       strokeWidth: 0.5,
                       outline: "none",
                     },
                     hover: {
-                      fill: "#1e293b",
-                      stroke: "#475569",
+                      fill: "#cbd5e1",
+                      stroke: "#94a3b8",
                       strokeWidth: 0.75,
                       outline: "none",
                     },
                     pressed: {
-                      fill: "#334155",
+                      fill: "#94a3b8",
                       outline: "none",
                     },
                   }}
@@ -283,15 +282,16 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
             }
           </Geographies>
 
-          {/* 도시 포인트 - 모바일 터치 지원 */}
+          {/* 도시 포인트 */}
           {citiesList}
         </ZoomableGroup>
       </ComposableMap>
 
-      {/* 모바일용 툴팁 - 화면 중앙 상단에 표시 */}
+      {/* 툴팁 */}
       {tooltipContent && (
         <div
-          className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none px-3 py-2 bg-gray-900 text-white text-xs sm:text-sm rounded-lg shadow-lg border border-gray-700 whitespace-nowrap animate-fade-in"
+          className="fixed top-16 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none px-4 py-2.5 bg-white text-[#222222] text-sm rounded-2xl whitespace-nowrap animate-fade-in font-medium"
+          style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px" }}
         >
           {tooltipContent}
         </div>

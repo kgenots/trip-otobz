@@ -73,10 +73,10 @@ export default function AccommodationTab({
             <button
               key={c.code}
               onClick={() => setSelectedCity(c.name)}
-              className={`px-3 py-1.5 rounded-full text-sm transition-colors ${
+              className={`px-3 py-1.5 rounded-full text-sm font-medium transition-all ${
                 selectedCity === c.name
-                  ? "bg-blue-600 text-white"
-                  : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+                  ? "bg-sky-500 text-white"
+                  : "bg-gray-100 text-[#6a6a6a] hover:bg-gray-200"
               }`}
             >
               {c.name}
@@ -85,16 +85,16 @@ export default function AccommodationTab({
         </div>
       )}
 
-      <p className="text-gray-500 text-xs mb-3">
+      <p className="text-[#6a6a6a] text-xs mb-3">
         {checkIn} ~ {checkOut} · 성인 2명 기준
       </p>
 
       {loading ? (
         <div className="flex justify-center py-12">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500" />
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-sky-200 border-t-sky-500" />
         </div>
       ) : items.length === 0 ? (
-        <p className="text-gray-500 text-center py-8">숙소 정보가 없습니다</p>
+        <p className="text-[#6a6a6a] text-center py-8">숙소 정보가 없습니다</p>
       ) : (
         <div className="space-y-3">
           {items.map((item) => (
@@ -103,25 +103,26 @@ export default function AccommodationTab({
               href={accommodationUrl(mylinkId, item.itemId)}
               target="_blank"
               rel="noopener noreferrer"
-              className="block bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"
+              className="block bg-white rounded-xl p-4 transition-all border border-gray-100 hover:border-sky-200 card-shadow-hover"
+              style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}
             >
               <div className="flex justify-between items-start">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-white font-medium truncate">{item.itemName}</h3>
-                  <div className="text-yellow-400 text-xs mt-1">
+                  <h3 className="text-[#222222] font-medium truncate">{item.itemName}</h3>
+                  <div className="text-amber-500 text-xs mt-1">
                     {stars(item.starRating)}
                   </div>
-                  <div className="text-gray-400 text-sm mt-1">
-                    ⭐ {item.reviewScore} ({item.reviewCount})
+                  <div className="text-[#6a6a6a] text-sm mt-1">
+                    {item.reviewScore} ({item.reviewCount})
                   </div>
                 </div>
                 <div className="text-right ml-4 shrink-0">
                   {item.originalPrice > item.salePrice && (
-                    <div className="text-gray-500 text-sm line-through">
+                    <div className="text-gray-400 text-sm line-through">
                       {formatPrice(item.originalPrice)}
                     </div>
                   )}
-                  <div className="text-lg font-bold text-emerald-400">
+                  <div className="text-lg font-bold text-sky-600">
                     {formatPrice(item.salePrice)}
                   </div>
                 </div>

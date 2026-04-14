@@ -31,17 +31,17 @@ export default function PriceChart({ city }: { city: string }) {
 
   if (loading) {
     return (
-      <div className="bg-gray-900 rounded-lg p-4 mb-4 border border-gray-800">
-        <div className="animate-pulse h-32 bg-gray-800 rounded" />
+      <div className="bg-white rounded-xl p-4 mb-4 border border-gray-100" style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}>
+        <div className="animate-pulse h-32 bg-gray-100 rounded-lg" />
       </div>
     );
   }
 
   if (data.length < 2) {
     return (
-      <div className="bg-gray-900 rounded-lg p-4 mb-4 border border-gray-800 text-center">
-        <p className="text-gray-500 text-sm">📈 가격 추이 데이터 수집 중...</p>
-        <p className="text-gray-600 text-xs mt-1">매일 자동 수집되며 곧 그래프가 표시됩니다</p>
+      <div className="bg-white rounded-xl p-4 mb-4 border border-gray-100 text-center" style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}>
+        <p className="text-[#6a6a6a] text-sm">가격 추이 데이터 수집 중...</p>
+        <p className="text-gray-400 text-xs mt-1">매일 자동 수집되며 곧 그래프가 표시됩니다</p>
       </div>
     );
   }
@@ -53,30 +53,31 @@ export default function PriceChart({ city }: { city: string }) {
   };
 
   return (
-    <div className="bg-gray-900 rounded-lg p-4 mb-4 border border-gray-800">
-      <h3 className="text-gray-400 text-xs mb-3">📈 최저가 추이 (최근 90일)</h3>
+    <div className="bg-white rounded-xl p-4 mb-4 border border-gray-100" style={{ boxShadow: "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.03) 0px 1px 3px" }}>
+      <h3 className="text-[#6a6a6a] text-xs mb-3 font-medium">최저가 추이 (최근 90일)</h3>
       <ResponsiveContainer width="100%" height={140}>
         <LineChart data={data}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
           <XAxis
             dataKey="date"
             tickFormatter={formatDate}
-            stroke="#6b7280"
+            stroke="#9ca3af"
             fontSize={10}
             interval="preserveStartEnd"
           />
           <YAxis
             tickFormatter={formatPrice}
-            stroke="#6b7280"
+            stroke="#9ca3af"
             fontSize={10}
             width={50}
           />
           <Tooltip
             contentStyle={{
-              backgroundColor: "#1f2937",
-              border: "1px solid #374151",
-              borderRadius: "8px",
+              backgroundColor: "#ffffff",
+              border: "1px solid #e5e7eb",
+              borderRadius: "12px",
               fontSize: 12,
+              boxShadow: "rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.08) 0px 4px 8px",
             }}
             labelFormatter={(label) => formatDate(String(label))}
             formatter={(value) => [`₩${Number(value).toLocaleString("ko-KR")}`, "최저가"]}
@@ -84,10 +85,10 @@ export default function PriceChart({ city }: { city: string }) {
           <Line
             type="monotone"
             dataKey="price"
-            stroke="#10b981"
+            stroke="#0EA5E9"
             strokeWidth={2}
             dot={false}
-            activeDot={{ r: 4, fill: "#10b981" }}
+            activeDot={{ r: 4, fill: "#0EA5E9" }}
           />
         </LineChart>
       </ResponsiveContainer>
