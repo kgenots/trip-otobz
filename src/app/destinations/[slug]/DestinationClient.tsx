@@ -125,7 +125,7 @@ export default function DestinationClient({ destination }: { destination: Destin
                 {flights.map((f, i) => (
                   <a
                     key={i}
-                    href={flightUrl(mylinkId, { arrCityCd: destination.cityCode, departureDate: f.departureDate, returnDate: f.returnDate })}
+                    href={flightUrl(mylinkId, { arrCityCd: destination.cityCode, arrCityNm: destination.cityKo, departureDate: f.departureDate, returnDate: f.returnDate })}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center justify-between bg-white rounded-xl p-4 transition-all border border-gray-100 hover:border-sky-200 card-shadow-hover"
