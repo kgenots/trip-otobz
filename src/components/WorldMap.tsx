@@ -181,26 +181,18 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
     return `${price.toLocaleString()}`;
   };
 
-  // 줌 레벨에 따라 표시 모드 결정
-  // 낮은 줌: 도시 이름만 (지역 탐색), 높은 줌: 이름 + 가격 (비교)
-  const showPrice = zoom >= 2;
+  // 줌 < 2: 마커 dot만, 줌 2~4: 도시 이름, 줌 4+: 이름 + 가격
+  const showLabel = zoom >= 2;
+  const showPrice = zoom >= 4;
 
   const citiesList = Object.entries(cityData).map(([code, data]) => {
     const coords = cityCoordinates[code];
     if (!coords) return null;
 
     const formattedPrice = formatPrice(data.price);
-    const label = showPrice ? `${data.name} ${shortPrice(data.price)}` : data.name;
 
     const markerR = 3.5 / zoom;
     const markerStroke = 1.2 / zoom;
-    const fontSize = Math.max(6, 9 / zoom);
-    const labelY = -(7 / zoom);
-    const pillPx = 4 / zoom;
-    const pillPy = 2 / zoom;
-    const pillR = 5 / zoom;
-    const labelW = label.length * fontSize * 0.55 + pillPx * 2;
-    const labelH = fontSize + pillPy * 2;
 
     return (
       <Marker key={code} coordinates={[coords.lng, coords.lat]}>
@@ -225,31 +217,24 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
             strokeWidth={markerStroke}
             style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))" }}
           />
-          <g transform={`translate(0, ${labelY})`}>
-            <rect
-              x={-labelW / 2}
-              y={-labelH / 2}
-              width={labelW}
-              height={labelH}
-              rx={pillR}
-              fill="white"
-              stroke="rgba(0,0,0,0.06)"
-              strokeWidth={0.4 / zoom}
-              style={{ filter: "drop-shadow(0 0.5px 1px rgba(0,0,0,0.08))" }}
-            />
+          {showLabel && (
             <text
+              y={-(5 / zoom)}
               textAnchor="middle"
-              dominantBaseline="central"
               style={{
-                fontSize: `${fontSize}px`,
+                fontSize: `${3 / zoom}px`,
                 fontWeight: 600,
                 fill: "#222222",
                 fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+                paintOrder: "stroke",
+                stroke: "white",
+                strokeWidth: `${1 / zoom}px`,
+                strokeLinejoin: "round",
               }}
             >
-              {label}
+              {showPrice ? `${data.name} ${shortPrice(data.price)}` : data.name}
             </text>
-          </g>
+          )}
         </g>
       </Marker>
     );
