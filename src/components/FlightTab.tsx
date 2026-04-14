@@ -2,6 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { flightUrl } from "@/lib/affiliate";
+import dynamic from "next/dynamic";
+
+const PriceChart = dynamic(() => import("./PriceChart"), { ssr: false });
 
 interface CityData {
   code: string;
@@ -59,6 +62,9 @@ export default function FlightTab({ cities, mylinkId }: { cities: CityData[]; my
 
   return (
     <div>
+      {/* 가격 추이 차트 */}
+      {selectedCity && <PriceChart city={selectedCity} />}
+
       {/* 도시 선택 */}
       {cities.length > 1 && (
         <div className="flex flex-wrap gap-2 mb-4">
@@ -77,6 +83,8 @@ export default function FlightTab({ cities, mylinkId }: { cities: CityData[]; my
           ))}
         </div>
       )}
+
+      {selectedCity && <PriceChart city={selectedCity} />}
 
       {loading ? (
         <div className="flex justify-center py-12">
