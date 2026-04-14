@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { tourUrl } from "@/lib/affiliate";
 
 interface CityData {
   code: string;
@@ -27,7 +28,7 @@ interface TnaItem {
   tags: string[];
 }
 
-export default function TourTab({ cities }: { cities: CityData[] }) {
+export default function TourTab({ cities, mylinkId }: { cities: CityData[]; mylinkId: string }) {
   const [selectedCity, setSelectedCity] = useState(cities[0]?.name || "");
   const [categories, setCategories] = useState<TnaCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -125,7 +126,7 @@ export default function TourTab({ cities }: { cities: CityData[] }) {
           {items.map((item) => (
             <a
               key={item.gid}
-              href={item.productUrl}
+              href={tourUrl(mylinkId, item.productUrl)}
               target="_blank"
               rel="noopener noreferrer"
               className="block bg-gray-900 rounded-lg overflow-hidden hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"

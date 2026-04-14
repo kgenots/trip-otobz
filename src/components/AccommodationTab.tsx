@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { accommodationUrl } from "@/lib/affiliate";
 
 interface CityData {
   code: string;
@@ -21,9 +22,11 @@ interface AccommodationItem {
 export default function AccommodationTab({
   countryName,
   cities,
+  mylinkId,
 }: {
   countryName: string;
   cities: CityData[];
+  mylinkId: string;
 }) {
   const [selectedCity, setSelectedCity] = useState(cities[0]?.name || "");
   const [items, setItems] = useState<AccommodationItem[]>([]);
@@ -97,7 +100,7 @@ export default function AccommodationTab({
           {items.map((item) => (
             <a
               key={item.itemId}
-              href={`https://www.myrealtrip.com/accommodations/${item.itemId}`}
+              href={accommodationUrl(mylinkId, item.itemId)}
               target="_blank"
               rel="noopener noreferrer"
               className="block bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"

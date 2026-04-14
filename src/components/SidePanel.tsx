@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cityCountryMap } from "@/data/city-country-map";
+import { getMylinkId } from "@/lib/affiliate";
 import FlightTab from "./FlightTab";
 import AccommodationTab from "./AccommodationTab";
 import TourTab from "./TourTab";
@@ -27,9 +28,14 @@ type TabId = (typeof tabs)[number]["id"];
 
 export default function SidePanel({ cities, onClose }: SidePanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>("flight");
+  const [mylinkId, setMylinkId] = useState("");
   const city = cities[0];
   const cityInfo = city ? cityCountryMap[city.code] : null;
   const countryName = cityInfo?.countryKo || "";
+
+  useEffect(() => {
+    getMylinkId().then(setMylinkId);
+  }, []);
 
   return (
     <div className="fixed right-0 sm:right-auto bottom-0 sm:top-0 h-full sm:h-[calc(100vh-180px)] w-full sm:w-[480px] max-w-full bg-gray-950 border-t sm:border-l border-gray-800 shadow-2xl z-40 flex flex-col animate-slide-up sm:animate-slide-in">
@@ -67,12 +73,12 @@ export default function SidePanel({ cities, onClose }: SidePanelProps) {
 
       {/* 컨텐츠 - 모바일에서 터치 스크롤 최적화 */}
       <div className="flex-1 overflow-y-auto overscroll-contain touch-pan-y p-4 sm:p-5">
-        {activeTab === "flight" && <FlightTab cities={cities} />}
+        {activeTab === "flight" && <FlightTab cities={cities} mylinkId={mylinkId} />}
         {activeTab === "accommodation" && (
-          <AccommodationTab countryName={countryName} cities={cities} />
+          <AccommodationTab countryName={countryName} cities={cities} mylinkId={mylinkId} />
         )}
         {activeTab === "tour" && (
-          <TourTab cities={cities} />
+          <TourTab cities={cities} mylinkId={mylinkId} />
         )}
       </div>
     </div>

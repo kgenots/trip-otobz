@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { flightUrl } from "@/lib/affiliate";
 
 interface CityData {
   code: string;
@@ -19,7 +20,7 @@ interface FlightDetail {
   period: number | null;
 }
 
-export default function FlightTab({ cities }: { cities: CityData[] }) {
+export default function FlightTab({ cities, mylinkId }: { cities: CityData[]; mylinkId: string }) {
   const [selectedCity, setSelectedCity] = useState(cities[0]?.code || "");
   const [flights, setFlights] = useState<FlightDetail[]>([]);
   const [loading, setLoading] = useState(false);
@@ -88,7 +89,7 @@ export default function FlightTab({ cities }: { cities: CityData[] }) {
           {flights.map((f, i) => (
             <a
               key={i}
-              href={`https://www.myrealtrip.com/flights?depCityCd=ICN&arrCityCd=${f.toCity}&departDate=${f.departureDate}${f.returnDate ? `&returnDate=${f.returnDate}` : ""}`}
+              href={flightUrl(mylinkId, { depCityCd: "ICN", arrCityCd: f.toCity, departDate: f.departureDate, returnDate: f.returnDate || undefined })}
               target="_blank"
               rel="noopener noreferrer"
               className="block bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"
