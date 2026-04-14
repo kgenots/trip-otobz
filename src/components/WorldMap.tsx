@@ -264,7 +264,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
         projectionConfig={{ scale: 140, center: [0, 20] }}
         className="w-full h-full"
       >
-        <ZoomableGroup zoom={1} minZoom={1} maxZoom={12} onMoveEnd={({ zoom: z }) => setZoom(z)}>
+        <ZoomableGroup zoom={1.5} minZoom={1.5} maxZoom={12} onMoveEnd={({ zoom: z }) => setZoom(z)}>
           {/* 배경 지도 */}
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>

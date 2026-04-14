@@ -48,18 +48,19 @@ export default function Home() {
   return (
     <main className="h-screen w-screen overflow-hidden bg-white relative">
       {/* 상단 헤더 */}
-      <div className="absolute top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex items-center gap-3 sm:gap-4 max-w-[1920px] mx-auto">
-          <h1 className="text-lg sm:text-xl font-bold text-[#222222] tracking-tight whitespace-nowrap">
-            Trip OTOBZ
+      <div className="absolute top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-3 sm:px-6 lg:px-8 py-2 sm:py-3">
+        <div className="flex items-center gap-2 sm:gap-4 max-w-[1920px] mx-auto">
+          <h1 className="text-base sm:text-xl font-bold text-[#222222] tracking-tight whitespace-nowrap shrink-0">
+            Trip
+            <span className="hidden sm:inline"> OTOBZ</span>
           </h1>
-          <div className="w-px h-5 bg-gray-200" />
-          <div className="flex items-center gap-1.5">
+          <div className="w-px h-4 sm:h-5 bg-gray-200 shrink-0" />
+          <div className="flex items-center gap-1 sm:gap-1.5 min-w-0">
             {PERIODS.map((p) => (
               <button
                 key={p}
                 onClick={() => setPeriod(p)}
-                className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
+                className={`px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all shrink-0 ${
                   period === p
                     ? "bg-sky-500 text-white shadow-sm"
                     : "bg-gray-100 text-[#6a6a6a] hover:bg-gray-200"
@@ -69,14 +70,12 @@ export default function Home() {
               </button>
             ))}
           </div>
-          <div className="ml-auto">
-            <Link
-              href="/blog"
-              className="px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#6a6a6a] hover:bg-gray-100 transition-colors"
-            >
-              블로그
-            </Link>
-          </div>
+          <Link
+            href="/blog"
+            className="ml-auto px-2 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#6a6a6a] hover:bg-gray-100 transition-colors shrink-0"
+          >
+            블로그
+          </Link>
         </div>
       </div>
 
