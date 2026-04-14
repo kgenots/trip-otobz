@@ -150,6 +150,7 @@ interface WorldMapProps {
 
 export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
   const [tooltipContent, setTooltipContent] = useState<string>("");
+  const [zoom, setZoom] = useState(1);
 
   // 도시별 최저가 집계
   const cityData = useMemo(() => {
@@ -216,13 +217,16 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
     const fillColor = priceToColor(data.price);
     const formattedPrice = formatPrice(data.price);
 
+    const markerR = 4 / zoom;
+    const markerStroke = 1.5 / zoom;
+
     return (
       <Marker key={code} coordinates={[coords.lng, coords.lat]}>
         <circle
-          r={4}
+          r={markerR}
           fill={fillColor}
           stroke="#ffffff"
-          strokeWidth={1.5}
+          strokeWidth={markerStroke}
           style={{
             cursor: "pointer",
             transition: "fill 0.3s ease, r 0.3s ease",
@@ -251,7 +255,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
         projectionConfig={{ scale: 140, center: [0, 20] }}
         className="w-full h-full"
       >
-        <ZoomableGroup zoom={1} minZoom={1} maxZoom={8}>
+        <ZoomableGroup zoom={1} minZoom={1} maxZoom={8} onMoveEnd={({ zoom: z }) => setZoom(z)}>
           {/* 배경 지도 */}
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>
