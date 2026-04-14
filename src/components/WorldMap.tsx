@@ -233,7 +233,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
         key={code}
         cx={projected[0]}
         cy={projected[1]}
-        r={8 / currentZoom}
+        r={12 / currentZoom}
         fill={fillColor}
         stroke="#1e293b"
         strokeWidth={2 / currentZoom}
