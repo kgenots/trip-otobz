@@ -3,7 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
 import SidePanel from "@/components/SidePanel";
-import FlightSearch from "@/components/FlightSearch";
 import type { FlightPrice } from "@/lib/api";
 
 const WorldMap = dynamic(() => import("@/components/WorldMap"), { ssr: false });
@@ -44,68 +43,30 @@ export default function Home() {
     []
   );
 
-  // 검색 폼에서 검색 시 호출
-  const handleSearch = async (params: {
-    depCityCd: string;
-    arrCityCd: string;
-    departureDate: string;
-    returnDate?: string;
-    period: number;
-  }) => {
-    setLoading(true);
-    try {
-      const res = await fetch("/api/flights", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "window",
-          depCityCd: params.depCityCd,
-          arrCityCd: params.arrCityCd,
-          period: params.period,
-        }),
-      });
-      const json = await res.json();
-      setFlightData(json.data || []);
-    } catch (e) {
-      setFlightData([]);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   return (
     <main className="h-screen w-screen overflow-hidden bg-white relative">
       {/* 상단 헤더 */}
       <div className="absolute top-0 left-0 right-0 z-30 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-4 sm:px-6 lg:px-8 py-3">
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 max-w-[1920px] mx-auto">
-          {/* 로고 + 여행기간 */}
-          <div className="flex items-center gap-3 sm:gap-4">
-            <h1 className="text-lg sm:text-xl font-bold text-[#222222] tracking-tight whitespace-nowrap">
-              Trip OTOBZ
-            </h1>
-            <span className="hidden sm:inline text-[#6a6a6a] text-sm">ICN 출발</span>
-            <div className="hidden sm:block w-px h-5 bg-gray-200" />
-            <div className="flex items-center gap-1.5">
-              <span className="text-[#6a6a6a] text-xs sm:text-sm whitespace-nowrap">여행기간</span>
-              {PERIODS.map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setPeriod(p)}
-                  className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
-                    period === p
-                      ? "bg-sky-500 text-white shadow-sm"
-                      : "bg-gray-100 text-[#6a6a6a] hover:bg-gray-200"
-                  }`}
-                >
-                  {p}일
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* 검색폼 */}
-          <div className="sm:ml-auto">
-            <FlightSearch onSearch={handleSearch} />
+        <div className="flex items-center gap-3 sm:gap-4 max-w-[1920px] mx-auto">
+          <h1 className="text-lg sm:text-xl font-bold text-[#222222] tracking-tight whitespace-nowrap">
+            Trip OTOBZ
+          </h1>
+          <div className="w-px h-5 bg-gray-200" />
+          <div className="flex items-center gap-1.5">
+            {PERIODS.map((p) => (
+              <button
+                key={p}
+                onClick={() => setPeriod(p)}
+                className={`px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full text-xs sm:text-sm font-medium transition-all ${
+                  period === p
+                    ? "bg-sky-500 text-white shadow-sm"
+                    : "bg-gray-100 text-[#6a6a6a] hover:bg-gray-200"
+                }`}
+              >
+                {p}일
+              </button>
+            ))}
           </div>
         </div>
       </div>
