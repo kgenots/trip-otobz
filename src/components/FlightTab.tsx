@@ -98,7 +98,7 @@ export default function FlightTab({ cities, mylinkId }: { cities: CityData[]; my
           {flights.map((f, i) => (
             <a
               key={i}
-              href={flightUrl(mylinkId, { arrCityCd: f.toCity, duration: f.period || undefined, destinationName: cityCountryMap[f.toCity]?.cityKo })}
+              href={flightUrl(mylinkId, { arrCityCd: f.toCity, departureDate: f.departureDate, returnDate: f.returnDate || undefined })}
               target="_blank"
               rel="noopener noreferrer"
               className="block bg-white rounded-xl p-4 transition-all border border-gray-100 hover:border-sky-200 card-shadow-hover"

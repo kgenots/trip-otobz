@@ -33,18 +33,41 @@ export function appendAffiliate(
   return url.toString();
 }
 
+/**
+ * 마이리얼트립 항공권 검색 결과 URL 생성
+ * 실제 검색 결과 페이지로 연결 (AIRINTSCH0100100010.k1)
+ */
 export function flightUrl(
   mylinkId: string,
-  params: { arrCityCd: string; duration?: number; destinationName?: string }
+  params: {
+    depCityCd?: string;
+    arrCityCd: string;
+    departureDate?: string;
+    returnDate?: string;
+  }
 ): string {
-  const url = new URL("https://flights.myrealtrip.com/air/agent/b2c/AIR/AAA/lowest_fare.k1");
-  url.searchParams.set("destination", params.arrCityCd);
-  if (params.duration) {
-    url.searchParams.set("duration", String(params.duration));
-  }
-  if (params.destinationName) {
-    url.searchParams.set("destinationName", params.destinationName);
-  }
+  const dep = params.depCityCd || "SEL";
+  const arr = params.arrCityCd;
+  const isRoundTrip = !!params.returnDate;
+
+  const url = new URL(
+    "https://flights.myrealtrip.com/air/b2c/AIR/INT/AIRINTSCH0100100010.k1"
+  );
+  url.searchParams.append("initform", isRoundTrip ? "RT" : "OW");
+  url.searchParams.append("domintgubun", "I");
+  url.searchParams.append("depctycd", dep);
+  if (isRoundTrip) url.searchParams.append("depctycd", arr);
+  url.searchParams.append("arrctycd", arr);
+  if (isRoundTrip) url.searchParams.append("arrctycd", dep);
+  if (params.departureDate) url.searchParams.append("depdt", params.departureDate);
+  if (params.returnDate) url.searchParams.append("depdt", params.returnDate);
+  url.searchParams.append("adtcount", "1");
+  url.searchParams.append("chdcount", "0");
+  url.searchParams.append("infcount", "0");
+  url.searchParams.append("cabinclass", "Y");
+  url.searchParams.append("secrchType", "FARE");
+  url.searchParams.append("availcount", "250");
+
   return appendAffiliate(url.toString(), mylinkId, "flight");
 }
 
