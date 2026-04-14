@@ -193,13 +193,13 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
     const label = showPrice ? `${data.name} ${shortPrice(data.price)}` : data.name;
 
     const s = 1 / zoom; // 스케일 팩터
-    const markerR = 6 * s;
+    const markerR = 8 * s;
 
     // pill 라벨 사이즈
-    const fs = 12 * s;
-    const px = 6 * s;
-    const py = 3.5 * s;
-    const gap = 6 * s;
+    const fs = 14 * s;
+    const px = 7 * s;
+    const py = 4 * s;
+    const gap = 7 * s;
     const pillW = label.length * fs * 0.58 + px * 2;
     const pillH = fs + py * 2;
     const pillR = pillH / 2;
@@ -264,7 +264,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
         projectionConfig={{ scale: 140, center: [0, 20] }}
         className="w-full h-full"
       >
-        <ZoomableGroup zoom={1} minZoom={1} maxZoom={8} onMoveEnd={({ zoom: z }) => setZoom(z)}>
+        <ZoomableGroup zoom={1} minZoom={1} maxZoom={12} onMoveEnd={({ zoom: z }) => setZoom(z)}>
           {/* 배경 지도 */}
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>
