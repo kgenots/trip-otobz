@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from "react-simple-maps";
 import { Tooltip } from "./Tooltip";
 import { cityCountryMap } from "@/data/city-country-map";
 import { getCountryName as getCountryNameKo } from "@/data/country-names";
@@ -219,30 +219,29 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
     const formattedPrice = formatPrice(data.price);
 
     return (
-      <circle
-        key={code}
-        cx={(coords.lng + 180) * 0.45}
-        cy={(90 - coords.lat) * 0.45}
-        r="8"
-        fill={fillColor}
-        stroke="#1e293b"
-        strokeWidth="2"
-        style={{
-          cursor: "pointer",
-          transition: "fill 0.3s ease, r 0.3s ease",
-        }}
-        onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
-        onMouseLeave={() => setTooltipContent("")}
-        onTouchStart={(e: any) => {
-          e.preventDefault();
-          setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
-        }}
-        onTouchEnd={(e: any) => {
-          e.preventDefault();
-          onCityClick(code, data.name, data.price);
-        }}
-        onClick={() => onCityClick(code, data.name, data.price)}
-      />
+      <Marker key={code} coordinates={[coords.lng, coords.lat]}>
+        <circle
+          r="8"
+          fill={fillColor}
+          stroke="#1e293b"
+          strokeWidth="2"
+          style={{
+            cursor: "pointer",
+            transition: "fill 0.3s ease, r 0.3s ease",
+          }}
+          onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
+          onMouseLeave={() => setTooltipContent("")}
+          onTouchStart={(e: any) => {
+            e.preventDefault();
+            setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
+          }}
+          onTouchEnd={(e: any) => {
+            e.preventDefault();
+            onCityClick(code, data.name, data.price);
+          }}
+          onClick={() => onCityClick(code, data.name, data.price)}
+        />
+      </Marker>
     );
   }).filter(Boolean);
 
