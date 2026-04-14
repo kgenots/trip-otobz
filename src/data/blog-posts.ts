@@ -581,7 +581,7 @@ LCC가 항상 싼 건 아닙니다. FSC 프로모션이 LCC보다 쌀 때도 있
 - 파리 IN → 로마 OUT (유럽 여행)
 - 여행 동선도 효율적!
 
-![여행 준비물과 여권](https://images.unsplash.com/photo-1742327648952-5babf10ae4?w=800&h=400&fit=crop&q=80)
+![여행 준비물과 여권](https://images.unsplash.com/photo-1553697388-94e804e2f0f6?w=800&h=400&fit=crop&q=80)
 
 ### 7. 가격 추적 도구 활용
 

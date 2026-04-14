@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import SidePanel from "@/components/SidePanel";
 import type { FlightPrice } from "@/lib/api";
 
@@ -67,6 +68,14 @@ export default function Home() {
                 {p}일
               </button>
             ))}
+          </div>
+          <div className="ml-auto">
+            <Link
+              href="/blog"
+              className="px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium text-[#6a6a6a] hover:bg-gray-100 transition-colors"
+            >
+              블로그
+            </Link>
           </div>
         </div>
       </div>
