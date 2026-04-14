@@ -20,8 +20,7 @@ jobs:
 
       - name: Rollout restart
         run: |
-          # 이미지 태그가 변경되었으므로 rollout restart 로 새 이미지 사용
-          KUBECONFIG=$HOME/.kube/config sudo kubectl set image deployment/trip-otobz trip-otobz=trip-otobz:latest -n worker
+          KUBECONFIG=$HOME/.kube/config sudo kubectl rollout restart deployment/trip-otobz -n worker
           KUBECONFIG=$HOME/.kube/config sudo kubectl rollout status deployment/trip-otobz -n worker --timeout=300s
 
       - name: Verify
