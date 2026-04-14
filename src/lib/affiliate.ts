@@ -91,6 +91,7 @@ export function flightUrl(
   p.append("chdcount", "0");
   p.append("infcount", "0");
   p.append("cabinclass", "Y");
+  p.append("cabinsepflag", "N");
   p.append("preferaircd", "");
   p.append("availcount", "250");
   // 필수 추가 파라미터
@@ -105,6 +106,10 @@ export function flightUrl(
   p.append("secrchType", "FARE");
   p.append("maxprice", "");
   p.append("servicecacheyn", "Y");
+  p.append("skplt", "N");
+  p.append("KSESID", "air:b2c:SELK138RB:SELK138RB::00");
+  p.append("areacd", "");
+  p.append("token", "");
   p.append("nonstop", "N");
   // 어필리에이트
   if (mylinkId) {
