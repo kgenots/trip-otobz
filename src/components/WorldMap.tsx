@@ -1,8 +1,7 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
-import { geoMercator } from "d3-geo";
+import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from "react-simple-maps";
 import { Tooltip } from "./Tooltip";
 import { cityCountryMap } from "@/data/city-country-map";
 import { getCountryName as getCountryNameKo } from "@/data/country-names";
@@ -152,7 +151,6 @@ interface WorldMapProps {
 export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
   const [tooltipContent, setTooltipContent] = useState<string>("");
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 });
-  const [currentZoom, setCurrentZoom] = useState(1);
 
   // 도시별 최저가 집계
   const cityData = useMemo(() => {
@@ -212,47 +210,38 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
   const formatPrice = (price: number) =>
     `₩${price.toLocaleString("ko-KR")}`;
 
-  // ComposableMap과 동일한 Mercator 프로젝션으로 좌표 변환
-  const projection = useMemo(
-    () => geoMercator().scale(140).center([0, 20]).translate([400, 300]),
-    []
-  );
-
   const citiesList = Object.entries(cityData).map(([code, data]) => {
     const coords = cityCoordinates[code];
     if (!coords) return null;
 
-    const projected = projection([coords.lng, coords.lat]);
-    if (!projected) return null;
-
+    const cityInfo = cityCountryMap[code];
     const fillColor = priceToColor(data.price);
     const formattedPrice = formatPrice(data.price);
 
     return (
-      <circle
-        key={code}
-        cx={projected[0]}
-        cy={projected[1]}
-        r={12 / currentZoom}
-        fill={fillColor}
-        stroke="#1e293b"
-        strokeWidth={2 / currentZoom}
-        style={{
-          cursor: "pointer",
-          transition: "fill 0.3s ease, r 0.3s ease",
-        }}
-        onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
-        onMouseLeave={() => setTooltipContent("")}
-        onTouchStart={(e: any) => {
-          e.preventDefault();
-          setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
-        }}
-        onTouchEnd={(e: any) => {
-          e.preventDefault();
-          onCityClick(code, data.name, data.price);
-        }}
-        onClick={() => onCityClick(code, data.name, data.price)}
-      />
+      <Marker key={code} coordinates={[coords.lng, coords.lat]}>
+        <circle
+          r={4}
+          fill={fillColor}
+          stroke="#1e293b"
+          strokeWidth={1}
+          style={{
+            cursor: "pointer",
+            transition: "fill 0.3s ease, r 0.3s ease",
+          }}
+          onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
+          onMouseLeave={() => setTooltipContent("")}
+          onTouchStart={(e: any) => {
+            e.preventDefault();
+            setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
+          }}
+          onTouchEnd={(e: any) => {
+            e.preventDefault();
+            onCityClick(code, data.name, data.price);
+          }}
+          onClick={() => onCityClick(code, data.name, data.price)}
+        />
+      </Marker>
     );
   }).filter(Boolean);
 
@@ -263,7 +252,7 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
         projectionConfig={{ scale: 140, center: [0, 20] }}
         className="w-full h-full"
       >
-        <ZoomableGroup zoom={1} minZoom={1} maxZoom={8} onMove={({ zoom }) => setCurrentZoom(zoom)}>
+        <ZoomableGroup zoom={1} minZoom={1} maxZoom={8}>
           {/* 배경 지도 */}
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>
