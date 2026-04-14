@@ -10,7 +10,7 @@ export default function Image() {
     (
       <div
         style={{
-          background: "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)",
+          background: "linear-gradient(135deg, #F0F9FF 0%, #E0F2FE 50%, #BAE6FD 100%)",
           width: "100%",
           height: "100%",
           display: "flex",
@@ -20,54 +20,57 @@ export default function Image() {
           fontFamily: "sans-serif",
         }}
       >
-        <div style={{ fontSize: 80, marginBottom: 16 }}>✈️🗺️</div>
         <div
           style={{
-            fontSize: 52,
+            fontSize: 56,
             fontWeight: 800,
-            color: "white",
-            marginBottom: 16,
+            color: "#0EA5E9",
+            marginBottom: 8,
+            letterSpacing: "-0.5px",
           }}
         >
           Trip OTOBZ
         </div>
         <div
           style={{
-            fontSize: 28,
-            color: "#94a3b8",
+            fontSize: 26,
+            color: "#222222",
             textAlign: "center",
-            maxWidth: 800,
+            maxWidth: 700,
+            marginBottom: 4,
           }}
         >
           세계지도에서 클릭 한 번으로
         </div>
         <div
           style={{
-            fontSize: 28,
-            color: "#94a3b8",
+            fontSize: 26,
+            color: "#6a6a6a",
             textAlign: "center",
-            maxWidth: 800,
+            maxWidth: 700,
           }}
         >
-          항공권·숙소·투어 최저가 비교
+          항공권 · 숙소 · 투어 최저가 비교
         </div>
         <div
           style={{
             display: "flex",
-            gap: 24,
-            marginTop: 40,
+            gap: 16,
+            marginTop: 36,
           }}
         >
-          {["✈️ 항공권", "🏨 숙소", "🎫 투어"].map((label) => (
+          {["항공권", "숙소", "투어"].map((label) => (
             <div
               key={label}
               style={{
-                background: "rgba(59,130,246,0.2)",
-                border: "1px solid rgba(59,130,246,0.4)",
-                borderRadius: 12,
-                padding: "12px 24px",
-                color: "#60a5fa",
-                fontSize: 22,
+                background: "white",
+                borderRadius: 20,
+                padding: "12px 28px",
+                color: "#0EA5E9",
+                fontSize: 20,
+                fontWeight: 600,
+                boxShadow:
+                  "rgba(0,0,0,0.02) 0px 0px 0px 1px, rgba(0,0,0,0.04) 0px 2px 6px, rgba(0,0,0,0.1) 0px 4px 8px",
               }}
             >
               {label}
