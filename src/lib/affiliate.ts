@@ -35,17 +35,15 @@ export function appendAffiliate(
 
 export function flightUrl(
   mylinkId: string,
-  params: { depCityCd: string; arrCityCd: string; departDate: string; returnDate?: string; period?: number }
+  params: { arrCityCd: string; duration?: number; destinationName?: string }
 ): string {
-  const url = new URL("https://www.myrealtrip.com/offers");
-  url.searchParams.set("depCityCd", params.depCityCd);
-  url.searchParams.set("arrCityCd", params.arrCityCd);
-  url.searchParams.set("departureDate", params.departDate);
-  if (params.returnDate) {
-    url.searchParams.set("returnDate", params.returnDate);
+  const url = new URL("https://flights.myrealtrip.com/air/agent/b2c/AIR/AAA/lowest_fare.k1");
+  url.searchParams.set("destination", params.arrCityCd);
+  if (params.duration) {
+    url.searchParams.set("duration", String(params.duration));
   }
-  if (params.period) {
-    url.searchParams.set("period", String(params.period));
+  if (params.destinationName) {
+    url.searchParams.set("destinationName", params.destinationName);
   }
   return appendAffiliate(url.toString(), mylinkId, "flight");
 }

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { flightUrl } from "@/lib/affiliate";
+import { cityCountryMap } from "@/data/city-country-map";
 import dynamic from "next/dynamic";
 
 const PriceChart = dynamic(() => import("./PriceChart"), { ssr: false });
@@ -97,7 +98,7 @@ export default function FlightTab({ cities, mylinkId }: { cities: CityData[]; my
           {flights.map((f, i) => (
             <a
               key={i}
-              href={flightUrl(mylinkId, { depCityCd: "ICN", arrCityCd: f.toCity, departDate: f.departureDate, returnDate: f.returnDate || undefined })}
+              href={flightUrl(mylinkId, { arrCityCd: f.toCity, duration: f.period || undefined, destinationName: cityCountryMap[f.toCity]?.cityKo })}
               target="_blank"
               rel="noopener noreferrer"
               className="block bg-gray-900 rounded-lg p-4 hover:bg-gray-800 transition-colors border border-gray-800 hover:border-gray-600"
