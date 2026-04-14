@@ -56,9 +56,6 @@ export const metadata: Metadata = {
     },
   },
   verification: {},
-  other: {
-    "agd-partner-manual-verification": "",
-  },
 };
 
 export default function RootLayout({
@@ -68,6 +65,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
+      <head>
+        <meta name="agd-partner-manual-verification" />
+      </head>
       <body className="antialiased">
         <GoogleAnalytics />
         <JsonLd />
