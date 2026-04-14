@@ -71,22 +71,6 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 범례 */}
-      <div className="absolute bottom-4 left-4 z-30 bg-white/95 backdrop-blur-sm rounded-2xl px-4 py-3 card-shadow">
-        <div className="text-[#6a6a6a] text-xs mb-2 font-medium">최저가 기준</div>
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs text-[#6a6a6a]">저렴</span>
-          <div className="w-24 sm:w-32 h-2.5 rounded-full" style={{
-            background: "linear-gradient(to right, #0EA5E9, #FBBF24, #EF4444)",
-          }} />
-          <span className="text-xs text-[#6a6a6a]">비쌈</span>
-        </div>
-        <div className="flex items-center gap-1.5 mt-1.5">
-          <div className="w-3 h-3 rounded-full bg-sky-500" />
-          <span className="text-xs text-[#6a6a6a]">출발지 (한국)</span>
-        </div>
-      </div>
-
       {/* 로딩 */}
       {loading && (
         <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70 backdrop-blur-sm">

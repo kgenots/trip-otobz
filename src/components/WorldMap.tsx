@@ -1,10 +1,8 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo } from "react";
 import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from "react-simple-maps";
-import { Tooltip } from "./Tooltip";
 import { cityCountryMap } from "@/data/city-country-map";
-import { getCountryName as getCountryNameKo } from "@/data/country-names";
 import type { FlightPrice } from "@/lib/api";
 
 const GEO_URL = "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
@@ -175,73 +173,34 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
     return map;
   }, [flightData]);
 
-  // 가격 → 색상 (스카이블루=저렴, 노랑=중간, 빨강=비쌈)
-  const priceToColor = useCallback((price: number) => {
-    const prices = Object.values(cityData).map(d => d.price);
-    if (prices.length === 0) return "#0EA5E9";
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    const ratio = max === min ? 0 : (price - min) / (max - min);
-
-    if (ratio <= 0.33) {
-      // 스카이블루 → 초록 (저렴)
-      const t = ratio / 0.33;
-      const r = Math.round(14 + t * (34 - 14));
-      const g = Math.round(165 + t * (197 - 165));
-      const b = Math.round(233 + t * (94 - 233));
-      return `rgb(${r},${g},${b})`;
-    } else if (ratio <= 0.66) {
-      // 초록 → 노랑 (중간)
-      const t = (ratio - 0.33) / 0.33;
-      const r = Math.round(34 + t * (251 - 34));
-      const g = Math.round(197 + t * (191 - 197));
-      const b = Math.round(94 + t * (36 - 94));
-      return `rgb(${r},${g},${b})`;
-    } else {
-      // 노랑 → 빨강 (비쌈)
-      const t = (ratio - 0.66) / 0.34;
-      const r = Math.round(251 + t * (239 - 251));
-      const g = Math.round(191 - t * (191 - 68));
-      const b = Math.round(36 + t * (68 - 36));
-      return `rgb(${r},${g},${b})`;
-    }
-  }, [cityData]);
-
   const formatPrice = (price: number) =>
     `₩${price.toLocaleString("ko-KR")}`;
 
   const shortPrice = (price: number) => {
-    if (price >= 1000000) return `${(price / 10000).toFixed(0)}만`;
-    if (price >= 10000) return `${(price / 10000).toFixed(0)}만`;
+    if (price >= 10000) return `${Math.round(price / 10000)}만`;
     return `${price.toLocaleString()}`;
   };
 
-  // 가격순 정렬 + 라벨 표시 개수 (줌 레벨에 따라)
-  const sortedCities = useMemo(() => {
-    const entries = Object.entries(cityData)
-      .filter(([code]) => cityCoordinates[code])
-      .sort((a, b) => a[1].price - b[1].price);
-    return entries;
-  }, [cityData]);
+  // 줌 레벨에 따라 표시 모드 결정
+  // 낮은 줌: 도시 이름만 (지역 탐색), 높은 줌: 이름 + 가격 (비교)
+  const showPrice = zoom >= 2;
 
-  // 줌에 따라 라벨 표시 개수 조절
-  const labelCount = zoom < 1.5 ? 15 : zoom < 3 ? 30 : zoom < 5 ? 60 : sortedCities.length;
-
-  const citiesList = sortedCities.map(([code, data], idx) => {
+  const citiesList = Object.entries(cityData).map(([code, data]) => {
     const coords = cityCoordinates[code];
     if (!coords) return null;
 
-    const fillColor = priceToColor(data.price);
     const formattedPrice = formatPrice(data.price);
-    const showLabel = idx < labelCount;
+    const label = showPrice ? `${data.name} ${shortPrice(data.price)}` : data.name;
 
-    const markerR = 4 / zoom;
-    const markerStroke = 1.5 / zoom;
-    const fontSize = Math.max(7, 10 / zoom);
-    const labelY = -(6 / zoom);
-    const pillPx = 3 / zoom;
-    const pillPy = 1.5 / zoom;
-    const pillR = 4 / zoom;
+    const markerR = 3.5 / zoom;
+    const markerStroke = 1.2 / zoom;
+    const fontSize = Math.max(6, 9 / zoom);
+    const labelY = -(7 / zoom);
+    const pillPx = 4 / zoom;
+    const pillPy = 2 / zoom;
+    const pillR = 5 / zoom;
+    const labelW = label.length * fontSize * 0.55 + pillPx * 2;
+    const labelH = fontSize + pillPy * 2;
 
     return (
       <Marker key={code} coordinates={[coords.lng, coords.lat]}>
@@ -261,41 +220,36 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
         >
           <circle
             r={markerR}
-            fill={fillColor}
+            fill="#0EA5E9"
             stroke="#ffffff"
             strokeWidth={markerStroke}
-            style={{
-              transition: "fill 0.3s ease",
-              filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))",
-            }}
+            style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.15))" }}
           />
-          {showLabel && (
-            <g transform={`translate(0, ${labelY})`}>
-              <rect
-                x={-(shortPrice(data.price).length * fontSize * 0.32 + pillPx)}
-                y={-(fontSize * 0.6 + pillPy)}
-                width={(shortPrice(data.price).length * fontSize * 0.64 + pillPx * 2)}
-                height={(fontSize * 1.2 + pillPy * 2)}
-                rx={pillR}
-                fill="white"
-                stroke="rgba(0,0,0,0.08)"
-                strokeWidth={0.5 / zoom}
-                style={{ filter: "drop-shadow(0 1px 2px rgba(0,0,0,0.1))" }}
-              />
-              <text
-                textAnchor="middle"
-                y={fontSize * 0.35}
-                style={{
-                  fontSize: `${fontSize}px`,
-                  fontWeight: 600,
-                  fill: "#222222",
-                  fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
-                }}
-              >
-                {shortPrice(data.price)}
-              </text>
-            </g>
-          )}
+          <g transform={`translate(0, ${labelY})`}>
+            <rect
+              x={-labelW / 2}
+              y={-labelH / 2}
+              width={labelW}
+              height={labelH}
+              rx={pillR}
+              fill="white"
+              stroke="rgba(0,0,0,0.06)"
+              strokeWidth={0.4 / zoom}
+              style={{ filter: "drop-shadow(0 0.5px 1px rgba(0,0,0,0.08))" }}
+            />
+            <text
+              textAnchor="middle"
+              dominantBaseline="central"
+              style={{
+                fontSize: `${fontSize}px`,
+                fontWeight: 600,
+                fill: "#222222",
+                fontFamily: "-apple-system, BlinkMacSystemFont, sans-serif",
+              }}
+            >
+              {label}
+            </text>
+          </g>
         </g>
       </Marker>
     );
