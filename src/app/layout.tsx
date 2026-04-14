@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
+import GoogleAnalytics from "@/components/GoogleAnalytics";
 import "./globals.css";
 
 const SITE_URL = "https://trip.otobz.com";
@@ -65,6 +66,7 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <body className="antialiased">
+        <GoogleAnalytics />
         <JsonLd />
         {children}
       </body>
