@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { ComposableMap, Geographies, Geography, ZoomableGroup, Marker } from "react-simple-maps";
+import { ComposableMap, Geographies, Geography, ZoomableGroup } from "react-simple-maps";
+import { geoMercator } from "d3-geo";
 import { Tooltip } from "./Tooltip";
 import { cityCountryMap } from "@/data/city-country-map";
 import { getCountryName as getCountryNameKo } from "@/data/country-names";
@@ -210,38 +211,47 @@ export default function WorldMap({ flightData, onCityClick }: WorldMapProps) {
   const formatPrice = (price: number) =>
     `₩${price.toLocaleString("ko-KR")}`;
 
+  // ComposableMap과 동일한 Mercator 프로젝션으로 좌표 변환
+  const projection = useMemo(
+    () => geoMercator().scale(140).center([0, 20]).translate([400, 300]),
+    []
+  );
+
   const citiesList = Object.entries(cityData).map(([code, data]) => {
     const coords = cityCoordinates[code];
     if (!coords) return null;
 
-    const cityInfo = cityCountryMap[code];
+    const projected = projection([coords.lng, coords.lat]);
+    if (!projected) return null;
+
     const fillColor = priceToColor(data.price);
     const formattedPrice = formatPrice(data.price);
 
     return (
-      <Marker key={code} coordinates={[coords.lng, coords.lat]}>
-        <circle
-          r="8"
-          fill={fillColor}
-          stroke="#1e293b"
-          strokeWidth="2"
-          style={{
-            cursor: "pointer",
-            transition: "fill 0.3s ease, r 0.3s ease",
-          }}
-          onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
-          onMouseLeave={() => setTooltipContent("")}
-          onTouchStart={(e: any) => {
-            e.preventDefault();
-            setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
-          }}
-          onTouchEnd={(e: any) => {
-            e.preventDefault();
-            onCityClick(code, data.name, data.price);
-          }}
-          onClick={() => onCityClick(code, data.name, data.price)}
-        />
-      </Marker>
+      <circle
+        key={code}
+        cx={projected[0]}
+        cy={projected[1]}
+        r="8"
+        fill={fillColor}
+        stroke="#1e293b"
+        strokeWidth="2"
+        style={{
+          cursor: "pointer",
+          transition: "fill 0.3s ease, r 0.3s ease",
+        }}
+        onMouseEnter={() => setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`)}
+        onMouseLeave={() => setTooltipContent("")}
+        onTouchStart={(e: any) => {
+          e.preventDefault();
+          setTooltipContent(`${data.name} (${data.country}) - ${formattedPrice}~`);
+        }}
+        onTouchEnd={(e: any) => {
+          e.preventDefault();
+          onCityClick(code, data.name, data.price);
+        }}
+        onClick={() => onCityClick(code, data.name, data.price)}
+      />
     );
   }).filter(Boolean);
 
