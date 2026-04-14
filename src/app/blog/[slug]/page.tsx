@@ -58,6 +58,51 @@ function renderMarkdown(content: string) {
           {line.slice(3)}
         </h2>
       );
+    } else if (line.trim().startsWith("|") && line.trim().endsWith("|")) {
+      // 테이블 파싱
+      const tableRows: string[][] = [];
+      while (i < lines.length && lines[i].trim().startsWith("|") && lines[i].trim().endsWith("|")) {
+        const row = lines[i].trim().slice(1, -1).split("|").map((c) => c.trim());
+        tableRows.push(row);
+        i++;
+      }
+      // 구분선(|--|--|) 행 제거
+      const filtered = tableRows.filter((row) => !row.every((c) => /^[-:]+$/.test(c)));
+      if (filtered.length > 0) {
+        const header = filtered[0];
+        const body = filtered.slice(1);
+        elements.push(
+          <div key={`table-${i}`} className="my-5 overflow-x-auto">
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr>
+                  {header.map((cell, ci) => (
+                    <th
+                      key={ci}
+                      className="text-left px-3 py-2 bg-gray-50 text-[#222] font-semibold border-b border-gray-200"
+                      dangerouslySetInnerHTML={{ __html: inlineFormat(cell) }}
+                    />
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {body.map((row, ri) => (
+                  <tr key={ri} className={ri % 2 === 1 ? "bg-gray-50/50" : ""}>
+                    {row.map((cell, ci) => (
+                      <td
+                        key={ci}
+                        className="px-3 py-2 text-[#444] border-b border-gray-100"
+                        dangerouslySetInnerHTML={{ __html: inlineFormat(cell) }}
+                      />
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        );
+      }
+      continue;
     } else if (line.startsWith("- ")) {
       const items: string[] = [];
       while (i < lines.length && lines[i].startsWith("- ")) {
