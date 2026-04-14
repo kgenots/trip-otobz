@@ -17,6 +17,7 @@ export const blogPosts: BlogPost[] = [
     description: "올여름 일본 여행을 계획 중이라면? 도쿄·오사카·후쿠오카 항공권 가격 추이와 최저가 예약 팁을 정리했습니다.",
     date: "2026-04-15",
     keywords: ["일본 항공권 최저가", "2026 여름 일본", "도쿄 항공권", "오사카 항공권", "일본 여행 팁"],
+    coverImage: "https://images.unsplash.com/photo-1524390308157-a4cc42cb95d2?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-rose-400 via-pink-300 to-sky-400",
     coverEmoji: "🗼",
     content: `## 올여름 일본, 언제 예약해야 가장 쌀까?
@@ -80,6 +81,7 @@ export const blogPosts: BlogPost[] = [
     description: "항공권부터 숙소, 교통, 식비, 관광까지. 도쿄 3박4일 실제 경비를 항목별로 정리했습니다.",
     date: "2026-04-15",
     keywords: ["도쿄 여행 경비", "도쿄 3박4일", "일본 여행 비용", "도쿄 예산", "도쿄 여행 준비"],
+    coverImage: "https://images.unsplash.com/photo-1558240077-e33b10a16a64?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-red-400 via-orange-300 to-yellow-300",
     coverEmoji: "🗼",
     content: `## 도쿄 3박4일, 실제로 얼마나 들까?
@@ -143,6 +145,7 @@ export const blogPosts: BlogPost[] = [
     description: "동남아 4대 인기 여행지 항공권 가격, 비행시간, 특징을 한눈에 비교합니다.",
     date: "2026-04-14",
     keywords: ["동남아 항공권", "방콕 항공권", "다낭 항공권", "세부 항공권", "발리 항공권", "동남아 여행"],
+    coverImage: "https://images.unsplash.com/photo-1563492065599-3520f775eeed?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-emerald-400 via-teal-300 to-cyan-400",
     coverEmoji: "🌴",
     content: `## 동남아 어디로 갈까? 가격부터 비교!
@@ -209,6 +212,7 @@ export const blogPosts: BlogPost[] = [
     description: "가까운 미국령 휴양지 괌과 사이판. 가격, 볼거리, 장단점을 비교해 내게 맞는 여행지를 골라보세요.",
     date: "2026-04-13",
     keywords: ["괌 vs 사이판", "괌 여행", "사이판 여행", "괌 사이판 비교", "가족 여행지 추천"],
+    coverImage: "https://images.unsplash.com/photo-1599172806427-975cc19da9c7?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-sky-400 via-blue-300 to-indigo-400",
     coverEmoji: "🏖️",
     content: `## 괌 vs 사이판, 나에게 맞는 곳은?
@@ -263,6 +267,7 @@ export const blogPosts: BlogPost[] = [
     description: "유럽 항공권은 비쌀 수밖에 없다? 100만 원 이하로 유럽 왕복 항공권 구매하는 실전 팁.",
     date: "2026-04-12",
     keywords: ["유럽 항공권 싸게", "유럽 항공권 최저가", "유럽 여행 준비", "파리 항공권", "유럽 특가"],
+    coverImage: "https://images.unsplash.com/photo-1592767074929-85305f4c1f57?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-violet-400 via-purple-300 to-fuchsia-400",
     coverEmoji: "✈️",
     content: `## 유럽 항공권, 100만 원 이하로 가능할까?
@@ -319,6 +324,7 @@ export const blogPosts: BlogPost[] = [
     description: "도톤보리, 신사이바시, 쿠로몬 시장까지. 오사카 먹방 여행의 모든 것을 정리했습니다.",
     date: "2026-04-11",
     keywords: ["오사카 맛집", "오사카 여행 코스", "오사카 먹방", "도톤보리 맛집", "오사카 음식 추천"],
+    coverImage: "https://images.unsplash.com/photo-1705580069832-ccff8ec4cad5?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-orange-400 via-red-300 to-pink-400",
     coverEmoji: "🍣",
     content: `## 오사카는 '먹다오레' — 먹다가 쓰러지는 도시
@@ -374,6 +380,7 @@ export const blogPosts: BlogPost[] = [
     description: "와이키키 비치부터 다이아몬드 헤드까지. 호놀룰루 여행에 필요한 모든 정보를 정리했습니다.",
     date: "2026-04-10",
     keywords: ["하와이 여행", "호놀룰루 여행", "와이키키", "하와이 경비", "하와이 항공권"],
+    coverImage: "https://images.unsplash.com/photo-1698094276348-c542aa9c5609?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-amber-400 via-orange-300 to-rose-400",
     coverEmoji: "🌺",
     content: `## 호놀룰루, 한국인이 사랑하는 장거리 휴양지
@@ -423,6 +430,7 @@ export const blogPosts: BlogPost[] = [
     description: "베트남 첫 여행, 해변의 다낭과 문화의 하노이 중 어디를 갈지 고민된다면 이 글을 읽어보세요.",
     date: "2026-04-09",
     keywords: ["다낭 vs 하노이", "베트남 여행", "다낭 여행", "하노이 여행", "베트남 첫 여행"],
+    coverImage: "https://images.unsplash.com/photo-1723142282970-1fd415eec1ad?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-lime-400 via-green-300 to-emerald-400",
     coverEmoji: "🍜",
     content: `## 다낭 vs 하노이, 첫 베트남은 어디로?
@@ -480,6 +488,7 @@ export const blogPosts: BlogPost[] = [
     description: "발리 여행 숙소를 어디에 잡을지 고민이라면? 우붓과 꾸따·스미냑의 특징과 장단점을 비교합니다.",
     date: "2026-04-08",
     keywords: ["발리 우붓", "발리 꾸따", "발리 숙소", "발리 지역 추천", "발리 여행 가이드"],
+    coverImage: "https://images.unsplash.com/photo-1555400038-63f5ba517a47?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-green-500 via-emerald-400 to-teal-400",
     coverEmoji: "🌿",
     content: `## 발리, 어디에 숙소를 잡을까?
@@ -532,6 +541,7 @@ export const blogPosts: BlogPost[] = [
     description: "항공권 검색의 기본부터 고급 팁까지. 같은 비행기를 타도 가격이 다른 이유와 최저가 찾는 노하우.",
     date: "2026-04-07",
     keywords: ["항공권 싸게 사는 법", "항공권 최저가", "항공권 검색 팁", "저가 항공권", "항공권 예약 꿀팁"],
+    coverImage: "https://images.unsplash.com/photo-1721592872734-3398900b195c?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-blue-500 via-sky-400 to-cyan-400",
     coverEmoji: "💰",
     content: `## 같은 비행기, 다른 가격 — 왜?
@@ -599,6 +609,7 @@ LCC가 항상 싼 건 아닙니다. FSC 프로모션이 LCC보다 쌀 때도 있
     description: "올여름 어디로 떠날까? 가성비, 날씨, 볼거리를 고려한 2026년 여름 해외여행지 베스트 10.",
     date: "2026-04-06",
     keywords: ["여름 해외여행지", "2026 여름 여행", "해외여행지 추천", "여름 휴가 추천", "해외여행 가성비"],
+    coverImage: "https://images.unsplash.com/photo-1541417904950-b855846fe074?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-cyan-400 via-sky-300 to-blue-500",
     coverEmoji: "🌏",
     content: `## 2026년 여름, 어디로 떠날까?
