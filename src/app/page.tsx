@@ -1,8 +1,7 @@
-"use client";
-
-import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
-import { cities, isKorea, type City } from "@/data/cities";
+import { cities } from "@/data/cities";
+import { blogPosts } from "@/data/blog-posts";
+import HeroClient from "@/components/HeroClient";
 
 const POPULAR_SLUGS = [
   "tokyo", "osaka", "bangkok", "danang", "cebu",
@@ -22,70 +21,9 @@ const regionGroups = [
 ];
 
 const cityBySlug = Object.fromEntries(cities.map((c) => [c.slug, c]));
-
-type LocationState =
-  | { status: "loading" }
-  | { status: "korea" }
-  | { status: "detected"; city: City }
-  | { status: "fallback" };
+const recentPosts = blogPosts.slice(0, 3);
 
 export default function Home() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [location, setLocation] = useState<LocationState>({ status: "loading" });
-
-  useEffect(() => {
-    if (!navigator.geolocation) {
-      setLocation({ status: "fallback" });
-      return;
-    }
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-
-        if (isKorea(latitude, longitude)) {
-          setLocation({ status: "korea" });
-          return;
-        }
-
-        // 가장 가까운 도시 찾기 (클라이언트 계산)
-        let nearest: City | null = null;
-        let minDist = Infinity;
-        for (const city of cities) {
-          const dlat = city.lat - latitude;
-          const dlng = city.lng - longitude;
-          const dist = dlat * dlat + dlng * dlng;
-          if (dist < minDist) {
-            minDist = dist;
-            nearest = city;
-          }
-        }
-
-        if (nearest && minDist < 25) {
-          setLocation({ status: "detected", city: nearest });
-        } else {
-          setLocation({ status: "fallback" });
-        }
-      },
-      () => {
-        setLocation({ status: "fallback" });
-      },
-      { timeout: 5000, maximumAge: 300000 }
-    );
-  }, []);
-
-  const filteredCities = useMemo(() => {
-    if (!searchQuery.trim()) return null;
-    const q = searchQuery.trim().toLowerCase();
-    return cities.filter(
-      (c) =>
-        c.cityKo.includes(q) ||
-        c.cityEn.toLowerCase().includes(q) ||
-        c.countryKo.includes(q) ||
-        c.slug.includes(q)
-    );
-  }, [searchQuery]);
-
   return (
     <main className="min-h-screen bg-white">
       {/* 헤더 */}
@@ -111,104 +49,8 @@ export default function Home() {
         </div>
       </header>
 
-      {/* 히어로 + 위치 인식 */}
-      <section className="bg-white px-4 sm:px-8 py-10 sm:py-14 text-center border-b border-gray-100">
-        {location.status === "loading" && (
-          <>
-            <div className="animate-spin rounded-full h-8 w-8 border-2 border-sky-200 border-t-sky-500 mx-auto mb-4" />
-            <h2 className="text-2xl sm:text-4xl font-bold text-[#222222] mb-2">
-              현재 위치를 확인하고 있어요
-            </h2>
-            <p className="text-[#6a6a6a] text-sm sm:text-base">
-              잠시만 기다려 주세요...
-            </p>
-          </>
-        )}
-
-        {location.status === "detected" && (
-          <>
-            <p className="text-4xl mb-3">{location.city.emoji}</p>
-            <h2 className="text-2xl sm:text-4xl font-bold text-[#222222] mb-2">
-              {location.city.cityKo}에 계신 것 같아요!
-            </h2>
-            <p className="text-[#6a6a6a] mb-6 text-sm sm:text-base">
-              {location.city.cityKo}에서 할 수 있는 베스트 투어·액티비티를 확인해 보세요
-            </p>
-            <Link
-              href={`/city/${location.city.slug}`}
-              className="inline-block bg-sky-500 hover:bg-sky-600 text-white font-semibold px-8 py-3.5 rounded-xl transition-all text-base shadow-sm"
-            >
-              {location.city.cityKo} 액티비티 보기
-            </Link>
-          </>
-        )}
-
-        {location.status === "korea" && (
-          <>
-            <h2 className="text-2xl sm:text-4xl font-bold text-[#222222] mb-2">
-              어디로 여행 가세요?
-            </h2>
-            <p className="text-[#6a6a6a] mb-6 text-sm sm:text-base">
-              인기 여행지의 베스트 투어·액티비티를 찾아보세요
-            </p>
-          </>
-        )}
-
-        {location.status === "fallback" && (
-          <>
-            <h2 className="text-2xl sm:text-4xl font-bold text-[#222222] mb-2">
-              여행지에서 뭐하지?
-            </h2>
-            <p className="text-[#6a6a6a] mb-6 text-sm sm:text-base">
-              전 세계 인기 도시의 베스트 투어·액티비티를 찾아보세요
-            </p>
-          </>
-        )}
-
-        {/* 검색바 (로딩 아닐 때만) */}
-        {location.status !== "loading" && (
-          <div className="max-w-md mx-auto relative mt-4">
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="어디로 가시나요? (예: 도쿄, 파리, Bangkok)"
-              className="w-full px-5 py-3 rounded-xl border border-gray-200 bg-white text-[#222222] placeholder-gray-400 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-100 text-sm"
-            />
-            {searchQuery && (
-              <button
-                onClick={() => setSearchQuery("")}
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg"
-              >
-                &times;
-              </button>
-            )}
-
-            {/* 검색 결과 드롭다운 */}
-            {filteredCities && (
-              <div className="absolute left-0 right-0 mt-1 bg-white border border-gray-200 rounded-xl shadow-lg overflow-hidden z-20">
-                {filteredCities.length === 0 ? (
-                  <p className="px-4 py-3 text-sm text-[#6a6a6a]">검색 결과가 없습니다</p>
-                ) : (
-                  filteredCities.slice(0, 8).map((c) => (
-                    <Link
-                      key={c.slug}
-                      href={`/city/${c.slug}`}
-                      className="flex items-center justify-between px-4 py-3 hover:bg-sky-50 transition-colors border-b border-gray-50 last:border-b-0"
-                    >
-                      <span className="text-sm font-medium text-[#222222]">
-                        {c.emoji} {c.cityKo}
-                        <span className="text-[#6a6a6a] ml-1.5 font-normal">{c.countryKo}</span>
-                      </span>
-                      <span className="text-xs text-sky-500">액티비티 보기 &rarr;</span>
-                    </Link>
-                  ))
-                )}
-              </div>
-            )}
-          </div>
-        )}
-      </section>
+      {/* 히어로 (클라이언트) */}
+      <HeroClient />
 
       {/* 인기 여행지 카드 */}
       <section id="explore" className="bg-[#FAFAFA]">
@@ -261,6 +103,76 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* 최근 블로그 */}
+      <section className="bg-white">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 sm:py-14">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-lg font-bold text-[#222222]">여행 블로그</h3>
+            <Link href="/blog" className="text-sm text-sky-500 hover:text-sky-600 font-medium">
+              전체 보기 &rarr;
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+            {recentPosts.map((post) => (
+              <Link
+                key={post.slug}
+                href={`/blog/${post.slug}`}
+                className="rounded-xl border border-gray-100 hover:border-sky-200 hover:shadow-md transition-all overflow-hidden group"
+              >
+                {post.coverImage ? (
+                  <div
+                    className="h-40 bg-cover bg-center"
+                    style={{ backgroundImage: `url(${post.coverImage})` }}
+                  />
+                ) : (
+                  <div
+                    className={`h-40 bg-gradient-to-br ${post.coverGradient} flex items-center justify-center`}
+                  >
+                    <span className="text-5xl">{post.coverEmoji}</span>
+                  </div>
+                )}
+                <div className="p-4">
+                  <h4 className="font-semibold text-sm text-[#222222] group-hover:text-sky-600 transition-colors line-clamp-2 mb-1">
+                    {post.title}
+                  </h4>
+                  <p className="text-xs text-[#6a6a6a] line-clamp-2">{post.description}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 푸터 */}
+      <footer className="bg-[#FAFAFA] border-t border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-8">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-semibold text-[#222222]">Trip OTOBZ</p>
+              <p className="text-xs text-[#6a6a6a] mt-1">
+                여행지에서 뭐하지? 전 세계 도시의 베스트 액티비티를 비교하세요.
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link href="/blog" className="text-xs text-[#6a6a6a] hover:text-sky-500">
+                블로그
+              </Link>
+              <Link href="/sitemap.xml" className="text-xs text-[#6a6a6a] hover:text-sky-500">
+                사이트맵
+              </Link>
+            </div>
+          </div>
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <p className="text-[11px] text-[#999]">
+              이 사이트는 마이리얼트립, Klook, Agoda 등의 제휴 링크를 포함하고 있으며, 링크를 통한 구매 시 사이트 운영자에게 수수료가 지급될 수 있습니다. 이용자에게 추가 비용은 발생하지 않습니다.
+            </p>
+            <p className="text-[11px] text-[#999] mt-1">
+              &copy; {new Date().getFullYear()} Trip OTOBZ. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </main>
   );
 }
