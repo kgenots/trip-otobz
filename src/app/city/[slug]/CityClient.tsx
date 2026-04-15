@@ -335,8 +335,7 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
             )}
 
             {/* 정렬 */}
-            <div className="flex items-center gap-2 mb-5">
-              <span className="text-xs text-[#6a6a6a]">정렬</span>
+            <div className="flex flex-wrap gap-2 mb-6">
               {([
                 ["rating", "인기순"],
                 ["price_asc", "가격 낮은순"],
@@ -345,10 +344,10 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
                 <button
                   key={val}
                   onClick={() => { setSortBy(val); setShowMore(false); }}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                     sortBy === val
-                      ? "bg-[#222222] text-white"
-                      : "bg-white text-[#6a6a6a] border border-gray-200 hover:border-gray-400"
+                      ? "bg-sky-500 text-white shadow-sm"
+                      : "bg-white text-[#6a6a6a] border border-gray-200 hover:border-sky-300 hover:text-sky-600"
                   }`}
                 >
                   {label}
