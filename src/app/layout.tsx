@@ -67,6 +67,7 @@ export default function RootLayout({
     <html lang="ko">
       <head>
         <meta name="agd-partner-manual-verification" />
+        <meta name="naver-site-verification" content="1a0fd44740cba0ba4b2912712da898b0857aa430" />
       </head>
       <body className="antialiased">
         <GoogleAnalytics />
