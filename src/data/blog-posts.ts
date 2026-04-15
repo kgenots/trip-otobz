@@ -137,7 +137,7 @@ export const blogPosts: BlogPost[] = [
 | 관광 | 10만 | 20만 | 40만 |
 | **합계** | **67만** | **107만** | **159만** |
 
-[Trip OTOBZ](https://trip.otobz.com/destinations/tokyo)에서 도쿄 항공권·숙소 실시간 최저가를 확인해보세요!`,
+[Trip OTOBZ](https://trip.otobz.com/city/tokyo)에서 도쿄 항공권·숙소 실시간 최저가를 확인해보세요!`,
   },
   {
     slug: "southeast-asia-flights-comparison",
@@ -372,7 +372,7 @@ export const blogPosts: BlogPost[] = [
 - 저녁: 2,000~5,000엔 (2~5만 원)
 - **3박4일 식비 총합**: 약 15~25만 원
 
-[Trip OTOBZ](https://trip.otobz.com/destinations/osaka)에서 오사카 항공권·숙소 최저가를 확인하세요!`,
+[Trip OTOBZ](https://trip.otobz.com/city/osaka)에서 오사카 항공권·숙소 최저가를 확인하세요!`,
   },
   {
     slug: "hawaii-honolulu-travel-guide",
@@ -422,7 +422,7 @@ export const blogPosts: BlogPost[] = [
 - **ABC 스토어** — 와이키키 곳곳에 있는 편의점, 물·간식 여기서
 - **시차** — 한국보다 19시간 느림, 첫날은 무리하지 말 것
 
-[Trip OTOBZ](https://trip.otobz.com/destinations/honolulu)에서 하와이 항공권 최저가를 확인해보세요!`,
+[Trip OTOBZ](https://trip.otobz.com/city/honolulu)에서 하와이 항공권 최저가를 확인해보세요!`,
   },
   {
     slug: "vietnam-danang-vs-hanoi",
@@ -533,7 +533,7 @@ export const blogPosts: BlogPost[] = [
 
 5일 이상이라면 **우붓 2박 + 꾸따/스미냑 2박** 조합이 최고! 다른 분위기를 모두 경험할 수 있습니다.
 
-[Trip OTOBZ](https://trip.otobz.com/destinations/bali)에서 발리 항공권·숙소 최저가를 확인해보세요!`,
+[Trip OTOBZ](https://trip.otobz.com/city/bali)에서 발리 항공권·숙소 최저가를 확인해보세요!`,
   },
   {
     slug: "how-to-find-cheap-flights",

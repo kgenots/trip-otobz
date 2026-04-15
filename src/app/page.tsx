@@ -11,12 +11,14 @@ const POPULAR_SLUGS = [
 ];
 
 const regionGroups = [
-  { label: "일본", slugs: ["tokyo", "osaka", "kyoto", "fukuoka", "sapporo"] },
-  { label: "동남아", slugs: ["bangkok", "chiangmai", "phuket", "hochiminh", "hanoi", "danang", "singapore", "bali", "cebu", "manila", "kualalumpur"] },
+  { label: "일본", slugs: ["tokyo", "osaka", "kyoto", "fukuoka", "sapporo", "okinawa", "nagoya"] },
+  { label: "동남아", slugs: ["bangkok", "chiangmai", "phuket", "hochiminh", "hanoi", "danang", "singapore", "bali", "cebu", "manila", "kualalumpur", "kotakinabalu", "siemreap"] },
   { label: "중화권", slugs: ["taipei", "hongkong", "macau", "shanghai", "beijing"] },
-  { label: "유럽", slugs: ["paris", "london", "barcelona", "rome"] },
-  { label: "미주·태평양", slugs: ["newyork", "hawaii", "guam", "saipan"] },
-  { label: "오세아니아", slugs: ["sydney"] },
+  { label: "중동·남아시아", slugs: ["dubai", "istanbul", "maldives"] },
+  { label: "유럽", slugs: ["paris", "london", "barcelona", "rome", "amsterdam", "prague", "vienna", "zurich", "lisbon", "athens", "helsinki"] },
+  { label: "미주", slugs: ["newyork", "losangeles", "sanfrancisco", "lasvegas", "hawaii", "cancun"] },
+  { label: "태평양·오세아니아", slugs: ["guam", "saipan", "sydney", "melbourne", "auckland"] },
+  { label: "아프리카", slugs: ["cairo"] },
 ];
 
 const cityBySlug = Object.fromEntries(cities.map((c) => [c.slug, c]));
