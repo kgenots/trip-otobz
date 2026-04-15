@@ -3,24 +3,21 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { City } from "@/data/cities";
-import { getMylinkId, accommodationUrl, tourUrl, klookSearchUrl } from "@/lib/affiliate";
+import { getMylinkId, accommodationUrl, klookSearchUrl } from "@/lib/affiliate";
 
-interface TnaCategory {
-  name: string;
-  value: string;
-}
-
-interface Tour {
-  gid: string;
-  itemName: string;
-  salePrice: number;
-  priceDisplay: string;
-  reviewScore: number;
-  reviewCount: number;
-  imageUrl: string;
-  productUrl: string;
-  category: string;
+interface Activity {
+  id: number;
+  source: "myrealtrip" | "klook";
+  sourceId: string;
+  title: string;
+  price: number | null;
+  priceDisplay: string | null;
+  imageUrl: string | null;
+  affiliateUrl: string;
+  category: string | null;
   tags: string[];
+  rating: number | null;
+  reviewCount: number;
 }
 
 interface AccommodationItem {
@@ -44,17 +41,38 @@ interface RelatedPost {
 }
 
 type TabId = "tour" | "accommodation";
+type SourceFilter = "all" | "myrealtrip" | "klook";
+
+function SourceBadge({ source }: { source: "myrealtrip" | "klook" }) {
+  if (source === "myrealtrip") {
+    return (
+      <span className="text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 rounded font-medium">
+        마이리얼트립
+      </span>
+    );
+  }
+  return (
+    <span className="text-[10px] px-1.5 py-0.5 bg-orange-50 text-orange-600 rounded font-medium">
+      Klook
+    </span>
+  );
+}
 
 export default function CityClient({ city, relatedPosts = [] }: { city: City; relatedPosts?: RelatedPost[] }) {
   const [activeTab, setActiveTab] = useState<TabId>("tour");
   const [mylinkId, setMylinkId] = useState("");
 
-  // Tour state
-  const [tours, setTours] = useState<Tour[]>([]);
-  const [categories, setCategories] = useState<TnaCategory[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState("all");
-  const [toursLoading, setToursLoading] = useState(true);
-  const [showMoreTours, setShowMoreTours] = useState(false);
+  // Activity state (DB)
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [activitiesLoading, setActivitiesLoading] = useState(true);
+  const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
+  const [sourceCounts, setSourceCounts] = useState<Record<string, number>>({});
+  const [showMore, setShowMore] = useState(false);
+  const [useDbData, setUseDbData] = useState(true);
+
+  // Fallback: direct API (기존 방식)
+  const [fallbackTours, setFallbackTours] = useState<Activity[]>([]);
+  const [fallbackLoading, setFallbackLoading] = useState(false);
 
   // Accommodation state
   const [accommodations, setAccommodations] = useState<AccommodationItem[]>([]);
@@ -65,45 +83,74 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
     getMylinkId().then(setMylinkId);
   }, []);
 
-  // 카테고리 로드
-  useEffect(() => {
+  // DB에서 액티비티 로드
+  const fetchActivities = useCallback(
+    (source: SourceFilter) => {
+      setActivitiesLoading(true);
+      fetch(`/api/activities?city=${city.slug}&source=${source}&perPage=60`)
+        .then((r) => r.json())
+        .then((json) => {
+          if (json.data?.items?.length > 0) {
+            setActivities(json.data.items);
+            setSourceCounts(json.data.sources || {});
+            setUseDbData(true);
+          } else {
+            setUseDbData(false);
+          }
+        })
+        .catch(() => setUseDbData(false))
+        .finally(() => setActivitiesLoading(false));
+    },
+    [city.slug]
+  );
+
+  // Fallback: 실시간 마이리얼트립 API
+  const fetchFallbackTours = useCallback(() => {
+    setFallbackLoading(true);
     fetch("/api/tours", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ action: "categories", city: city.cityKo }),
+      body: JSON.stringify({
+        action: "search",
+        keyword: city.cityKo,
+        city: city.cityKo,
+        sort: "review_score_desc",
+        perPage: 30,
+      }),
     })
       .then((r) => r.json())
-      .then((json) => setCategories(json.data?.categories || []))
-      .catch(() => setCategories([]));
+      .then((json) => {
+        const items = json.data?.items || [];
+        setFallbackTours(
+          items.map((t: Record<string, unknown>) => ({
+            id: 0,
+            source: "myrealtrip" as const,
+            sourceId: t.gid as string,
+            title: t.itemName as string,
+            price: (t.salePrice as number) || null,
+            priceDisplay: (t.priceDisplay as string) || null,
+            imageUrl: (t.imageUrl as string) || null,
+            affiliateUrl: (t.productUrl as string) || "",
+            category: (t.category as string) || null,
+            tags: (t.tags as string[]) || [],
+            rating: (t.reviewScore as number) || null,
+            reviewCount: (t.reviewCount as number) || 0,
+          }))
+        );
+      })
+      .catch(() => setFallbackTours([]))
+      .finally(() => setFallbackLoading(false));
   }, [city.cityKo]);
 
-  // 투어 검색
-  const fetchTours = useCallback(
-    (category: string) => {
-      setToursLoading(true);
-      fetch("/api/tours", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "search",
-          keyword: city.cityKo,
-          city: city.cityKo,
-          category: category === "all" ? undefined : category,
-          sort: "review_score_desc",
-          perPage: 30,
-        }),
-      })
-        .then((r) => r.json())
-        .then((json) => setTours(json.data?.items || []))
-        .catch(() => setTours([]))
-        .finally(() => setToursLoading(false));
-    },
-    [city.cityKo]
-  );
+  useEffect(() => {
+    fetchActivities(sourceFilter);
+  }, [sourceFilter, fetchActivities]);
 
   useEffect(() => {
-    fetchTours(selectedCategory);
-  }, [selectedCategory, fetchTours]);
+    if (!useDbData && !activitiesLoading && fallbackTours.length === 0) {
+      fetchFallbackTours();
+    }
+  }, [useDbData, activitiesLoading, fallbackTours.length, fetchFallbackTours]);
 
   // 숙소 (탭 클릭 시 lazy 로드)
   useEffect(() => {
@@ -139,15 +186,13 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
   }, [activeTab, accomLoaded, city.cityKo]);
 
   const formatPrice = (n: number) => `₩${n.toLocaleString("ko-KR")}`;
-
-  const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
-    setShowMoreTours(false);
-  };
-
-  const visibleTours = showMoreTours ? tours : tours.slice(0, 12);
-
   const stars = (n: number) => "★".repeat(Math.min(n, 5)) + "☆".repeat(Math.max(5 - n, 0));
+
+  const displayActivities = useDbData ? activities : fallbackTours;
+  const isLoading = useDbData ? activitiesLoading : fallbackLoading;
+  const visibleActivities = showMore ? displayActivities : displayActivities.slice(0, 12);
+  const totalMrt = sourceCounts["myrealtrip"] || 0;
+  const totalKlook = sourceCounts["klook"] || 0;
 
   return (
     <div className="min-h-screen bg-[#FAFAFA] text-[#222222]">
@@ -158,16 +203,10 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
             Trip OTOBZ
           </Link>
           <div className="flex items-center gap-3">
-            <Link
-              href="/blog"
-              className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors"
-            >
+            <Link href="/blog" className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors">
               블로그
             </Link>
-            <Link
-              href="/"
-              className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors"
-            >
+            <Link href="/" className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors">
               도시 탐색
             </Link>
           </div>
@@ -225,88 +264,93 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
               {city.cityKo} 베스트 액티비티
             </h2>
 
-            {/* 카테고리 필터 */}
-            {categories.length > 0 && (
+            {/* Source 필터 */}
+            {useDbData && (totalMrt > 0 || totalKlook > 0) && (
               <div className="flex flex-wrap gap-2 mb-6">
-                <button
-                  onClick={() => handleCategoryChange("all")}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                    selectedCategory === "all"
-                      ? "bg-sky-500 text-white shadow-sm"
-                      : "bg-white text-[#6a6a6a] border border-gray-200 hover:border-sky-300 hover:text-sky-600"
-                  }`}
-                >
-                  전체
-                </button>
-                {categories.map((cat) => (
-                  <button
-                    key={cat.value}
-                    onClick={() => handleCategoryChange(cat.value)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
-                      selectedCategory === cat.value
-                        ? "bg-sky-500 text-white shadow-sm"
-                        : "bg-white text-[#6a6a6a] border border-gray-200 hover:border-sky-300 hover:text-sky-600"
-                    }`}
-                  >
-                    {cat.name}
-                  </button>
-                ))}
+                {(["all", "myrealtrip", "klook"] as SourceFilter[]).map((s) => {
+                  const label = s === "all" ? "전체" : s === "myrealtrip" ? "마이리얼트립" : "Klook";
+                  const count = s === "all" ? totalMrt + totalKlook : s === "myrealtrip" ? totalMrt : totalKlook;
+                  if (s !== "all" && count === 0) return null;
+                  return (
+                    <button
+                      key={s}
+                      onClick={() => { setSourceFilter(s); setShowMore(false); }}
+                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                        sourceFilter === s
+                          ? "bg-sky-500 text-white shadow-sm"
+                          : "bg-white text-[#6a6a6a] border border-gray-200 hover:border-sky-300 hover:text-sky-600"
+                      }`}
+                    >
+                      {label} ({count})
+                    </button>
+                  );
+                })}
               </div>
             )}
 
-            {/* 투어 카드 그리드 */}
-            {toursLoading ? (
+            {/* 카드 그리드 */}
+            {isLoading ? (
               <div className="flex items-center justify-center py-16">
                 <div className="animate-spin rounded-full h-10 w-10 border-2 border-sky-200 border-t-sky-500" />
               </div>
-            ) : tours.length === 0 ? (
-              <p className="text-[#6a6a6a] text-center py-12">액티비티 정보가 없습니다</p>
+            ) : displayActivities.length === 0 ? (
+              <div className="text-center py-12">
+                <p className="text-[#6a6a6a] mb-4">액티비티 정보가 없습니다</p>
+                <a
+                  href={klookSearchUrl(city.cityKo)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-block px-6 py-2.5 bg-[#FF5722] hover:bg-[#E64A19] text-white text-sm font-medium rounded-xl transition-colors"
+                >
+                  Klook에서 검색하기
+                </a>
+              </div>
             ) : (
               <>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-                  {visibleTours.map((t) => (
+                  {visibleActivities.map((a) => (
                     <a
-                      key={t.gid}
-                      href={tourUrl(mylinkId, t.productUrl)}
+                      key={`${a.source}-${a.sourceId}`}
+                      href={a.affiliateUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="bg-white rounded-2xl overflow-hidden transition-all border border-gray-100 hover:border-sky-200 hover:shadow-lg group"
                     >
-                      {t.imageUrl && (
+                      {a.imageUrl && (
                         <div className="aspect-[4/3] overflow-hidden">
                           <img
-                            src={t.imageUrl}
-                            alt={t.itemName}
+                            src={a.imageUrl}
+                            alt={a.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                           />
                         </div>
                       )}
                       <div className="p-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs px-2 py-0.5 bg-sky-50 text-sky-600 rounded-md font-medium">
-                            {t.category}
-                          </span>
-                          {t.tags.slice(0, 2).map((tag) => (
-                            <span
-                              key={tag}
-                              className="text-xs px-2 py-0.5 bg-gray-50 text-[#6a6a6a] rounded-md"
-                            >
+                        <div className="flex items-center gap-1.5 mb-2 flex-wrap">
+                          <SourceBadge source={a.source} />
+                          {a.category && (
+                            <span className="text-xs px-2 py-0.5 bg-sky-50 text-sky-600 rounded-md font-medium">
+                              {a.category}
+                            </span>
+                          )}
+                          {a.tags.slice(0, 1).map((tag) => (
+                            <span key={tag} className="text-xs px-2 py-0.5 bg-gray-50 text-[#6a6a6a] rounded-md">
                               {tag}
                             </span>
                           ))}
                         </div>
                         <h3 className="font-semibold text-[15px] line-clamp-2 mb-2 text-[#222222] group-hover:text-sky-600 transition-colors">
-                          {t.itemName}
+                          {a.title}
                         </h3>
                         <div className="flex items-center justify-between">
                           <span className="text-lg font-bold text-sky-600">
-                            {t.priceDisplay || formatPrice(t.salePrice)}
+                            {a.priceDisplay || (a.price ? formatPrice(a.price) : "")}
                           </span>
-                          {t.reviewScore > 0 && (
+                          {a.rating && a.rating > 0 && (
                             <span className="text-sm text-[#6a6a6a]">
                               <span className="text-amber-400">&#9733;</span>{" "}
-                              {t.reviewScore.toFixed(1)}
-                              <span className="text-xs ml-0.5">({t.reviewCount})</span>
+                              {a.rating.toFixed(1)}
+                              <span className="text-xs ml-0.5">({a.reviewCount})</span>
                             </span>
                           )}
                         </div>
@@ -315,39 +359,16 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
                   ))}
                 </div>
 
-                {tours.length > 12 && !showMoreTours && (
+                {displayActivities.length > 12 && !showMore && (
                   <div className="text-center mt-8">
                     <button
-                      onClick={() => setShowMoreTours(true)}
+                      onClick={() => setShowMore(true)}
                       className="px-8 py-3 rounded-xl text-sm font-medium bg-white border border-gray-200 text-[#6a6a6a] hover:border-sky-300 hover:text-sky-600 transition-all"
                     >
-                      액티비티 더보기 ({tours.length - 12}개)
+                      액티비티 더보기 ({displayActivities.length - 12}개)
                     </button>
                   </div>
                 )}
-
-                {/* Klook 비교 CTA */}
-                <div className="mt-8 p-5 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-100">
-                  <div className="flex items-center justify-between flex-wrap gap-4">
-                    <div>
-                      <p className="font-semibold text-[#222222] text-sm">
-                        Klook에서도 비교해보세요
-                      </p>
-                      <p className="text-xs text-[#6a6a6a] mt-1">
-                        {city.cityKo} 입장권·패스·데이투어를 Klook에서 확인
-                      </p>
-                    </div>
-                    <a
-                      href={klookSearchUrl(city.cityKo)}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#FF5722] hover:bg-[#E64A19] text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
-                    >
-                      Klook에서 검색
-                      <span className="text-xs">&rarr;</span>
-                    </a>
-                  </div>
-                </div>
               </>
             )}
           </section>
@@ -382,9 +403,7 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
                     <div className="flex justify-between items-start">
                       <div className="flex-1 min-w-0">
                         <h3 className="text-[#222222] font-medium truncate">{a.itemName}</h3>
-                        <div className="text-amber-500 text-xs mt-1">
-                          {stars(a.starRating)}
-                        </div>
+                        <div className="text-amber-500 text-xs mt-1">{stars(a.starRating)}</div>
                         <div className="text-[#6a6a6a] text-sm mt-1">
                           {a.reviewScore} ({a.reviewCount})
                         </div>
@@ -421,14 +440,9 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
                   className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-sky-200 hover:shadow-md transition-all group"
                 >
                   {post.coverImage ? (
-                    <div
-                      className="h-36 bg-cover bg-center"
-                      style={{ backgroundImage: `url(${post.coverImage})` }}
-                    />
+                    <div className="h-36 bg-cover bg-center" style={{ backgroundImage: `url(${post.coverImage})` }} />
                   ) : (
-                    <div
-                      className={`h-36 bg-gradient-to-br ${post.coverGradient} flex items-center justify-center`}
-                    >
+                    <div className={`h-36 bg-gradient-to-br ${post.coverGradient} flex items-center justify-center`}>
                       <span className="text-4xl">{post.coverEmoji}</span>
                     </div>
                   )}
@@ -436,9 +450,7 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
                     <h3 className="font-semibold text-sm line-clamp-2 text-[#222222] group-hover:text-sky-600 transition-colors mb-1">
                       {post.title}
                     </h3>
-                    <p className="text-xs text-[#6a6a6a] line-clamp-2">
-                      {post.description}
-                    </p>
+                    <p className="text-xs text-[#6a6a6a] line-clamp-2">{post.description}</p>
                     <p className="text-xs text-[#999] mt-2">{post.date}</p>
                   </div>
                 </Link>

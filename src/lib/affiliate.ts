@@ -45,7 +45,6 @@ export function tourUrl(mylinkId: string, productUrl: string): string {
   return appendAffiliate(productUrl, mylinkId, "tour");
 }
 
-
 // Klook 어필리에이트
 const KLOOK_AID = "118698";
 
@@ -56,4 +55,33 @@ export function klookSearchUrl(cityKo: string): string {
 export function klookCityUrl(cityEn: string): string {
   const slug = cityEn.toLowerCase().replace(/\s+/g, "-");
   return `https://www.klook.com/ko/city/${slug}/?aid=${KLOOK_AID}&utm_medium=affiliate&utm_source=trip-otobz&utm_campaign=${KLOOK_AID}`;
+}
+
+// ── 서버사이드 빌더 (DB 저장 시 사용) ──
+
+export function buildMrtAffiliateUrl(productUrl: string): string {
+  const mylinkId = process.env.MYLINK_ID;
+  if (!mylinkId) return productUrl;
+  try {
+    const url = new URL(productUrl);
+    url.searchParams.set("mylink_id", mylinkId);
+    url.searchParams.set("utm_content", "tour");
+    url.searchParams.set("utm_source", "trip-otobz");
+    return url.toString();
+  } catch {
+    return productUrl;
+  }
+}
+
+export function buildKlookAffiliateUrl(originalUrl: string): string {
+  try {
+    const url = new URL(originalUrl);
+    url.searchParams.set("aid", KLOOK_AID);
+    url.searchParams.set("utm_medium", "affiliate");
+    url.searchParams.set("utm_source", "trip-otobz");
+    url.searchParams.set("utm_campaign", KLOOK_AID);
+    return url.toString();
+  } catch {
+    return originalUrl;
+  }
 }
