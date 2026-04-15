@@ -70,6 +70,7 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
   const [sourceCounts, setSourceCounts] = useState<Record<string, number>>({});
   const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<"rating" | "price_asc" | "price_desc">("rating");
   const [showMore, setShowMore] = useState(false);
   const [useDbData, setUseDbData] = useState(true);
 
@@ -90,10 +91,10 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
 
   // DB에서 액티비티 로드
   const fetchActivities = useCallback(
-    (source: SourceFilter, category: string | null) => {
+    (source: SourceFilter, category: string | null, sort: string) => {
       setActivitiesLoading(true);
       const catParam = category ? `&category=${encodeURIComponent(category)}` : "";
-      fetch(`/api/activities?city=${city.slug}&source=${source}&perPage=60${catParam}`)
+      fetch(`/api/activities?city=${city.slug}&source=${source}&perPage=60&sort=${sort}${catParam}`)
         .then((r) => r.json())
         .then((json) => {
           if (json.data?.items?.length > 0 || json.data?.categories?.length > 0) {
@@ -150,8 +151,8 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
   }, [city.cityKo]);
 
   useEffect(() => {
-    fetchActivities(sourceFilter, selectedCategory);
-  }, [sourceFilter, selectedCategory, fetchActivities]);
+    fetchActivities(sourceFilter, selectedCategory, sortBy);
+  }, [sourceFilter, selectedCategory, sortBy, fetchActivities]);
 
   useEffect(() => {
     if (!useDbData && !activitiesLoading && fallbackTours.length === 0) {
@@ -332,6 +333,28 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
                 ))}
               </div>
             )}
+
+            {/* 정렬 */}
+            <div className="flex items-center gap-2 mb-5">
+              <span className="text-xs text-[#6a6a6a]">정렬</span>
+              {([
+                ["rating", "인기순"],
+                ["price_asc", "가격 낮은순"],
+                ["price_desc", "가격 높은순"],
+              ] as const).map(([val, label]) => (
+                <button
+                  key={val}
+                  onClick={() => { setSortBy(val); setShowMore(false); }}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
+                    sortBy === val
+                      ? "bg-[#222222] text-white"
+                      : "bg-white text-[#6a6a6a] border border-gray-200 hover:border-gray-400"
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
 
             {/* 카드 그리드 */}
             {isLoading ? (
