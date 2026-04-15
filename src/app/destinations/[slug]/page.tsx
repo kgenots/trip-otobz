@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { permanentRedirect } from "next/navigation";
 import { destinations } from "@/data/destinations";
 
 interface Props {
@@ -11,5 +11,5 @@ export function generateStaticParams() {
 
 export default async function DestinationPage({ params }: Props) {
   const { slug } = await params;
-  redirect(`/city/${slug}`);
+  permanentRedirect(`/city/${slug}`);
 }

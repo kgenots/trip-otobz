@@ -33,9 +33,19 @@ interface AccommodationItem {
   reviewCount: number;
 }
 
+interface RelatedPost {
+  slug: string;
+  title: string;
+  description: string;
+  date: string;
+  coverImage?: string;
+  coverGradient: string;
+  coverEmoji: string;
+}
+
 type TabId = "tour" | "accommodation";
 
-export default function CityClient({ city }: { city: City }) {
+export default function CityClient({ city, relatedPosts = [] }: { city: City; relatedPosts?: RelatedPost[] }) {
   const [activeTab, setActiveTab] = useState<TabId>("tour");
   const [mylinkId, setMylinkId] = useState("");
 
@@ -371,6 +381,46 @@ export default function CityClient({ city }: { city: City }) {
                 ))}
               </div>
             )}
+          </section>
+        )}
+
+        {/* 관련 블로그 포스트 */}
+        {relatedPosts.length > 0 && (
+          <section className="mt-8">
+            <h2 className="text-xl font-bold mb-4 text-[#222222]">
+              {city.cityKo} 여행 가이드
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {relatedPosts.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className="bg-white rounded-xl overflow-hidden border border-gray-100 hover:border-sky-200 hover:shadow-md transition-all group"
+                >
+                  {post.coverImage ? (
+                    <div
+                      className="h-36 bg-cover bg-center"
+                      style={{ backgroundImage: `url(${post.coverImage})` }}
+                    />
+                  ) : (
+                    <div
+                      className={`h-36 bg-gradient-to-br ${post.coverGradient} flex items-center justify-center`}
+                    >
+                      <span className="text-4xl">{post.coverEmoji}</span>
+                    </div>
+                  )}
+                  <div className="p-4">
+                    <h3 className="font-semibold text-sm line-clamp-2 text-[#222222] group-hover:text-sky-600 transition-colors mb-1">
+                      {post.title}
+                    </h3>
+                    <p className="text-xs text-[#6a6a6a] line-clamp-2">
+                      {post.description}
+                    </p>
+                    <p className="text-xs text-[#999] mt-2">{post.date}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </section>
         )}
 
