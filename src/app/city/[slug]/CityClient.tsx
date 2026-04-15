@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { City } from "@/data/cities";
-import { getMylinkId, accommodationUrl, tourUrl } from "@/lib/affiliate";
+import { getMylinkId, accommodationUrl, tourUrl, klookSearchUrl } from "@/lib/affiliate";
 
 interface TnaCategory {
   name: string;
@@ -325,6 +325,29 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
                     </button>
                   </div>
                 )}
+
+                {/* Klook 비교 CTA */}
+                <div className="mt-8 p-5 bg-gradient-to-r from-orange-50 to-amber-50 rounded-2xl border border-orange-100">
+                  <div className="flex items-center justify-between flex-wrap gap-4">
+                    <div>
+                      <p className="font-semibold text-[#222222] text-sm">
+                        Klook에서도 비교해보세요
+                      </p>
+                      <p className="text-xs text-[#6a6a6a] mt-1">
+                        {city.cityKo} 입장권·패스·데이투어를 Klook에서 확인
+                      </p>
+                    </div>
+                    <a
+                      href={klookSearchUrl(city.cityKo)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-[#FF5722] hover:bg-[#E64A19] text-white text-sm font-medium rounded-xl transition-colors shadow-sm"
+                    >
+                      Klook에서 검색
+                      <span className="text-xs">&rarr;</span>
+                    </a>
+                  </div>
+                </div>
               </>
             )}
           </section>

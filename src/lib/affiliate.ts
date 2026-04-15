@@ -44,3 +44,18 @@ export function accommodationUrl(mylinkId: string, itemId: number): string {
 export function tourUrl(mylinkId: string, productUrl: string): string {
   return appendAffiliate(productUrl, mylinkId, "tour");
 }
+
+
+// Klook 어필리에이트
+const KLOOK_AID = "118698";
+
+export function klookSearchUrl(cityKo: string): string {
+  const target = encodeURIComponent(`https://www.klook.com/ko/search/?query=${cityKo}`);
+  return `https://affiliate.klook.com/redirect?aid=${KLOOK_AID}&aff_adid=&k_site=&url=${target}`;
+}
+
+export function klookCityUrl(cityEn: string): string {
+  const slug = cityEn.toLowerCase().replace(/\s+/g, "-");
+  const target = encodeURIComponent(`https://www.klook.com/ko/city/${slug}/`);
+  return `https://affiliate.klook.com/redirect?aid=${KLOOK_AID}&aff_adid=&k_site=&url=${target}`;
+}
