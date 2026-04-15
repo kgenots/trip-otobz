@@ -67,6 +67,8 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
   const [activitiesLoading, setActivitiesLoading] = useState(true);
   const [sourceFilter, setSourceFilter] = useState<SourceFilter>("all");
   const [sourceCounts, setSourceCounts] = useState<Record<string, number>>({});
+  const [categories, setCategories] = useState<{ name: string; count: number }[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [showMore, setShowMore] = useState(false);
   const [useDbData, setUseDbData] = useState(true);
 
@@ -85,14 +87,16 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
 
   // DB에서 액티비티 로드
   const fetchActivities = useCallback(
-    (source: SourceFilter) => {
+    (source: SourceFilter, category: string | null) => {
       setActivitiesLoading(true);
-      fetch(`/api/activities?city=${city.slug}&source=${source}&perPage=60`)
+      const catParam = category ? `&category=${encodeURIComponent(category)}` : "";
+      fetch(`/api/activities?city=${city.slug}&source=${source}&perPage=60${catParam}`)
         .then((r) => r.json())
         .then((json) => {
-          if (json.data?.items?.length > 0) {
-            setActivities(json.data.items);
+          if (json.data?.items?.length > 0 || json.data?.categories?.length > 0) {
+            setActivities(json.data.items || []);
             setSourceCounts(json.data.sources || {});
+            if (!category) setCategories(json.data.categories || []);
             setUseDbData(true);
           } else {
             setUseDbData(false);
@@ -143,8 +147,8 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
   }, [city.cityKo]);
 
   useEffect(() => {
-    fetchActivities(sourceFilter);
-  }, [sourceFilter, fetchActivities]);
+    fetchActivities(sourceFilter, selectedCategory);
+  }, [sourceFilter, selectedCategory, fetchActivities]);
 
   useEffect(() => {
     if (!useDbData && !activitiesLoading && fallbackTours.length === 0) {
@@ -285,6 +289,35 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
                     </button>
                   );
                 })}
+              </div>
+            )}
+
+            {/* 카테고리 필터 */}
+            {useDbData && categories.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-6">
+                <button
+                  onClick={() => { setSelectedCategory(null); setShowMore(false); }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                    !selectedCategory
+                      ? "bg-sky-500 text-white shadow-sm"
+                      : "bg-white text-[#6a6a6a] border border-gray-200 hover:border-sky-300 hover:text-sky-600"
+                  }`}
+                >
+                  전체
+                </button>
+                {categories.map((cat) => (
+                  <button
+                    key={cat.name}
+                    onClick={() => { setSelectedCategory(cat.name); setShowMore(false); }}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                      selectedCategory === cat.name
+                        ? "bg-sky-500 text-white shadow-sm"
+                        : "bg-white text-[#6a6a6a] border border-gray-200 hover:border-sky-300 hover:text-sky-600"
+                    }`}
+                  >
+                    {cat.name} ({cat.count})
+                  </button>
+                ))}
               </div>
             )}
 

@@ -45,7 +45,7 @@ export async function GET(req: NextRequest) {
   const where = conditions.join(" AND ");
 
   try {
-    const [itemsResult, countResult, sourcesResult] = await Promise.all([
+    const [itemsResult, countResult, sourcesResult, categoriesResult] = await Promise.all([
       pool.query(
         `SELECT id, source, source_id, city_slug, title, description,
                 price, price_display, image_url, affiliate_url,
@@ -64,12 +64,23 @@ export async function GET(req: NextRequest) {
         `SELECT source, COUNT(*) as count FROM activities WHERE city_slug = $1 GROUP BY source`,
         [city]
       ),
+      pool.query(
+        `SELECT category, COUNT(*) as count FROM activities
+         WHERE city_slug = $1 AND category IS NOT NULL
+         GROUP BY category ORDER BY count DESC`,
+        [city]
+      ),
     ]);
 
     const sources: Record<string, number> = {};
     for (const row of sourcesResult.rows) {
       sources[row.source] = parseInt(row.count);
     }
+
+    const categories = categoriesResult.rows.map((r) => ({
+      name: r.category,
+      count: parseInt(r.count),
+    }));
 
     return NextResponse.json({
       data: {
@@ -93,6 +104,7 @@ export async function GET(req: NextRequest) {
         page,
         perPage,
         sources,
+        categories,
       },
     });
   } catch (e) {
