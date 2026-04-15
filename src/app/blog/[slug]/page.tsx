@@ -192,8 +192,29 @@ export default async function BlogPostPage({ params }: Props) {
   const post = blogPostBySlug[slug];
   if (!post) notFound();
 
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.description,
+    datePublished: post.date,
+    dateModified: post.date,
+    author: { "@type": "Organization", name: "Trip OTOBZ" },
+    publisher: {
+      "@type": "Organization",
+      name: "Trip OTOBZ",
+      url: "https://trip.otobz.com",
+    },
+    mainEntityOfPage: `https://trip.otobz.com/blog/${slug}`,
+    ...(post.coverImage && { image: post.coverImage }),
+  };
+
   return (
     <main className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
       <header className="border-b border-gray-100 px-3 sm:px-6 lg:px-8 py-2 sm:py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-2 sm:gap-3">
           <Link
