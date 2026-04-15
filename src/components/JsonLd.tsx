@@ -5,7 +5,7 @@ export default function JsonLd() {
     name: "Trip OTOBZ",
     url: "https://trip.otobz.com",
     description:
-      "SVG 세계지도에서 클릭 한 번으로 전 세계 항공권, 숙소, 투어·티켓 최저가를 비교하세요.",
+      "여행지에서 뭐하지? 전 세계 인기 도시의 베스트 투어, 액티비티, 체험을 한눈에 비교하고 예약하세요.",
     applicationCategory: "TravelApplication",
     operatingSystem: "Web",
     offers: {

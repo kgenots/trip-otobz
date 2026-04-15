@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { cities } from "@/data/cities";
 import { destinations } from "@/data/destinations";
 import { blogPosts } from "@/data/blog-posts";
 
@@ -12,6 +13,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
       priority: 1,
     },
+    ...cities.map((c) => ({
+      url: `${baseUrl}/city/${c.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "daily" as const,
+      priority: 0.9,
+    })),
     ...destinations.map((d) => ({
       url: `${baseUrl}/destinations/${d.slug}`,
       lastModified: new Date(),

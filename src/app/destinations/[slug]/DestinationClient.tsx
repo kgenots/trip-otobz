@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { Destination } from "@/data/destinations";
-import { getMylinkId, flightUrl, accommodationUrl, tourUrl } from "@/lib/affiliate";
+import { getMylinkId, accommodationUrl, tourUrl } from "@/lib/affiliate";
 
 interface TnaCategory {
   name: string;
@@ -23,14 +23,6 @@ interface Tour {
   tags: string[];
 }
 
-interface Flight {
-  departureDate: string;
-  returnDate: string;
-  totalPrice: number;
-  airline: string;
-  transfer: number;
-}
-
 interface Accommodation {
   itemId: number;
   itemName: string;
@@ -46,9 +38,8 @@ export default function DestinationClient({ destination }: { destination: Destin
   const [categories, setCategories] = useState<TnaCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [toursLoading, setToursLoading] = useState(true);
-  const [flights, setFlights] = useState<Flight[]>([]);
   const [accommodations, setAccommodations] = useState<Accommodation[]>([]);
-  const [auxLoading, setAuxLoading] = useState(true);
+  const [accomLoading, setAccomLoading] = useState(true);
   const [mylinkId, setMylinkId] = useState("");
   const [showMoreTours, setShowMoreTours] = useState(false);
 
@@ -96,32 +87,18 @@ export default function DestinationClient({ destination }: { destination: Destin
     fetchTours(selectedCategory);
   }, [selectedCategory, fetchTours]);
 
-  // 항공/숙소 (보조 - lazy)
+  // 숙소
   useEffect(() => {
-    const fetchAux = async () => {
-      setAuxLoading(true);
-      try {
-        const [flightRes, accomRes] = await Promise.all([
-          fetch("/api/flights", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ action: "window", depCityCd: "ICN", arrCityCd: destination.cityCode, period: 5 }),
-          }).then((r) => r.json()),
-          fetch("/api/accommodation", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ keyword: destination.cityKo, adultCount: 2 }),
-          }).then((r) => r.json()),
-        ]);
-        setFlights((flightRes.data || []).slice(0, 5));
-        setAccommodations((accomRes.data?.items || []).slice(0, 4));
-      } catch {
-        // ignore
-      } finally {
-        setAuxLoading(false);
-      }
-    };
-    fetchAux();
+    setAccomLoading(true);
+    fetch("/api/accommodation", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ keyword: destination.cityKo, adultCount: 2 }),
+    })
+      .then((r) => r.json())
+      .then((json) => setAccommodations((json.data?.items || []).slice(0, 4)))
+      .catch(() => setAccommodations([]))
+      .finally(() => setAccomLoading(false));
   }, [destination]);
 
   const formatPrice = (n: number) => n.toLocaleString("ko-KR") + "원";
@@ -152,7 +129,7 @@ export default function DestinationClient({ destination }: { destination: Destin
               href="/"
               className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors"
             >
-              지도
+              도시 탐색
             </Link>
           </div>
         </div>
@@ -268,7 +245,6 @@ export default function DestinationClient({ destination }: { destination: Destin
                 ))}
               </div>
 
-              {/* 더보기 */}
               {tours.length > 12 && !showMoreTours && (
                 <div className="text-center mt-8">
                   <button
@@ -286,104 +262,50 @@ export default function DestinationClient({ destination }: { destination: Destin
         {/* 구분선 */}
         <hr className="my-12 border-gray-200" />
 
-        {/* 보조: 이 도시 가는 법 */}
-        <section className="space-y-10">
-          <h2 className="text-xl font-bold text-[#222222]">
-            {destination.cityKo} 가는 법
+        {/* 인기 숙소 */}
+        <section>
+          <h2 className="text-xl font-bold mb-4 text-[#222222]">
+            {destination.cityKo} 인기 숙소
           </h2>
 
-          {auxLoading ? (
+          {accomLoading ? (
             <div className="flex items-center justify-center py-12">
               <div className="animate-spin rounded-full h-8 w-8 border-2 border-sky-200 border-t-sky-500" />
             </div>
+          ) : accommodations.length === 0 ? (
+            <p className="text-sm text-[#6a6a6a]">숙소 정보를 불러올 수 없습니다.</p>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              {/* 항공권 */}
-              <div>
-                <h3 className="text-base font-semibold mb-3 text-[#222222]">
-                  최저가 항공권
-                </h3>
-                {flights.length === 0 ? (
-                  <p className="text-sm text-[#6a6a6a]">항공편 정보를 불러올 수 없습니다.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {flights.map((f, i) => (
-                      <a
-                        key={i}
-                        href={flightUrl(mylinkId, {
-                          arrCityCd: destination.cityCode,
-                          arrCityNm: destination.cityKo,
-                          departureDate: f.departureDate,
-                          returnDate: f.returnDate,
-                        })}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between bg-white rounded-xl p-3 transition-all border border-gray-100 hover:border-sky-200 hover:shadow-sm"
-                      >
-                        <div>
-                          <span className="text-sm text-[#222222]">
-                            {f.departureDate} ~ {f.returnDate}
-                          </span>
-                          <div className="text-xs text-[#6a6a6a] mt-0.5">
-                            {f.airline} · {f.transfer === 0 ? "직항" : `경유 ${f.transfer}회`}
-                          </div>
-                        </div>
-                        <span className="text-base font-bold text-sky-600">
-                          {formatPrice(f.totalPrice)}
-                        </span>
-                      </a>
-                    ))}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {accommodations.map((a) => (
+                <a
+                  key={a.itemId}
+                  href={accommodationUrl(mylinkId, a.itemId)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between bg-white rounded-xl p-4 transition-all border border-gray-100 hover:border-sky-200 hover:shadow-sm"
+                >
+                  <div className="min-w-0 flex-1 mr-3">
+                    <h4 className="text-sm font-medium truncate text-[#222222]">
+                      {a.itemName}
+                    </h4>
+                    {a.reviewScore > 0 && (
+                      <span className="text-xs text-[#6a6a6a]">
+                        {a.reviewScore.toFixed(1)} ({a.reviewCount})
+                      </span>
+                    )}
                   </div>
-                )}
-              </div>
-
-              {/* 숙소 */}
-              <div>
-                <h3 className="text-base font-semibold mb-3 text-[#222222]">
-                  인기 숙소
-                </h3>
-                {accommodations.length === 0 ? (
-                  <p className="text-sm text-[#6a6a6a]">숙소 정보를 불러올 수 없습니다.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {accommodations.map((a) => (
-                      <a
-                        key={a.itemId}
-                        href={accommodationUrl(mylinkId, a.itemId)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-between bg-white rounded-xl p-3 transition-all border border-gray-100 hover:border-sky-200 hover:shadow-sm"
-                      >
-                        <div className="min-w-0 flex-1 mr-3">
-                          <h4 className="text-sm font-medium truncate text-[#222222]">
-                            {a.itemName}
-                          </h4>
-                          <div className="flex items-center gap-2 mt-0.5">
-                            {a.starRating && (
-                              <span className="text-xs text-amber-500">{a.starRating}</span>
-                            )}
-                            {a.reviewScore > 0 && (
-                              <span className="text-xs text-[#6a6a6a]">
-                                {a.reviewScore.toFixed(1)} ({a.reviewCount})
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                        <div className="text-right shrink-0">
-                          <span className="text-base font-bold text-sky-600">
-                            {formatPrice(a.salePrice)}
-                          </span>
-                          {a.originalPrice > a.salePrice && (
-                            <div className="text-xs text-gray-400 line-through">
-                              {formatPrice(a.originalPrice)}
-                            </div>
-                          )}
-                        </div>
-                      </a>
-                    ))}
+                  <div className="text-right shrink-0">
+                    <span className="text-base font-bold text-sky-600">
+                      {formatPrice(a.salePrice)}
+                    </span>
+                    {a.originalPrice > a.salePrice && (
+                      <div className="text-xs text-gray-400 line-through">
+                        {formatPrice(a.originalPrice)}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
+                </a>
+              ))}
             </div>
           )}
         </section>

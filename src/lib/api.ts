@@ -24,45 +24,6 @@ async function apiRequest<T>(path: string, body: Record<string, unknown>): Promi
   return json.data;
 }
 
-// 항공권
-export interface FlightPrice {
-  fromCity: string;
-  toCity: string;
-  period: number | null;
-  departureDate: string;
-  returnDate: string | null;
-  totalPrice: number;
-  airline: string | null;
-  transfer: number | null;
-  averagePrice: number | null;
-}
-
-export async function getFlightBulkLowest(depCityCd: string, period: number): Promise<FlightPrice[]> {
-  return apiRequest("/v1/products/flight/calendar/bulk-lowest", { depCityCd, period });
-}
-
-export async function getFlightCalendar(
-  depCityCd: string,
-  arrCityCd: string,
-  period: number,
-  startDate: string,
-  endDate: string
-): Promise<FlightPrice[]> {
-  return apiRequest("/v1/products/flight/calendar", {
-    depCityCd, arrCityCd, period, startDate, endDate,
-  });
-}
-
-export async function getFlightWindow(
-  depCityCd: string,
-  arrCityCd: string,
-  period: number
-): Promise<FlightPrice[]> {
-  return apiRequest("/v1/products/flight/calendar/window", {
-    depCityCd, arrCityCd, period,
-  });
-}
-
 // 숙소
 export interface Accommodation {
   itemId: number;
@@ -144,49 +105,3 @@ export async function searchTna(params: {
   return apiRequest("/v1/products/tna/search", params as Record<string, unknown>);
 }
 
-// 어필리에이트 링크 생성 (API 없이 URL 파라미터 사용)
-export function createAffiliateFlightLink(params: {
-  depCityCd: string;
-  arrCityCd: string;
-  departureDate: string;
-  returnDate?: string;
-  period: number;
-  mylinkId: string;
-  utmContent?: string;
-  openInApp?: boolean;
-}): string {
-  const url = new URL("https://www.myrealtrip.com/offers");
-  url.searchParams.set("depCityCd", params.depCityCd);
-  url.searchParams.set("arrCityCd", params.arrCityCd);
-  url.searchParams.set("departureDate", params.departureDate);
-  url.searchParams.set("period", String(params.period));
-  if (params.returnDate) {
-    url.searchParams.set("returnDate", params.returnDate);
-  }
-  url.searchParams.set("mylink_id", params.mylinkId);
-  if (params.utmContent) {
-    url.searchParams.set("utm_content", params.utmContent);
-  }
-  if (params.openInApp) {
-    url.searchParams.set("open_in_app", "true");
-  }
-  return url.toString();
-}
-
-// URL 파라미터 기반 어필리에이트 링크 생성 (API 불필요)
-export function generateAffiliateLink(
-  baseUrl: string,
-  mylinkId: string,
-  utmContent?: string,
-  openInApp?: boolean
-): string {
-  const url = new URL(baseUrl);
-  url.searchParams.set("mylink_id", mylinkId);
-  if (utmContent) {
-    url.searchParams.set("utm_content", utmContent);
-  }
-  if (openInApp) {
-    url.searchParams.set("open_in_app", "true");
-  }
-  return url.toString();
-}
