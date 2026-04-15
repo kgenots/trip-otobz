@@ -11,19 +11,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const source = req.nextUrl.searchParams.get("source") || "all";
+  const source = req.nextUrl.searchParams.get("source") || "tours";
 
   await ensureActivitiesTable();
 
-  const results: Record<string, unknown> = {};
-
-  if (source === "myrealtrip" || source === "all") {
-    results.tours = await syncMyrealtrip();
-    results.accommodation = await syncAccommodation();
+  if (source === "tours") {
+    const result = await syncMyrealtrip();
+    return NextResponse.json({ source: "tours", ...result, timestamp: new Date().toISOString() });
   }
 
-  return NextResponse.json({
-    ...results,
-    timestamp: new Date().toISOString(),
-  });
+  if (source === "accommodation") {
+    const result = await syncAccommodation();
+    return NextResponse.json({ source: "accommodation", ...result, timestamp: new Date().toISOString() });
+  }
+
+  return NextResponse.json({ error: `Unknown source: ${source}. Use 'tours' or 'accommodation'` }, { status: 400 });
 }
