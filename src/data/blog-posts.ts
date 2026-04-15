@@ -706,7 +706,7 @@ LCC가 항상 싼 건 아닙니다. FSC 프로모션이 LCC보다 쌀 때도 있
 
 신선한 해산물과 일본 길거리 음식의 천국! 타마고야키, 참치 꼬치, 생굴까지 아침부터 먹방 투어를 즐길 수 있습니다.
 
-![도쿄 아사쿠사 센소지의 카미나리몬](https://images.unsplash.com/photo-1583400225507-f879fa5c0a18?w=800&h=400&fit=crop&q=80)
+![도쿄 아사쿠사 센소지의 카미나리몬](https://images.unsplash.com/photo-1613131145282-9476375618e1?w=800&h=400&fit=crop&q=80)
 
 ### 4. 하라주쿠 & 다케시타도리
 
@@ -769,7 +769,7 @@ LCC가 항상 싼 건 아닙니다. FSC 프로모션이 LCC보다 쌀 때도 있
 
 400년 역사의 오사카성 천수각에 올라 시내 전망을 감상하세요. 봄에는 벚꽃, 가을에는 단풍이 장관입니다.
 
-![오사카성과 벚꽃](https://images.unsplash.com/photo-1589452271712-64b8a66c3929?w=800&h=400&fit=crop&q=80)
+![오사카성과 벚꽃](https://images.unsplash.com/photo-1579622754173-e2a9aad270e3?w=800&h=400&fit=crop&q=80)
 
 ### 4. 신세카이 & 츠텐카쿠
 
@@ -895,7 +895,7 @@ LCC가 항상 싼 건 아닙니다. FSC 프로모션이 LCC보다 쌀 때도 있
 
 다낭에서 차로 30분, 유네스코 세계문화유산 호이안! 등불이 가득한 밤의 올드타운은 베트남 여행의 하이라이트입니다.
 
-![호이안 올드타운 등불](https://images.unsplash.com/photo-1535092467795-1d8ee41ae681?w=800&h=400&fit=crop&q=80)
+![호이안 올드타운 등불](https://images.unsplash.com/photo-1528127269322-539801943592?w=800&h=400&fit=crop&q=80)
 
 ### 4. 오행산 (마블 마운틴)
 
@@ -1189,14 +1189,14 @@ LCC가 항상 싼 건 아닙니다. FSC 프로모션이 LCC보다 쌀 때도 있
     description: "홍콩에서 뭘 하면 좋을까? 빅토리아 피크 야경부터 딤섬 투어까지, 홍콩 필수 액티비티 10가지를 정리했습니다.",
     date: "2026-04-15",
     keywords: ["홍콩에서 뭐하지", "홍콩 액티비티", "홍콩 여행", "홍콩에서 할 것", "홍콩 투어", "홍콩 맛집"],
-    coverImage: "https://images.unsplash.com/photo-1536599018102-9f803c979b13?w=800&h=400&fit=crop&q=80",
+    coverImage: "https://images.unsplash.com/photo-1547448526-5e9d57fa28f7?w=800&h=400&fit=crop&q=80",
     coverGradient: "from-rose-400 via-red-300 to-orange-400",
     coverEmoji: "🇭🇰",
     content: `## 홍콩에서 뭐하지? 동양의 진주 베스트 액티비티 TOP 10
 
 작지만 강렬한 도시 홍콩! 스카이라인, 먹거리, 쇼핑이 가득한 이 도시에서 꼭 해봐야 할 10가지를 소개합니다.
 
-![홍콩 빅토리아 하버 야경](https://images.unsplash.com/photo-1536599018102-9f803c979b13?w=800&h=400&fit=crop&q=80)
+![홍콩 빅토리아 하버 야경](https://images.unsplash.com/photo-1547448526-5e9d57fa28f7?w=800&h=400&fit=crop&q=80)
 
 ### 1. 빅토리아 피크 야경
 
@@ -1210,7 +1210,7 @@ LCC가 항상 싼 건 아닙니다. FSC 프로모션이 LCC보다 쌀 때도 있
 
 스타페리로 빅토리아 하버를 건너며 스카이라인을 감상하세요. 침사추이 워터프론트에서 매일 밤 8시 심포니 오브 라이츠 쇼!
 
-![홍콩 피크트램과 스카이라인](https://images.unsplash.com/photo-1594973782943-3314e08caa04?w=800&h=400&fit=crop&q=80)
+![홍콩 피크트램과 스카이라인](https://images.unsplash.com/photo-1558240077-e33b10a16a64?w=800&h=400&fit=crop&q=80)
 
 ### 4. 란타우섬 옹핑 케이블카
 
