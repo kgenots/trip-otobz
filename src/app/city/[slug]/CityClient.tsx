@@ -9,6 +9,7 @@ interface Activity {
   id: number;
   source: "myrealtrip" | "klook";
   sourceId: string;
+  description?: string;
   title: string;
   price: number | null;
   priceDisplay: string | null;
@@ -76,10 +77,12 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
   const [fallbackTours, setFallbackTours] = useState<Activity[]>([]);
   const [fallbackLoading, setFallbackLoading] = useState(false);
 
-  // Accommodation state
+  // Accommodation state (DB first, fallback to realtime)
+  const [dbAccom, setDbAccom] = useState<Activity[]>([]);
   const [accommodations, setAccommodations] = useState<AccommodationItem[]>([]);
   const [accomLoading, setAccomLoading] = useState(false);
   const [accomLoaded, setAccomLoaded] = useState(false);
+  const [useDbAccom, setUseDbAccom] = useState(true);
 
   useEffect(() => {
     getMylinkId().then(setMylinkId);
@@ -156,38 +159,47 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
     }
   }, [useDbData, activitiesLoading, fallbackTours.length, fetchFallbackTours]);
 
-  // 숙소 (탭 클릭 시 lazy 로드)
+  // 숙소 (탭 클릭 시 lazy 로드 — DB → fallback)
   useEffect(() => {
     if (activeTab !== "accommodation" || accomLoaded) return;
     setAccomLoading(true);
 
-    const tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 7);
-    const dayAfter = new Date(tomorrow);
-    dayAfter.setDate(dayAfter.getDate() + 2);
-    const checkIn = tomorrow.toISOString().split("T")[0];
-    const checkOut = dayAfter.toISOString().split("T")[0];
-
-    fetch("/api/accommodation", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        keyword: city.cityKo,
-        checkIn,
-        checkOut,
-        adultCount: 2,
-        order: "review_desc",
-        size: 20,
-      }),
-    })
+    // DB에서 먼저 시도
+    fetch(`/api/activities?city=${city.slug}&category=숙소&perPage=30&sort=rating`)
       .then((r) => r.json())
-      .then((json) => setAccommodations(json.data?.items || []))
-      .catch(() => setAccommodations([]))
-      .finally(() => {
-        setAccomLoading(false);
-        setAccomLoaded(true);
+      .then((json) => {
+        if (json.data?.items?.length > 0) {
+          setDbAccom(json.data.items);
+          setUseDbAccom(true);
+          setAccomLoading(false);
+          setAccomLoaded(true);
+        } else {
+          throw new Error("no db data");
+        }
+      })
+      .catch(() => {
+        // Fallback: 실시간 API
+        setUseDbAccom(false);
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 7);
+        const dayAfter = new Date(tomorrow);
+        dayAfter.setDate(dayAfter.getDate() + 2);
+        const checkIn = tomorrow.toISOString().split("T")[0];
+        const checkOut = dayAfter.toISOString().split("T")[0];
+
+        fetch("/api/accommodation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            keyword: city.cityKo, checkIn, checkOut, adultCount: 2, order: "review_desc", size: 20,
+          }),
+        })
+          .then((r) => r.json())
+          .then((json) => setAccommodations(json.data?.items || []))
+          .catch(() => setAccommodations([]))
+          .finally(() => { setAccomLoading(false); setAccomLoaded(true); });
       });
-  }, [activeTab, accomLoaded, city.cityKo]);
+  }, [activeTab, accomLoaded, city.cityKo, city.slug]);
 
   const formatPrice = (n: number) => `₩${n.toLocaleString("ko-KR")}`;
   const stars = (n: number) => "★".repeat(Math.min(n, 5)) + "☆".repeat(Math.max(5 - n, 0));
@@ -420,6 +432,37 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
             {accomLoading ? (
               <div className="flex items-center justify-center py-16">
                 <div className="animate-spin rounded-full h-10 w-10 border-2 border-sky-200 border-t-sky-500" />
+              </div>
+            ) : useDbAccom && dbAccom.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {dbAccom.map((a) => (
+                  <a
+                    key={a.sourceId}
+                    href={a.affiliateUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="bg-white rounded-xl p-4 transition-all border border-gray-100 hover:border-sky-200 hover:shadow-md"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-[#222222] font-medium truncate">{a.title}</h3>
+                        {a.description && (
+                          <div className="text-amber-500 text-xs mt-1">{a.description}</div>
+                        )}
+                        {a.rating && (
+                          <div className="text-[#6a6a6a] text-sm mt-1">
+                            {a.rating.toFixed(1)} ({a.reviewCount})
+                          </div>
+                        )}
+                      </div>
+                      <div className="text-right ml-4 shrink-0">
+                        <div className="text-lg font-bold text-sky-600">
+                          {a.priceDisplay || (a.price ? formatPrice(a.price) : "")}
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                ))}
               </div>
             ) : accommodations.length === 0 ? (
               <p className="text-[#6a6a6a] text-center py-12">숙소 정보가 없습니다</p>

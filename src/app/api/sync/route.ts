@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureActivitiesTable } from "@/lib/db";
 import { syncMyrealtrip } from "@/lib/sync-myrealtrip";
+import { syncAccommodation } from "@/lib/sync-accommodation";
 
-export const maxDuration = 300; // 5분
+export const maxDuration = 300;
 
 export async function GET(req: NextRequest) {
   const key = req.nextUrl.searchParams.get("key");
@@ -10,18 +11,19 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const source = req.nextUrl.searchParams.get("source") || "myrealtrip";
+  const source = req.nextUrl.searchParams.get("source") || "all";
 
   await ensureActivitiesTable();
 
+  const results: Record<string, unknown> = {};
+
   if (source === "myrealtrip" || source === "all") {
-    const result = await syncMyrealtrip();
-    return NextResponse.json({
-      source: "myrealtrip",
-      ...result,
-      timestamp: new Date().toISOString(),
-    });
+    results.tours = await syncMyrealtrip();
+    results.accommodation = await syncAccommodation();
   }
 
-  return NextResponse.json({ error: `Unknown source: ${source}` }, { status: 400 });
+  return NextResponse.json({
+    ...results,
+    timestamp: new Date().toISOString(),
+  });
 }

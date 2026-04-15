@@ -65,6 +65,38 @@ function getRelatedPosts(cityKo: string, slug: string) {
     }));
 }
 
+function CityJsonLd({ city }: { city: { cityKo: string; cityEn: string; countryKo: string; description?: string; slug: string; lat: number; lng: number } }) {
+  const data = {
+    "@context": "https://schema.org",
+    "@type": "TouristDestination",
+    name: `${city.cityKo} (${city.cityEn})`,
+    description: city.description || `${city.cityKo} 여행에서 꼭 해봐야 할 베스트 투어, 액티비티, 체험`,
+    url: `https://trip.otobz.com/city/${city.slug}`,
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: city.lat,
+      longitude: city.lng,
+    },
+    containedInPlace: {
+      "@type": "Country",
+      name: city.countryKo,
+    },
+    touristType: ["여행자", "관광객"],
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `https://trip.otobz.com/city/${city.slug}`,
+      name: `${city.cityKo} 액티비티 검색`,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
+    />
+  );
+}
+
 export default async function CityPage({ params }: Props) {
   const { slug } = await params;
   const city = cityBySlug[slug];
@@ -72,5 +104,10 @@ export default async function CityPage({ params }: Props) {
 
   const relatedPosts = getRelatedPosts(city.cityKo, slug);
 
-  return <CityClient city={city} relatedPosts={relatedPosts} />;
+  return (
+    <>
+      <CityJsonLd city={city} />
+      <CityClient city={city} relatedPosts={relatedPosts} />
+    </>
+  );
 }

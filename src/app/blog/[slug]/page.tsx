@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { blogPosts, blogPostBySlug } from "@/data/blog-posts";
+import { cities } from "@/data/cities";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -176,6 +177,16 @@ function inlineFormat(text: string): string {
     );
 }
 
+function getRelatedCities(post: { title: string; keywords: string[]; content: string }) {
+  return cities
+    .filter((c) =>
+      post.title.includes(c.cityKo) ||
+      post.keywords.some((k) => k.includes(c.cityKo)) ||
+      post.content.includes(c.cityKo)
+    )
+    .slice(0, 4);
+}
+
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
   const post = blogPostBySlug[slug];
@@ -216,6 +227,32 @@ export default async function BlogPostPage({ params }: Props) {
         </h1>
 
         <div className="prose-custom">{renderMarkdown(post.content)}</div>
+
+        {/* 관련 도시 CTA */}
+        {(() => {
+          const relatedCities = getRelatedCities(post);
+          if (relatedCities.length === 0) return null;
+          return (
+            <div className="mt-10 p-6 bg-sky-50 rounded-2xl">
+              <h3 className="font-bold text-[#222222] mb-3">
+                관련 도시 액티비티 둘러보기
+              </h3>
+              <div className="flex flex-wrap gap-2">
+                {relatedCities.map((c) => (
+                  <Link
+                    key={c.slug}
+                    href={`/city/${c.slug}`}
+                    className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white rounded-xl text-sm font-medium text-[#222222] border border-sky-100 hover:border-sky-300 hover:shadow-sm transition-all"
+                  >
+                    <span>{c.emoji}</span>
+                    <span>{c.cityKo} 액티비티</span>
+                    <span className="text-sky-500">&rarr;</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="mt-12 pt-6 border-t border-gray-100">
           <Link
