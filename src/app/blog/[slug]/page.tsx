@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getMergedBlogPosts, getMergedPostBySlug, getMergedSlugs } from "@/data/blog";
 import { cities } from "@/data/cities";
 
-export const revalidate = 3600; // ISR: revalidate every hour
+export const dynamic = "force-dynamic";
 
 interface Props {
   params: Promise<{ slug: string }>;

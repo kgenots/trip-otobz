@@ -11,14 +11,14 @@ export async function getMergedBlogPosts(): Promise<BlogPost[]> {
       title: r.title,
       description: r.description,
       date: typeof r.date === "string" ? r.date : new Date(r.date).toISOString().split("T")[0],
-      keywords: r.keywords,
+      keywords: r.keywords || [],
       coverImage: r.cover_image || undefined,
-      coverGradient: r.cover_gradient,
-      coverEmoji: r.cover_emoji,
+      coverGradient: r.cover_gradient || "from-blue-400 to-purple-500",
+      coverEmoji: r.cover_emoji || "",
       content: r.content,
     }));
-  } catch {
-    // DB unavailable at build time — fall back to static only
+  } catch (e) {
+    console.error("[blog] DB query failed, using static only:", e);
   }
 
   const dbSlugs = new Set(dbPosts.map((p) => p.slug));
