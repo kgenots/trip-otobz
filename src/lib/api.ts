@@ -24,6 +24,23 @@ async function apiRequest<T>(path: string, body: Record<string, unknown>): Promi
   return json.data;
 }
 
+// 항공권
+export interface FlightPrice {
+  fromCity: string;
+  toCity: string;
+  period: number | null;
+  departureDate: string;
+  returnDate: string | null;
+  totalPrice: number;
+  airline: string | null;
+  transfer: number | null;
+  averagePrice: number | null;
+}
+
+export async function getFlightBulkLowest(depCityCd: string, period: number): Promise<FlightPrice[]> {
+  return apiRequest("/v1/products/flight/calendar/bulk-lowest", { depCityCd, period });
+}
+
 // 숙소
 export interface Accommodation {
   itemId: number;
