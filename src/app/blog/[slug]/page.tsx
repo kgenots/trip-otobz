@@ -1,20 +1,23 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { blogPosts, blogPostBySlug } from "@/data/blog-posts";
+import { getMergedBlogPosts, getMergedPostBySlug, getMergedSlugs } from "@/data/blog";
 import { cities } from "@/data/cities";
+
+export const revalidate = 3600; // ISR: revalidate every hour
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return blogPosts.map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  const slugs = await getMergedSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPostBySlug[slug];
+  const post = await getMergedPostBySlug(slug);
   if (!post) return {};
 
   return {
@@ -193,7 +196,7 @@ function getRelatedCities(post: { title: string; keywords: string[]; content: st
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = blogPostBySlug[slug];
+  const post = await getMergedPostBySlug(slug);
   if (!post) notFound();
 
   const articleJsonLd = {

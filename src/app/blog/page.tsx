@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { blogPosts } from "@/data/blog-posts";
+import { getMergedBlogPosts } from "@/data/blog";
+
+export const revalidate = 3600;
 
 export const metadata: Metadata = {
   title: "여행 블로그",
@@ -18,7 +20,9 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogListPage() {
+export default async function BlogListPage() {
+  const blogPosts = await getMergedBlogPosts();
+
   return (
     <main className="min-h-screen bg-white">
       <header className="border-b border-gray-100 px-3 sm:px-6 lg:px-8 py-2 sm:py-3">

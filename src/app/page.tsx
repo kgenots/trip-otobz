@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cities } from "@/data/cities";
-import { blogPosts } from "@/data/blog-posts";
+import { getMergedBlogPosts } from "@/data/blog";
 import HeroClient from "@/components/HeroClient";
 
 const POPULAR_SLUGS = [
@@ -21,9 +21,12 @@ const regionGroups = [
 ];
 
 const cityBySlug = Object.fromEntries(cities.map((c) => [c.slug, c]));
-const recentPosts = blogPosts.slice(0, 3);
 
-export default function Home() {
+export const revalidate = 3600;
+
+export default async function Home() {
+  const blogPosts = await getMergedBlogPosts();
+  const recentPosts = blogPosts.slice(0, 3);
   return (
     <main className="min-h-screen bg-white">
       {/* 헤더 */}

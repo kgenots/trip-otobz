@@ -1,7 +1,8 @@
 import { cities } from "@/data/cities";
-import { blogPosts } from "@/data/blog-posts";
+import { getMergedBlogPosts } from "@/data/blog";
 
-export function GET() {
+export async function GET() {
+  const blogPosts = await getMergedBlogPosts();
   const base = "https://trip.otobz.com";
 
   const lines = [

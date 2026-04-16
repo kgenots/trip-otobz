@@ -43,4 +43,26 @@ export async function ensureActivitiesTable() {
   `);
 }
 
+export async function ensureBlogPostsTable() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS blog_posts (
+      id SERIAL PRIMARY KEY,
+      slug VARCHAR(200) NOT NULL UNIQUE,
+      title TEXT NOT NULL,
+      description TEXT NOT NULL,
+      date DATE NOT NULL DEFAULT CURRENT_DATE,
+      keywords TEXT[] NOT NULL DEFAULT '{}',
+      cover_image TEXT,
+      cover_gradient VARCHAR(100) NOT NULL DEFAULT 'from-blue-400 to-purple-500',
+      cover_emoji VARCHAR(10) NOT NULL DEFAULT '',
+      content TEXT NOT NULL,
+      status VARCHAR(20) NOT NULL DEFAULT 'published',
+      created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status, date DESC);
+    CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
+  `);
+}
+
 export default pool;

@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { cities, cityBySlug } from "@/data/cities";
-import { blogPosts } from "@/data/blog-posts";
+import { getMergedBlogPosts } from "@/data/blog";
 import CityClient from "./CityClient";
 
 interface Props {
@@ -43,7 +43,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-function getRelatedPosts(cityKo: string, slug: string) {
+import type { BlogPost } from "@/data/blog-posts";
+
+async function getRelatedPosts(cityKo: string, slug: string) {
+  const blogPosts = await getMergedBlogPosts();
   const q = cityKo.toLowerCase();
   return blogPosts
     .filter(
@@ -102,7 +105,7 @@ export default async function CityPage({ params }: Props) {
   const city = cityBySlug[slug];
   if (!city) notFound();
 
-  const relatedPosts = getRelatedPosts(city.cityKo, slug);
+  const relatedPosts = await getRelatedPosts(city.cityKo, slug);
 
   return (
     <>

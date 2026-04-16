@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next";
 import { cities } from "@/data/cities";
-import { blogPosts } from "@/data/blog-posts";
+import { getMergedBlogPosts } from "@/data/blog";
 
-export default function sitemap(): MetadataRoute.Sitemap {
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = "https://trip.otobz.com";
+  const blogPosts = await getMergedBlogPosts();
 
   return [
     {
