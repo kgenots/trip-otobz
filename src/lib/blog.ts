@@ -58,7 +58,7 @@ export async function upsertBlogPost(post: {
   await ensureBlogPostsTable();
   const { rows } = await pool.query<BlogPostRow>(
     `INSERT INTO blog_posts (slug, title, description, date, keywords, cover_image, cover_gradient, cover_emoji, content, status)
-     VALUES ($1, $2, $3, COALESCE($4, CURRENT_DATE), COALESCE($5, '{}'), $6, COALESCE($7, 'from-blue-400 to-purple-500'), COALESCE($8, ''), $9, COALESCE($10, 'published'))
+     VALUES ($1, $2, $3, COALESCE($4, CURRENT_DATE), COALESCE($5::text[], '{}'), $6, COALESCE($7, 'from-blue-400 to-purple-500'), COALESCE($8, ''), $9, COALESCE($10, 'published'))
      ON CONFLICT (slug) DO UPDATE SET
        title = EXCLUDED.title,
        description = EXCLUDED.description,
