@@ -13,7 +13,7 @@ const PUBLIC_BASE_URL =
   process.env.PUBLIC_BASE_URL || "https://trip.otobz.com";
 
 const DEFAULT_EDIT_INSTRUCTION =
-  "Subtly adjust this photo for a travel blog cover: warmer tone, slightly boosted contrast, natural color grading, cinematic travel-magazine feel. Keep the subject and composition unchanged. No text, no watermarks, no logos.";
+  "Reimagine this scene from a slightly different camera angle (rotate viewpoint about 20-30 degrees, slightly lower or side). Keep the same subject, location, time of day, mood. Warm natural lighting, cinematic travel photography. No text, no watermarks, no logos.";
 
 function slugSafe(value: string): string {
   return value.replace(/[^a-z0-9-]/gi, "").slice(0, 60);
