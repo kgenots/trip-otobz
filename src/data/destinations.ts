@@ -38,6 +38,18 @@ export const destinations: Destination[] = [
   // 중국
   { slug: "beijing", cityCode: "PEK", cityKo: "베이징", countryKo: "중국", description: "만리장성 트레킹, 자금성 가이드투어, 후통 골목 탐방까지! 베이징 액티비티 총정리.", keywords: ["베이징에서 뭐하지", "베이징 액티비티", "베이징에서 할 것", "베이징 투어", "만리장성 투어"] },
   { slug: "shanghai", cityCode: "PVG", cityKo: "상하이", countryKo: "중국", description: "와이탄 야경, 동방명주 전망대, 주자각 수향마을까지! 상하이에서 할 것 총정리.", keywords: ["상하이에서 뭐하지", "상하이 액티비티", "상하이에서 할 것", "상하이 투어"] },
+  { slug: "qingdao", cityCode: "TAO", cityKo: "칭다오", countryKo: "중국", description: "잔교 해변 산책, 칭다오 맥주박물관, 팔대관 유럽풍 거리까지! 칭다오 베스트 액티비티.", keywords: ["칭다오에서 뭐하지", "칭다오 액티비티", "칭다오에서 할 것", "칭다오 투어"] },
+  { slug: "dalian", cityCode: "DLC", cityKo: "다롄", countryKo: "중국", description: "싱하이광장 야경, 해산물 투어, 러시아풍 거리 산책까지! 다롄에서 할 것 총정리.", keywords: ["다롄에서 뭐하지", "다롄 액티비티", "다롄에서 할 것", "다롄 투어"] },
+  // 대만 추가
+  { slug: "kaohsiung", cityCode: "KHH", cityKo: "가오슝", countryKo: "대만", description: "연지담 용호탑, 보얼예술특구, 치진섬 페리 투어까지! 가오슝 베스트 액티비티.", keywords: ["가오슝에서 뭐하지", "가오슝 액티비티", "가오슝에서 할 것", "대만 투어"] },
+  // 동남아 추가
+  { slug: "jakarta", cityCode: "CGK", cityKo: "자카르타", countryKo: "인도네시아", description: "모나스 전망대, 코타투아 올드타운, 천섬 아일랜드 호핑까지! 자카르타 액티비티 모음.", keywords: ["자카르타에서 뭐하지", "자카르타 액티비티", "자카르타에서 할 것", "자카르타 투어"] },
+  { slug: "phnompenh", cityCode: "PNH", cityKo: "프놈펜", countryKo: "캄보디아", description: "왕궁 투어, 실버 파고다, 메콩강 선셋 크루즈까지! 프놈펜에서 할 것 총정리.", keywords: ["프놈펜에서 뭐하지", "프놈펜 액티비티", "프놈펜에서 할 것", "캄보디아 투어"] },
+  { slug: "vientiane", cityCode: "VTE", cityKo: "비엔티안", countryKo: "라오스", description: "파탓루앙 사원, 빠뚜싸이 전망대, 메콩강변 야시장까지! 비엔티안 베스트 액티비티.", keywords: ["비엔티안에서 뭐하지", "비엔티안 액티비티", "라오스에서 할 것", "라오스 투어"] },
+  // 남아시아
+  { slug: "delhi", cityCode: "DEL", cityKo: "델리", countryKo: "인도", description: "타지마할 당일투어, 레드포트, 꾸뜹미나르 탐방까지! 델리에서 할 것 총정리.", keywords: ["델리에서 뭐하지", "델리 액티비티", "인도에서 할 것", "타지마할 투어", "인도 투어"] },
+  { slug: "colombo", cityCode: "CMB", cityKo: "콜롬보", countryKo: "스리랑카", description: "갈레페이스 선셋, 실론티 농장 투어, 국립박물관까지! 콜롬보 베스트 액티비티.", keywords: ["콜롬보에서 뭐하지", "콜롬보 액티비티", "스리랑카에서 할 것", "스리랑카 투어"] },
+  { slug: "kathmandu", cityCode: "KTM", cityKo: "카트만두", countryKo: "네팔", description: "히말라야 트레킹, 더르바르 광장, 스와얌부나트 사원까지! 카트만두에서 할 것 총정리.", keywords: ["카트만두에서 뭐하지", "카트만두 액티비티", "네팔에서 할 것", "히말라야 트레킹", "네팔 투어"] },
   // 중동
   { slug: "dubai", cityCode: "DXB", cityKo: "두바이", countryKo: "아랍에미리트", description: "사막 사파리, 부르즈 할리파 전망대, 스카이다이빙까지! 두바이에서 즐기는 극한 액티비티.", keywords: ["두바이에서 뭐하지", "두바이 액티비티", "두바이에서 할 것", "두바이 투어", "사막 사파리"] },
   { slug: "istanbul", cityCode: "IST", cityKo: "이스탄불", countryKo: "튀르키예", description: "아야소피아, 블루모스크, 그랜드 바자르 쇼핑, 보스포러스 크루즈까지! 이스탄불 액티비티 모음.", keywords: ["이스탄불에서 뭐하지", "이스탄불 액티비티", "이스탄불에서 할 것", "이스탄불 투어", "튀르키예 투어"] },
@@ -50,6 +62,8 @@ export const destinations: Destination[] = [
   { slug: "barcelona", cityCode: "BCN", cityKo: "바르셀로나", countryKo: "스페인", description: "사그라다 파밀리아, 구엘공원, 플라멩코 공연, 타파스 투어까지! 바르셀로나 액티비티 모음.", keywords: ["바르셀로나에서 뭐하지", "바르셀로나 액티비티", "바르셀로나에서 할 것", "바르셀로나 투어"] },
   { slug: "amsterdam", cityCode: "AMS", cityKo: "암스테르담", countryKo: "네덜란드", description: "운하 크루즈, 반 고흐 미술관, 안네 프랑크의 집까지! 암스테르담 베스트 액티비티.", keywords: ["암스테르담에서 뭐하지", "암스테르담 액티비티", "암스테르담에서 할 것", "암스테르담 투어"] },
   { slug: "prague", cityCode: "PRG", cityKo: "프라하", countryKo: "체코", description: "카를교 산책, 프라하성 투어, 체코 맥주 테이스팅까지! 프라하에서 할 것 총정리.", keywords: ["프라하에서 뭐하지", "프라하 액티비티", "프라하에서 할 것", "프라하 투어"] },
+  { slug: "budapest", cityCode: "BUD", cityKo: "부다페스트", countryKo: "헝가리", description: "국회의사당 야경 크루즈, 세체니 온천, 어부의 요새까지! 부다페스트 베스트 액티비티.", keywords: ["부다페스트에서 뭐하지", "부다페스트 액티비티", "부다페스트에서 할 것", "부다페스트 투어", "헝가리 투어"] },
+  { slug: "frankfurt", cityCode: "FRA", cityKo: "프랑크푸르트", countryKo: "독일", description: "뢰머광장 산책, 마인강 크루즈, 라인강 와인 투어까지! 프랑크푸르트에서 할 것 총정리.", keywords: ["프랑크푸르트에서 뭐하지", "프랑크푸르트 액티비티", "독일에서 할 것", "독일 투어"] },
   { slug: "vienna", cityCode: "VIE", cityKo: "빈", countryKo: "오스트리아", description: "쇤브룬 궁전 투어, 오페라 감상, 카페 문화 체험까지! 빈에서 즐기는 베스트 액티비티.", keywords: ["빈에서 뭐하지", "빈 액티비티", "비엔나에서 할 것", "빈 투어", "비엔나 투어"] },
   { slug: "zurich", cityCode: "ZRH", cityKo: "취리히", countryKo: "스위스", description: "융프라우 등반, 호수 크루즈, 구시가지 산책까지! 취리히에서 즐기는 알프스 액티비티.", keywords: ["취리히에서 뭐하지", "취리히 액티비티", "스위스에서 할 것", "스위스 투어", "융프라우 투어"] },
   { slug: "lisbon", cityCode: "LIS", cityKo: "리스본", countryKo: "포르투갈", description: "트램 28번 투어, 벨렘탑, 파두 공연, 신트라 당일치기까지! 리스본 베스트 액티비티.", keywords: ["리스본에서 뭐하지", "리스본 액티비티", "리스본에서 할 것", "리스본 투어", "포르투갈 투어"] },
@@ -63,6 +77,7 @@ export const destinations: Destination[] = [
   { slug: "newyork", cityCode: "JFK", cityKo: "뉴욕", countryKo: "미국", description: "브로드웨이 뮤지컬, 자유의 여신상, 센트럴파크 투어까지! 뉴욕에서 즐기는 베스트 액티비티.", keywords: ["뉴욕에서 뭐하지", "뉴욕 액티비티", "뉴욕에서 할 것", "뉴욕 투어", "브로드웨이"] },
   { slug: "sanfrancisco", cityCode: "SFO", cityKo: "샌프란시스코", countryKo: "미국", description: "알카트라즈 투어, 골든게이트 자전거, 피어39까지! 샌프란시스코에서 할 것 총정리.", keywords: ["샌프란시스코에서 뭐하지", "샌프란시스코 액티비티", "샌프란시스코에서 할 것", "샌프란시스코 투어"] },
   { slug: "lasvegas", cityCode: "LAS", cityKo: "라스베이거스", countryKo: "미국", description: "그랜드캐니언 투어, 시르크 뒤 솔레이유, 헬리콥터 야경까지! 라스베이거스 베스트 액티비티.", keywords: ["라스베이거스에서 뭐하지", "라스베이거스 액티비티", "라스베이거스에서 할 것", "그랜드캐니언 투어"] },
+  { slug: "vancouver", cityCode: "YVR", cityKo: "밴쿠버", countryKo: "캐나다", description: "스탠리파크 자전거, 그랜빌 아일랜드 마켓, 캐필라노 현수교까지! 밴쿠버 베스트 액티비티.", keywords: ["밴쿠버에서 뭐하지", "밴쿠버 액티비티", "캐나다에서 할 것", "캐나다 투어"] },
   { slug: "cancun", cityCode: "CUN", cityKo: "칸쿤", countryKo: "멕시코", description: "세노테 다이빙, 치첸이트사 투어, 카리브해 스노클링까지! 칸쿤에서 즐기는 베스트 액티비티.", keywords: ["칸쿤에서 뭐하지", "칸쿤 액티비티", "칸쿤에서 할 것", "칸쿤 투어", "세노테 다이빙"] },
   // 오세아니아
   { slug: "sydney", cityCode: "SYD", cityKo: "시드니", countryKo: "호주", description: "오페라하우스 투어, 하버브릿지 클라이밍, 본다이비치 서핑까지! 시드니 베스트 액티비티.", keywords: ["시드니에서 뭐하지", "시드니 액티비티", "시드니에서 할 것", "시드니 투어", "호주 액티비티"] },
