@@ -37,6 +37,48 @@ async function searchUnsplash(query: string, accessKey: string) {
   return { id: pick.id, imageUrl: pick.urls.regular };
 }
 
+async function searchNaverScrape(query: string) {
+  // 네이버 이미지 검색 페이지 scraping (API key 불필요)
+  const url = `https://search.naver.com/search.naver?where=image&query=${encodeURIComponent(query)}`;
+  const res = await fetch(url, {
+    headers: {
+      "User-Agent":
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
+      "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+    },
+  });
+  if (!res.ok) {
+    throw new Error(`Naver search page failed (${res.status})`);
+  }
+  const html = await res.text();
+
+  // 다양한 패턴 시도 — 네이버 페이지 JSON embed or data attribute
+  const patterns = [
+    /"originalUrl":"([^"]+)"/g,
+    /"imageUrl":"([^"]+)"/g,
+    /data-source=["']([^"']+)["']/g,
+    /"thumbnail":"([^"]+)"/g,
+  ];
+
+  const collected: string[] = [];
+  for (const re of patterns) {
+    const matches = [...html.matchAll(re)];
+    for (const m of matches) {
+      const url = m[1].replace(/\\\//g, "/");
+      if (url.startsWith("http") && !collected.includes(url)) {
+        collected.push(url);
+      }
+    }
+    if (collected.length >= 10) break;
+  }
+
+  if (collected.length === 0) return null;
+  const pool = collected.slice(0, Math.min(10, collected.length));
+  const pick = pool[Math.floor(Math.random() * Math.min(5, pool.length))];
+  return { id: pick, imageUrl: pick };
+}
+
 async function downloadAsBase64(
   url: string
 ): Promise<{ base64: string; mime: string }> {
@@ -114,9 +156,10 @@ export async function POST(request: NextRequest) {
 
   const geminiKey = process.env.GEMINI_API_KEY;
   const unsplashKey = process.env.UNSPLASH_ACCESS_KEY;
-  if (!geminiKey || !unsplashKey) {
+
+  if (!geminiKey) {
     return NextResponse.json(
-      { error: "Missing GEMINI_API_KEY or UNSPLASH_ACCESS_KEY" },
+      { error: "Missing GEMINI_API_KEY" },
       { status: 500 }
     );
   }
@@ -125,8 +168,10 @@ export async function POST(request: NextRequest) {
     slug?: string;
     query?: string;
     instruction?: string;
+    source?: "naver" | "unsplash";
   };
   const { slug, query } = body;
+  const source = body.source || "naver"; // default: naver scraping (한국 실사)
   const instruction = body.instruction || DEFAULT_EDIT_INSTRUCTION;
 
   if (!slug || !query) {
@@ -138,16 +183,26 @@ export async function POST(request: NextRequest) {
 
   let found;
   try {
-    found = await searchUnsplash(query, unsplashKey);
+    if (source === "naver") {
+      found = await searchNaverScrape(query);
+    } else {
+      if (!unsplashKey) {
+        return NextResponse.json(
+          { error: "Missing UNSPLASH_ACCESS_KEY (source=unsplash)" },
+          { status: 500 }
+        );
+      }
+      found = await searchUnsplash(query, unsplashKey);
+    }
   } catch (e) {
     return NextResponse.json(
-      { error: "Unsplash search error", detail: String(e) },
+      { error: `${source} search error`, detail: String(e) },
       { status: 502 }
     );
   }
   if (!found) {
     return NextResponse.json(
-      { error: "No Unsplash results for query", query },
+      { error: `No ${source} results for query`, query },
       { status: 404 }
     );
   }
@@ -171,15 +226,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       ok: true,
       ...saved,
-      unsplash_id: found.id,
+      search_source: source,
+      origin_id: found.id,
       origin_url: found.imageUrl,
     });
   } catch (e) {
-    const saved = await saveImage(slug, origBase64, origMime, "unsplash-fallback");
+    const saved = await saveImage(slug, origBase64, origMime, `${source}-fallback`);
     return NextResponse.json({
       ok: true,
       ...saved,
-      unsplash_id: found.id,
+      search_source: source,
+      origin_id: found.id,
       origin_url: found.imageUrl,
       fallback_reason: String(e),
     });
