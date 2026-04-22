@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
-export const alt = "Trip OTOBZ - 세계 항공권·숙소·투어 최저가 지도";
+export const alt =
+  "Trip OTOBZ — World Travel Deals Map · 세계 항공권·숙소·투어 최저가 지도";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -25,7 +26,7 @@ export default function Image() {
             fontSize: 56,
             fontWeight: 800,
             color: "#0EA5E9",
-            marginBottom: 8,
+            marginBottom: 4,
             letterSpacing: "-0.5px",
           }}
         >
@@ -33,33 +34,46 @@ export default function Image() {
         </div>
         <div
           style={{
-            fontSize: 26,
-            color: "#222222",
+            fontSize: 22,
+            color: "#0369A1",
             textAlign: "center",
-            maxWidth: 700,
-            marginBottom: 4,
+            maxWidth: 800,
+            marginBottom: 14,
+            fontWeight: 600,
+            letterSpacing: "0.2px",
           }}
         >
-          세계지도에서 클릭 한 번으로
+          World Travel Deals Map · 세계 여행 최저가 지도
         </div>
         <div
           style={{
-            fontSize: 26,
-            color: "#6a6a6a",
+            fontSize: 22,
+            color: "#222222",
             textAlign: "center",
-            maxWidth: 700,
+            maxWidth: 820,
+            marginBottom: 4,
           }}
         >
-          항공권 · 숙소 · 투어 최저가 비교
+          Click one city. Compare flights, stays, and tours.
+        </div>
+        <div
+          style={{
+            fontSize: 22,
+            color: "#6a6a6a",
+            textAlign: "center",
+            maxWidth: 820,
+          }}
+        >
+          세계지도에서 클릭 한 번으로 항공권·숙소·투어 최저가 비교
         </div>
         <div
           style={{
             display: "flex",
             gap: 16,
-            marginTop: 36,
+            marginTop: 30,
           }}
         >
-          {["항공권", "숙소", "투어"].map((label) => (
+          {["Flights", "Stays", "Tours"].map((label) => (
             <div
               key={label}
               style={{

@@ -5,9 +5,10 @@ import "./globals.css";
 
 const SITE_URL = "https://trip.otobz.com";
 const SITE_NAME = "Trip OTOBZ";
-const TITLE = "Trip OTOBZ - 여행지에서 뭐하지? 도시별 베스트 액티비티·투어";
+const TITLE =
+  "Trip OTOBZ — 세계 여행 최저가 지도 | World Travel Deals Map (Flights · Stays · Tours)";
 const DESCRIPTION =
-  "도쿄에서 뭐하지? 방콕에서 할 것? 전 세계 인기 도시의 베스트 액티비티, 투어, 티켓을 한눈에 비교하고 최저가로 예약하세요.";
+  "세계지도에서 클릭 한 번으로 항공권·숙소·투어 최저가를 비교. 도쿄·방콕·파리·뉴욕 등 인기 도시의 베스트 액티비티와 예약 정보를 한 곳에서. Global travel deals map: compare flights, hotels, and tours across Tokyo, Bangkok, Paris, New York and more — built for travelers worldwide.";
 
 export const metadata: Metadata = {
   title: {
@@ -26,6 +27,16 @@ export const metadata: Metadata = {
     "베스트 액티비티",
     "마이리얼트립",
     "여행 최저가 비교",
+    "things to do in tokyo",
+    "things to do in bangkok",
+    "world travel deals",
+    "cheap flights hotels tours",
+    "travel activities guide",
+    "best city tours",
+    "global travel map",
+    "budget travel planner",
+    "asia travel guide",
+    "europe travel deals",
   ],
   metadataBase: new URL(SITE_URL),
   alternates: {
@@ -37,6 +48,7 @@ export const metadata: Metadata = {
     url: SITE_URL,
     siteName: SITE_NAME,
     locale: "ko_KR",
+    alternateLocale: ["en_US"],
     type: "website",
   },
   twitter: {

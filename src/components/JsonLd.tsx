@@ -3,9 +3,10 @@ export default function JsonLd() {
     "@context": "https://schema.org",
     "@type": "WebApplication",
     name: "Trip OTOBZ",
+    alternateName: "Trip OTOBZ — World Travel Deals Map",
     url: "https://trip.otobz.com",
     description:
-      "여행지에서 뭐하지? 전 세계 인기 도시의 베스트 투어, 액티비티, 체험을 한눈에 비교하고 예약하세요.",
+      "세계지도에서 항공권·숙소·투어 최저가를 비교하고 예약. Global travel deals map — compare flights, hotels, and tours across popular cities worldwide.",
     applicationCategory: "TravelApplication",
     operatingSystem: "Web",
     offers: {
@@ -13,7 +14,14 @@ export default function JsonLd() {
       priceCurrency: "KRW",
       availability: "https://schema.org/InStock",
     },
-    inLanguage: "ko",
+    inLanguage: ["ko", "en"],
+    audience: {
+      "@type": "Audience",
+      geographicArea: {
+        "@type": "AdministrativeArea",
+        name: "Worldwide",
+      },
+    },
   };
 
   return (
