@@ -22,7 +22,7 @@ const AIDS = {
   kayak: process.env.NEXT_PUBLIC_AID_KAYAK || "",
 };
 
-// Awin affiliate network (wraps Booking.com + other Awin-enabled merchants)
+// Awin affiliate network (fallback for non-Travelpayouts merchants)
 const AWIN = {
   publisherId: process.env.NEXT_PUBLIC_AWIN_PUBLISHER_ID || "",
   midBooking: process.env.NEXT_PUBLIC_AWIN_MID_BOOKING || "",
@@ -35,6 +35,40 @@ function wrapAwin(mid: string, deeplink: string, clickref = ""): string {
   const p = encodeURIComponent(deeplink);
   const ref = encodeURIComponent(clickref);
   return `https://www.awin1.com/cread.php?awinmid=${mid}&awinaffid=${AWIN.publisherId}&clickref=${ref}&p=${p}`;
+}
+
+// Travelpayouts 통합 네트워크 (Booking/Agoda/Skyscanner/Trip.com 일원화)
+// Passive 트래커(<head> 스크립트)가 클릭 자동 캡처 + 명시 deeplink로 이중 방어
+const TP = {
+  marker: process.env.NEXT_PUBLIC_TP_MARKER || "",
+  // Travelpayouts 내부 program IDs (https://www.travelpayouts.com/ dashboard > Programs)
+  // 미설정 시 tp.media 래핑 건너뛰고 직접 URL + label 파라미터만 사용 (트래커가 캡처)
+  pBooking: process.env.NEXT_PUBLIC_TP_P_BOOKING || "",
+  pAgoda: process.env.NEXT_PUBLIC_TP_P_AGODA || "",
+  pSkyscanner: process.env.NEXT_PUBLIC_TP_P_SKYSCANNER || "",
+  pTripcom: process.env.NEXT_PUBLIC_TP_P_TRIPCOM || "",
+  pHotellook: process.env.NEXT_PUBLIC_TP_P_HOTELLOOK || "",
+  pAiralo: process.env.NEXT_PUBLIC_TP_P_AIRALO || "",
+};
+
+// tp.media redirector 래퍼 — program ID 있을 때만
+function wrapTP(programId: string, deeplink: string, campaign: string): string {
+  if (!TP.marker || !programId) return deeplink;
+  const u = encodeURIComponent(deeplink);
+  const trs = encodeURIComponent(campaign);
+  return `https://tp.media/r?marker=${TP.marker}&trs=${trs}&p=${programId}&u=${u}&campaign_id=100`;
+}
+
+// 직접 URL + TP label (passive 트래커용 fallback)
+function appendTPLabel(url: string, campaign: string): string {
+  if (!TP.marker) return url;
+  try {
+    const u = new URL(url);
+    u.searchParams.set("label", `tp-${TP.marker}-${campaign}`);
+    return u.toString();
+  } catch {
+    return url;
+  }
 }
 
 const UTM = (region: Region, p: AffiliateProvider, product: Product) =>
@@ -80,28 +114,47 @@ export function buildUrl(provider: AffiliateProvider, ctx: AffiliateCtx): string
     }
     case "agoda": {
       const direct = `https://www.agoda.com/search?city=${encodeURIComponent(ctx.cityEn)}`;
-      if (AWIN.publisherId && AWIN.midAgoda) {
-        const deeplink = `${direct}&${utm}`;
-        return wrapAwin(AWIN.midAgoda, deeplink, `city-${cityEnSlug}-${ctx.region}`);
+      const deeplink = `${direct}&${utm}`;
+      const campaign = `city-${cityEnSlug}-${ctx.region}`;
+      // 1) Travelpayouts 우선 — program ID 있으면 래핑
+      if (TP.marker && TP.pAgoda) {
+        return wrapTP(TP.pAgoda, deeplink, campaign);
       }
+      // 2) TP 트래커 passive 캡처용 label 추가
+      if (TP.marker) {
+        return appendTPLabel(deeplink, campaign);
+      }
+      // 3) Awin fallback
+      if (AWIN.publisherId && AWIN.midAgoda) {
+        return wrapAwin(AWIN.midAgoda, deeplink, campaign);
+      }
+      // 4) 직접 AID
       if (AIDS.agoda) {
         return ensure(direct, { cid: AIDS.agoda }) + `&${utm}`;
       }
-      return direct + `&${utm}`;
+      return deeplink;
     }
     case "booking": {
       const direct = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(ctx.cityEn)}`;
-      // 1) Awin 래핑 우선 (publisherId + MID 있으면)
-      if (AWIN.publisherId && AWIN.midBooking) {
-        const deeplink = `${direct}&${utm}`;
-        return wrapAwin(AWIN.midBooking, deeplink, `city-${cityEnSlug}-${ctx.region}`);
+      const deeplink = `${direct}&${utm}`;
+      const campaign = `city-${cityEnSlug}-${ctx.region}`;
+      // 1) Travelpayouts 우선 — program ID 있으면 래핑
+      if (TP.marker && TP.pBooking) {
+        return wrapTP(TP.pBooking, deeplink, campaign);
       }
-      // 2) Booking 직접 aid 파라미터 (별도 가입 시)
+      // 2) TP 트래커 passive 캡처용 label 추가
+      if (TP.marker) {
+        return appendTPLabel(deeplink, campaign);
+      }
+      // 3) Awin fallback
+      if (AWIN.publisherId && AWIN.midBooking) {
+        return wrapAwin(AWIN.midBooking, deeplink, campaign);
+      }
+      // 4) Booking 직접 aid
       if (AIDS.booking) {
         return ensure(direct, { aid: AIDS.booking }) + `&${utm}`;
       }
-      // 3) Fallback: UTM만
-      return direct + `&${utm}`;
+      return deeplink;
     }
     case "hotels": {
       const url = `https://www.hotels.com/Hotel-Search?destination=${encodeURIComponent(ctx.cityEn)}`;
@@ -143,15 +196,34 @@ export function buildUrl(provider: AffiliateProvider, ctx: AffiliateCtx): string
       const url = ctx.product === "flight"
         ? `https://www.trip.com/flights/showfarefirst?dcity=&acity=${encodeURIComponent(ctx.cityEn)}`
         : `https://www.trip.com/hotels/list?city=${encodeURIComponent(ctx.cityEn)}`;
-      return AIDS.tripcom
-        ? url + `&AID=${AIDS.tripcom}&${utm}`
-        : url + `&${utm}`;
+      const deeplink = `${url}&${utm}`;
+      const campaign = `city-${cityEnSlug}-${ctx.region}`;
+      if (TP.marker && TP.pTripcom) {
+        return wrapTP(TP.pTripcom, deeplink, campaign);
+      }
+      if (TP.marker) {
+        return appendTPLabel(deeplink, campaign);
+      }
+      if (AIDS.tripcom) {
+        return url + `&AID=${AIDS.tripcom}&${utm}`;
+      }
+      return deeplink;
     }
     case "skyscanner": {
       const url = `https://www.skyscanner.net/flights-to/${cityEnSlug}/`;
-      return AIDS.skyscanner
-        ? url + `?associateid=${AIDS.skyscanner}&${utm}`
-        : url + `?${utm}`;
+      const deeplink = `${url}?${utm}`;
+      const campaign = `city-${cityEnSlug}-${ctx.region}`;
+      // 1) Travelpayouts 우선 (Skyscanner 공식 파트너)
+      if (TP.marker && TP.pSkyscanner) {
+        return wrapTP(TP.pSkyscanner, deeplink, campaign);
+      }
+      if (TP.marker) {
+        return appendTPLabel(deeplink, campaign);
+      }
+      if (AIDS.skyscanner) {
+        return url + `?associateid=${AIDS.skyscanner}&${utm}`;
+      }
+      return deeplink;
     }
     case "kayak": {
       const url = `https://www.kayak.com/flights?destination=${encodeURIComponent(ctx.cityEn)}`;
