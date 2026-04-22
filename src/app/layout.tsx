@@ -102,7 +102,14 @@ export default function RootLayout({
         <meta name="naver-site-verification" content="1a0fd44740cba0ba4b2912712da898b0857aa430" />
         <meta name="theme-color" content="#0EA5E9" />
         <meta name="format-detection" content="telephone=no" />
+        <meta name="google-adsense-account" content="ca-pub-8619591050588950" />
         <link rel="alternate" type="text/plain" href="https://trip.otobz.com/llms.txt" title="LLMs.txt" />
+        {/* Google AdSense */}
+        <script
+          async
+          src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8619591050588950"
+          crossOrigin="anonymous"
+        />
         {/* Travelpayouts 트래커 */}
         <script
           data-noptimize="1"
