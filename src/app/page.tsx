@@ -48,6 +48,13 @@ export default async function Home() {
             >
               블로그
             </Link>
+            <Link
+              href="/en"
+              className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors"
+              hrefLang="en"
+            >
+              EN
+            </Link>
           </nav>
         </div>
       </header>

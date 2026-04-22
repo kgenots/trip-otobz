@@ -12,6 +12,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(),
       changeFrequency: "daily",
       priority: 1,
+      alternates: {
+        languages: {
+          ko: `${baseUrl}/`,
+          en: `${baseUrl}/en`,
+        },
+      },
+    },
+    {
+      url: `${baseUrl}/en`,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 0.95,
+      alternates: {
+        languages: {
+          ko: `${baseUrl}/`,
+          en: `${baseUrl}/en`,
+        },
+      },
     },
     ...cities.map((c) => ({
       url: `${baseUrl}/city/${c.slug}`,
