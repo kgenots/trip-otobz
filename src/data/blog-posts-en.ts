@@ -30,7 +30,10 @@ Google Maps, translation, photo uploads — you need data throughout your Japan 
 - **Cons**: Requires eSIM-compatible device (iPhone XS+, Samsung S20+, most recent flagships)
 - **Best for**: Solo travelers with recent phones
 
-Top eSIM providers: **Klook eSIM Japan** (multilingual support, 24/7 help), **Airalo** (global standard, 190+ countries), **Holafly** (unlimited data option).
+Top eSIM providers:
+- **[Klook eSIM Japan](https://www.klook.com/search/?query=japan+esim&aid=118698&utm_source=trip-otobz&utm_medium=affiliate&utm_campaign=klook&utm_content=esim-japan)** — multilingual support + 24/7 help
+- **[Airalo Japan eSIM](https://www.airalo.com/japan-esim?label=tp-521399-esim-japan-global)** — global standard, 190+ countries
+- **Holafly** — unlimited data option (premium pricing)
 
 ### 2. Pocket WiFi — Groups and laptops
 

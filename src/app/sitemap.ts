@@ -27,6 +27,32 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.95,
       alternates: { languages: hreflang },
     },
+    ...["about", "privacy", "terms", "contact"].flatMap((p) => [
+      {
+        url: `${baseUrl}/${p}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.4,
+        alternates: {
+          languages: {
+            ko: `${baseUrl}/${p}`,
+            en: `${baseUrl}/en/${p}`,
+          },
+        },
+      },
+      {
+        url: `${baseUrl}/en/${p}`,
+        lastModified: new Date(),
+        changeFrequency: "monthly" as const,
+        priority: 0.4,
+        alternates: {
+          languages: {
+            ko: `${baseUrl}/${p}`,
+            en: `${baseUrl}/en/${p}`,
+          },
+        },
+      },
+    ]),
     ...cities.flatMap((c) => [
       {
         url: `${baseUrl}/city/${c.slug}`,

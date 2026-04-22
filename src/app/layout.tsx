@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import Footer from "@/components/Footer";
 import "./globals.css";
 
 const SITE_URL = "https://trip.otobz.com";
@@ -101,6 +102,7 @@ export default function RootLayout({
         <GoogleAnalytics />
         <JsonLd />
         {children}
+        <Footer />
       </body>
     </html>
   );
