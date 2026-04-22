@@ -9,6 +9,9 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/"],
       },
     ],
-    sitemap: "https://trip.otobz.com/sitemap.xml",
+    sitemap: [
+      "https://trip.otobz.com/sitemap.xml",
+      "https://otobz.com/sitemap.xml",
+    ],
   };
 }

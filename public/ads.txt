@@ -1,0 +1,6 @@
+# ads.txt — AdSense, 기타 광고 네트워크 승인 선언
+# https://iabtechlab.com/ads-txt/
+# AdSense 승인 후 Publisher ID 주입 (형식: google.com, pub-XXXXXXXXXX, DIRECT, f08c47fec0942fa0)
+
+# Travelpayouts (네트워크 파트너 공시용)
+tpembars.com, 521399, DIRECT
