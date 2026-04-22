@@ -22,6 +22,21 @@ const AIDS = {
   kayak: process.env.NEXT_PUBLIC_AID_KAYAK || "",
 };
 
+// Awin affiliate network (wraps Booking.com + other Awin-enabled merchants)
+const AWIN = {
+  publisherId: process.env.NEXT_PUBLIC_AWIN_PUBLISHER_ID || "",
+  midBooking: process.env.NEXT_PUBLIC_AWIN_MID_BOOKING || "",
+  midAgoda: process.env.NEXT_PUBLIC_AWIN_MID_AGODA || "",
+  midHotels: process.env.NEXT_PUBLIC_AWIN_MID_HOTELS || "",
+};
+
+function wrapAwin(mid: string, deeplink: string, clickref = ""): string {
+  if (!AWIN.publisherId || !mid) return deeplink;
+  const p = encodeURIComponent(deeplink);
+  const ref = encodeURIComponent(clickref);
+  return `https://www.awin1.com/cread.php?awinmid=${mid}&awinaffid=${AWIN.publisherId}&clickref=${ref}&p=${p}`;
+}
+
 const UTM = (region: Region, p: AffiliateProvider, product: Product) =>
   `utm_source=trip-otobz&utm_medium=affiliate&utm_campaign=${p}&utm_content=${product}-${region}`;
 
@@ -64,16 +79,29 @@ export function buildUrl(provider: AffiliateProvider, ctx: AffiliateCtx): string
       return ensure(url, { aid: AIDS.klook }) + `&${utm}`;
     }
     case "agoda": {
-      const url = `https://www.agoda.com/search?city=${encodeURIComponent(ctx.cityEn)}`;
-      return AIDS.agoda
-        ? ensure(url, { cid: AIDS.agoda }) + `&${utm}`
-        : url + `&${utm}`;
+      const direct = `https://www.agoda.com/search?city=${encodeURIComponent(ctx.cityEn)}`;
+      if (AWIN.publisherId && AWIN.midAgoda) {
+        const deeplink = `${direct}&${utm}`;
+        return wrapAwin(AWIN.midAgoda, deeplink, `city-${cityEnSlug}-${ctx.region}`);
+      }
+      if (AIDS.agoda) {
+        return ensure(direct, { cid: AIDS.agoda }) + `&${utm}`;
+      }
+      return direct + `&${utm}`;
     }
     case "booking": {
-      const url = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(ctx.cityEn)}`;
-      return AIDS.booking
-        ? ensure(url, { aid: AIDS.booking }) + `&${utm}`
-        : url + `&${utm}`;
+      const direct = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(ctx.cityEn)}`;
+      // 1) Awin 래핑 우선 (publisherId + MID 있으면)
+      if (AWIN.publisherId && AWIN.midBooking) {
+        const deeplink = `${direct}&${utm}`;
+        return wrapAwin(AWIN.midBooking, deeplink, `city-${cityEnSlug}-${ctx.region}`);
+      }
+      // 2) Booking 직접 aid 파라미터 (별도 가입 시)
+      if (AIDS.booking) {
+        return ensure(direct, { aid: AIDS.booking }) + `&${utm}`;
+      }
+      // 3) Fallback: UTM만
+      return direct + `&${utm}`;
     }
     case "hotels": {
       const url = `https://www.hotels.com/Hotel-Search?destination=${encodeURIComponent(ctx.cityEn)}`;
