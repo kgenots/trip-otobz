@@ -38,6 +38,12 @@ export default function EnHome() {
               Explore Cities
             </a>
             <Link
+              href="/en/blog"
+              className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors"
+            >
+              Blog
+            </Link>
+            <Link
               href="/"
               className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors"
               hrefLang="ko"

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getMergedBlogPosts, getMergedPostBySlug, getMergedSlugs } from "@/data/blog";
 import { cities } from "@/data/cities";
+import { blogPostEnBySlug } from "@/data/blog-posts-en";
 import SmartCTA from "@/components/SmartCTA";
 import BookingBar from "@/components/BookingBar";
 
@@ -22,17 +23,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getMergedPostBySlug(slug);
   if (!post) return {};
 
+  const hasEn = !!blogPostEnBySlug[slug];
   return {
     title: post.title,
     description: post.description,
     keywords: post.keywords,
-    alternates: { canonical: `/blog/${slug}` },
+    alternates: {
+      canonical: `/blog/${slug}`,
+      languages: hasEn
+        ? {
+            "x-default": `/blog/${slug}`,
+            ko: `/blog/${slug}`,
+            en: `/en/blog/${slug}`,
+          }
+        : undefined,
+    },
     openGraph: {
       title: `${post.title} | Trip OTOBZ`,
       description: post.description,
       url: `https://trip.otobz.com/blog/${slug}`,
       siteName: "Trip OTOBZ",
       locale: "ko_KR",
+      ...(hasEn && { alternateLocale: ["en_US"] }),
       type: "article",
       publishedTime: post.date,
       ...(post.coverImage && {
