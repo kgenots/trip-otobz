@@ -235,6 +235,13 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
             <Link href="/" className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors">
               도시 탐색
             </Link>
+            <Link
+              href={`/en/city/${city.slug}`}
+              className="text-xs text-[#888] hover:text-sky-600"
+              hrefLang="en"
+            >
+              EN
+            </Link>
           </div>
         </div>
       </header>

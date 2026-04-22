@@ -82,7 +82,7 @@ export default function EnHome() {
               return (
                 <Link
                   key={slug}
-                  href={`/city/${slug}`}
+                  href={`/en/city/${slug}`}
                   className="group flex items-center gap-3 px-4 py-3 bg-white rounded-xl border border-gray-100 hover:border-sky-300 hover:shadow-sm transition"
                 >
                   <span className="text-2xl">{c.emoji}</span>
@@ -117,7 +117,7 @@ export default function EnHome() {
                     return (
                       <Link
                         key={slug}
-                        href={`/city/${slug}`}
+                        href={`/en/city/${slug}`}
                         className="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-sky-50 rounded-full text-sm text-[#333] hover:text-sky-700 transition"
                       >
                         <span>{c.emoji}</span>
@@ -139,9 +139,8 @@ export default function EnHome() {
           </h3>
           <p className="text-sm sm:text-base text-[#555] max-w-2xl mx-auto mb-6">
             One map, one click, every deal. Flights, hotels, tours, and
-            curated activity guides from a traveler&apos;s perspective. Korean
-            guides currently available for each city — full English city pages
-            rolling out.
+            curated activity guides from a traveler&apos;s perspective. Live
+            pricing across Booking.com, Agoda, Klook, Skyscanner, and more.
           </p>
           <Link
             href="/"

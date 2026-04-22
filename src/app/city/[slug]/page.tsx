@@ -26,13 +26,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     title,
     description,
     keywords: city.keywords,
-    alternates: { canonical: `/city/${slug}` },
+    alternates: {
+      canonical: `/city/${slug}`,
+      languages: {
+        "x-default": `/city/${slug}`,
+        ko: `/city/${slug}`,
+        en: `/en/city/${slug}`,
+      },
+    },
     openGraph: {
       title: `${title} | trip.otobz.com`,
       description,
       url: `https://trip.otobz.com/city/${slug}`,
       siteName: "Trip OTOBZ",
       locale: "ko_KR",
+      alternateLocale: ["en_US"],
       type: "website",
     },
     twitter: {
