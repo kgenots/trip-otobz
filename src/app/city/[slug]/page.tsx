@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { cities, cityBySlug } from "@/data/cities";
 import { getMergedBlogPosts } from "@/data/blog";
 import CityClient from "./CityClient";
+import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -118,6 +119,13 @@ export default async function CityPage({ params }: Props) {
   return (
     <>
       <CityJsonLd city={city} />
+      <BreadcrumbJsonLd
+        items={[
+          { name: "Trip OTOBZ", url: "https://trip.otobz.com/" },
+          { name: "도시", url: "https://trip.otobz.com/#explore" },
+          { name: city.cityKo, url: `https://trip.otobz.com/city/${slug}` },
+        ]}
+      />
       <CityClient city={city} relatedPosts={relatedPosts} />
     </>
   );

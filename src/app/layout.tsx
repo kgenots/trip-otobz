@@ -61,6 +61,20 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: TITLE,
     description: DESCRIPTION,
+    site: "@tripotobz",
+    creator: "@tripotobz",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Trip OTOBZ",
+    statusBarStyle: "default",
+  },
+  formatDetection: {
+    telephone: false,
+  },
+  other: {
+    "theme-color": "#0EA5E9",
+    "msapplication-TileColor": "#0EA5E9",
   },
   robots: {
     index: true,
@@ -86,6 +100,8 @@ export default function RootLayout({
       <head>
         <meta name="agd-partner-manual-verification" />
         <meta name="naver-site-verification" content="1a0fd44740cba0ba4b2912712da898b0857aa430" />
+        <meta name="theme-color" content="#0EA5E9" />
+        <meta name="format-detection" content="telephone=no" />
         <link rel="alternate" type="text/plain" href="https://trip.otobz.com/llms.txt" title="LLMs.txt" />
         {/* Travelpayouts 트래커 */}
         <script

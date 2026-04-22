@@ -73,6 +73,7 @@ export default async function BlogPostPageEn({ params }: Props) {
   const post = blogPostEnBySlug[slug];
   if (!post) notFound();
 
+  const wordCount = post.content.split(/\s+/).filter(Boolean).length;
   const articleJsonLd = {
     "@context": "https://schema.org",
     "@type": "Article",
@@ -81,14 +82,36 @@ export default async function BlogPostPageEn({ params }: Props) {
     datePublished: post.date,
     dateModified: post.date,
     inLanguage: "en",
-    author: { "@type": "Organization", name: "Trip OTOBZ" },
+    wordCount,
+    author: {
+      "@type": "Organization",
+      name: "Trip OTOBZ",
+      url: "https://trip.otobz.com/en/about",
+    },
     publisher: {
       "@type": "Organization",
       name: "Trip OTOBZ",
       url: "https://trip.otobz.com",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://trip.otobz.com/icon",
+        width: 512,
+        height: 512,
+      },
     },
     mainEntityOfPage: `https://trip.otobz.com/en/blog/${slug}`,
+    keywords: post.keywords.join(", "),
     ...(post.coverImage && { image: post.coverImage }),
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Trip OTOBZ", item: "https://trip.otobz.com/en" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://trip.otobz.com/en/blog" },
+      { "@type": "ListItem", position: 3, name: post.title, item: `https://trip.otobz.com/en/blog/${slug}` },
+    ],
   };
 
   const rc = getRelatedCities(post);
@@ -100,6 +123,10 @@ export default async function BlogPostPageEn({ params }: Props) {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
       <header className="border-b border-gray-100 px-3 sm:px-6 lg:px-8 py-2 sm:py-3">
         <div className="max-w-3xl mx-auto flex items-center gap-2 sm:gap-3">
