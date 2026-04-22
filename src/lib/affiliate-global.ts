@@ -22,21 +22,6 @@ const AIDS = {
   kayak: process.env.NEXT_PUBLIC_AID_KAYAK || "",
 };
 
-// Awin affiliate network (fallback for non-Travelpayouts merchants)
-const AWIN = {
-  publisherId: process.env.NEXT_PUBLIC_AWIN_PUBLISHER_ID || "",
-  midBooking: process.env.NEXT_PUBLIC_AWIN_MID_BOOKING || "",
-  midAgoda: process.env.NEXT_PUBLIC_AWIN_MID_AGODA || "",
-  midHotels: process.env.NEXT_PUBLIC_AWIN_MID_HOTELS || "",
-};
-
-function wrapAwin(mid: string, deeplink: string, clickref = ""): string {
-  if (!AWIN.publisherId || !mid) return deeplink;
-  const p = encodeURIComponent(deeplink);
-  const ref = encodeURIComponent(clickref);
-  return `https://www.awin1.com/cread.php?awinmid=${mid}&awinaffid=${AWIN.publisherId}&clickref=${ref}&p=${p}`;
-}
-
 // Travelpayouts 통합 네트워크 (Booking/Agoda/Skyscanner/Trip.com 일원화)
 // Passive 트래커(<head> 스크립트)가 클릭 자동 캡처 + 명시 deeplink로 이중 방어
 const TP = {
@@ -116,7 +101,7 @@ export function buildUrl(provider: AffiliateProvider, ctx: AffiliateCtx): string
       const direct = `https://www.agoda.com/search?city=${encodeURIComponent(ctx.cityEn)}`;
       const deeplink = `${direct}&${utm}`;
       const campaign = `city-${cityEnSlug}-${ctx.region}`;
-      // 1) Travelpayouts 우선 — program ID 있으면 래핑
+      // 1) Travelpayouts 우선 — program ID 있으면 tp.media 래핑
       if (TP.marker && TP.pAgoda) {
         return wrapTP(TP.pAgoda, deeplink, campaign);
       }
@@ -124,11 +109,7 @@ export function buildUrl(provider: AffiliateProvider, ctx: AffiliateCtx): string
       if (TP.marker) {
         return appendTPLabel(deeplink, campaign);
       }
-      // 3) Awin fallback
-      if (AWIN.publisherId && AWIN.midAgoda) {
-        return wrapAwin(AWIN.midAgoda, deeplink, campaign);
-      }
-      // 4) 직접 AID
+      // 3) 직접 AID (TP 미설정 시)
       if (AIDS.agoda) {
         return ensure(direct, { cid: AIDS.agoda }) + `&${utm}`;
       }
@@ -138,19 +119,15 @@ export function buildUrl(provider: AffiliateProvider, ctx: AffiliateCtx): string
       const direct = `https://www.booking.com/searchresults.html?ss=${encodeURIComponent(ctx.cityEn)}`;
       const deeplink = `${direct}&${utm}`;
       const campaign = `city-${cityEnSlug}-${ctx.region}`;
-      // 1) Travelpayouts 우선 — program ID 있으면 래핑
+      // 1) Travelpayouts 우선 — program ID 있으면 tp.media 래핑 (승인 완료 후)
       if (TP.marker && TP.pBooking) {
         return wrapTP(TP.pBooking, deeplink, campaign);
       }
-      // 2) TP 트래커 passive 캡처용 label 추가
+      // 2) TP 트래커 passive 캡처용 label 추가 (검토 중에도 작동)
       if (TP.marker) {
         return appendTPLabel(deeplink, campaign);
       }
-      // 3) Awin fallback
-      if (AWIN.publisherId && AWIN.midBooking) {
-        return wrapAwin(AWIN.midBooking, deeplink, campaign);
-      }
-      // 4) Booking 직접 aid
+      // 3) 직접 aid (TP 미설정 시)
       if (AIDS.booking) {
         return ensure(direct, { aid: AIDS.booking }) + `&${utm}`;
       }
