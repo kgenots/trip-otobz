@@ -6,6 +6,7 @@ import type { City } from "@/data/cities";
 import { getMylinkId, accommodationUrl, klookSearchUrl } from "@/lib/affiliate";
 import BookingBar from "@/components/BookingBar";
 import SmartCTA from "@/components/SmartCTA";
+import { readGeoCookie, toRegion, type Region } from "@/lib/region";
 
 interface Activity {
   id: number;
@@ -64,6 +65,12 @@ function SourceBadge({ source }: { source: "myrealtrip" | "klook" }) {
 export default function CityClient({ city, relatedPosts = [] }: { city: City; relatedPosts?: RelatedPost[] }) {
   const [activeTab, setActiveTab] = useState<TabId>("tour");
   const [mylinkId, setMylinkId] = useState("");
+  const [region, setRegion] = useState<Region>("global");
+
+  useEffect(() => {
+    setRegion(toRegion(readGeoCookie()));
+  }, []);
+  const isKoreaUser = region === "kr";
 
   // Activity state (DB)
   const [activities, setActivities] = useState<Activity[]>([]);
@@ -467,7 +474,22 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
               7일 후 체크인 · 2박 · 성인 2명 기준
             </p>
 
-            {accomLoading ? (
+            {!isKoreaUser ? (
+              <div className="py-4">
+                <SmartCTA
+                  cityEn={city.cityEn}
+                  cityKo={city.cityKo}
+                  product="hotel"
+                  stage="book"
+                  placement="city-accom-nonkr"
+                  lang="ko"
+                  limit={3}
+                />
+                <p className="text-xs text-[#888] mt-3 text-center">
+                  MyRealTrip listings are available in Korea only. Global users: use providers above.
+                </p>
+              </div>
+            ) : accomLoading ? (
               <div className="flex items-center justify-center py-16">
                 <div className="animate-spin rounded-full h-10 w-10 border-2 border-sky-200 border-t-sky-500" />
               </div>
