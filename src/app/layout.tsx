@@ -86,6 +86,16 @@ export default function RootLayout({
         <meta name="agd-partner-manual-verification" />
         <meta name="naver-site-verification" content="1a0fd44740cba0ba4b2912712da898b0857aa430" />
         <link rel="alternate" type="text/plain" href="https://trip.otobz.com/llms.txt" title="LLMs.txt" />
+        {/* Travelpayouts 트래커 */}
+        <script
+          data-noptimize="1"
+          data-cfasync="false"
+          data-wpfc-render="false"
+          data-no-defer="1"
+          dangerouslySetInnerHTML={{
+            __html: `(function () { var script = document.createElement("script"); script.async = 1; script.src = 'https://tpembars.com/NTIxMzk5.js?t=521399'; document.head.appendChild(script); })();`,
+          }}
+        />
       </head>
       <body className="antialiased">
         <GoogleAnalytics />
