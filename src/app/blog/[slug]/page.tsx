@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getMergedBlogPosts, getMergedPostBySlug, getMergedSlugs } from "@/data/blog";
 import { cities } from "@/data/cities";
+import SmartCTA from "@/components/SmartCTA";
+import BookingBar from "@/components/BookingBar";
 
 export const dynamic = "force-dynamic";
 
@@ -194,6 +196,13 @@ function getRelatedCities(post: { title: string; keywords: string[]; content: st
     .slice(0, 4);
 }
 
+function inferStage(post: { title: string; content: string }): "browse" | "plan" | "book" {
+  const text = `${post.title} ${post.content.slice(0, 500)}`;
+  if (/날씨|유심|환전|공항|택시|심카드|eSIM|와이파이|면세|환율|출입국/.test(text)) return "book";
+  if (/3박|4박|일정|코스|경비|예산|plan|itinerary|비교|vs/i.test(text)) return "plan";
+  return "browse";
+}
+
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
   const post = await getMergedPostBySlug(slug);
@@ -254,7 +263,48 @@ export default async function BlogPostPage({ params }: Props) {
           {post.title}
         </h1>
 
+        {/* 상단 CTA — intent-aware. plan/book 단계면 바로 예약 바 */}
+        {(() => {
+          const rc = getRelatedCities(post);
+          const stage = inferStage(post);
+          if (rc.length === 0 || stage === "browse") return null;
+          const primary = rc[0];
+          return (
+            <div className="mb-8">
+              <BookingBar
+                cityEn={primary.cityEn}
+                cityKo={primary.cityKo}
+                stage={stage}
+                placement={`blog-top-${stage}`}
+                lang="ko"
+                products={stage === "book" ? ["hotel", "flight"] : ["hotel", "tour", "flight"]}
+              />
+            </div>
+          );
+        })()}
+
         <div className="prose-custom">{renderMarkdown(post.content)}</div>
+
+        {/* 본문 하단 CTA — 호텔 집중 (primary city 기준) */}
+        {(() => {
+          const rc = getRelatedCities(post);
+          if (rc.length === 0) return null;
+          const primary = rc[0];
+          const stage = inferStage(post);
+          return (
+            <div className="mt-10">
+              <SmartCTA
+                cityEn={primary.cityEn}
+                cityKo={primary.cityKo}
+                product="hotel"
+                stage={stage}
+                placement="blog-bottom-hotel"
+                lang="ko"
+                limit={3}
+              />
+            </div>
+          );
+        })()}
 
         {/* 관련 도시 CTA */}
         {(() => {

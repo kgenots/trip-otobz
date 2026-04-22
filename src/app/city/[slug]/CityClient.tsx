@@ -4,6 +4,8 @@ import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { City } from "@/data/cities";
 import { getMylinkId, accommodationUrl, klookSearchUrl } from "@/lib/affiliate";
+import BookingBar from "@/components/BookingBar";
+import SmartCTA from "@/components/SmartCTA";
 
 interface Activity {
   id: number;
@@ -242,6 +244,20 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
           <p className="text-[#6a6a6a] text-lg max-w-2xl">
             {city.cityKo}에서 꼭 해봐야 할 투어, 액티비티, 체험을 한눈에 비교하세요.
           </p>
+        </div>
+      </section>
+
+      {/* 예약 바 — 호텔·투어·항공권 (geo-aware) */}
+      <section className="bg-gradient-to-b from-sky-50/50 to-white border-b border-gray-100">
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-6">
+          <BookingBar
+            cityEn={city.cityEn}
+            cityKo={city.cityKo}
+            stage="plan"
+            placement="city-top"
+            lang="ko"
+            products={["hotel", "tour", "flight"]}
+          />
         </div>
       </section>
 
@@ -523,6 +539,19 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
             )}
           </section>
         )}
+
+        {/* 하단 CTA — 호텔 집중 (최고 커미션) */}
+        <section className="mt-10">
+          <SmartCTA
+            cityEn={city.cityEn}
+            cityKo={city.cityKo}
+            product="hotel"
+            stage="book"
+            placement="city-bottom"
+            lang="ko"
+            limit={3}
+          />
+        </section>
 
         {/* 관련 블로그 포스트 */}
         {relatedPosts.length > 0 && (
