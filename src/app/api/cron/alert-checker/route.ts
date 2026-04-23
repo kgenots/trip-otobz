@@ -75,16 +75,18 @@ export async function GET(req: Request) {
         [alert.route_code]
       );
 
-      if (subs.rows.length === 0) {
-        await pool.query(
-          `UPDATE price_alerts SET triggered_at = NOW() WHERE id = $1`,
-          [alert.id]
-        );
-        continue;
-      }
+      const allSubs = await pool.query<SubRow>(
+        `SELECT endpoint, p256dh, auth FROM push_subscriptions
+         WHERE route_code = $1 AND is_active = true
+         UNION
+         SELECT endpoint, p256dh, auth FROM push_subscriptions
+         WHERE route_code IS NULL AND is_active = true`
+      );
+
+      if (allSubs.rows.length === 0) continue;
 
       const results = await Promise.all(
-        subs.rows.map((sub) => sendPush(sub, alert.route_code, latestPrice, alert.target_price))
+        allSubs.rows.map((sub) => sendPush(sub, alert.route_code, latestPrice, alert.target_price))
       );
 
       const successCount = results.filter((r) => r).length;

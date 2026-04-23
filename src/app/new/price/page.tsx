@@ -61,6 +61,13 @@ function formatPrice(n: number) {
   return n.toLocaleString("ko-KR");
 }
 
+function urlBase64ToUint8Array(base64String: string): Uint8Array {
+  const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
+  const base64 = base64String.replace(/-/g, "+").replace(/_/g, "/") + padding;
+  const decoded = decodeURIComponent(escape(atob(base64)));
+  return new Uint8Array([...decoded].map((c) => c.charCodeAt(0)));
+}
+
 export default function PricePage() {
   const [selectedRoute, setSelectedRoute] = useState<string>(DEFAULT_ROUTE);
   const [routes, setRoutes] = useState<RouteInfo[]>([]);
@@ -134,6 +141,38 @@ export default function PricePage() {
     price: h.price,
   }));
 
+  async function registerPushSubscription(routeCode: string) {
+    const key = process.env.NEXT_PUBLIC_PUSH_API_KEY;
+    const vapidKey = process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY;
+    if (!key || !vapidKey || !("serviceWorker" in navigator)) return;
+
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") return;
+
+      const reg = await navigator.serviceWorker.ready;
+      const subscription = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+      });
+
+      const p256dh = btoa(String.fromCharCode(...new Uint8Array(subscription.getKey("p256dh"))));
+      const auth = btoa(String.fromCharCode(...new Uint8Array(subscription.getKey("auth"))));
+
+      await fetch(`/api/push/register?key=${key}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: btoa(alertEmail).slice(0, 100),
+          subscription: { endpoint: subscription.endpoint, keys: { p256dh, auth } },
+          routeCode,
+        }),
+      });
+    } catch {
+      // Non-blocking — push failure does not break alert
+    }
+  }
+
   const targetPriceNum = alertPrice ? Number(alertPrice) : null;
   const currentPrice = prediction?.current || null;
 
@@ -166,12 +205,12 @@ export default function PricePage() {
       });
       const data = (await res.json()) as AlertResult;
       if (data.alert) {
-        setAlertSuccess(data.message);
         setAlertEmail("");
         setAlertName("");
         setAlertPrice("");
+        registerPushSubscription(selectedRoute);
       } else {
-        setAlertError("Could not save alert. Try again.");
+        setAlertError(data.error || "Could not save alert. Try again.");
       }
     } catch {
       setAlertError("Network error.");
