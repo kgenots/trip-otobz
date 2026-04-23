@@ -1,10 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const key = req.nextUrl.searchParams.get("key");
+  if (!process.env.ALERTS_API_KEY || key !== process.env.ALERTS_API_KEY) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
   try {
     const rows = await pool.query(
-      `SELECT pa.*, pr.arr_city, pr.arr_code
+      `SELECT pa.id, pa.route_code, pa.target_price, pa.is_active, pa.created_at,
+              pr.arr_city, pr.arr_code
        FROM price_alerts pa
        JOIN price_routes pr ON pr.arr_code = pa.route_code
        WHERE pa.is_active = true
@@ -27,6 +32,10 @@ export async function POST(req: NextRequest) {
 
   if (!route || !email || !targetPrice) {
     return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    return NextResponse.json({ error: "Invalid email format" }, { status: 400 });
   }
 
   try {

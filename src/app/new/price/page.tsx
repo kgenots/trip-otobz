@@ -92,26 +92,34 @@ export default function PricePage() {
   useEffect(() => {
     if (!selectedRoute) return;
 
+    const controller = new AbortController();
+
     setLoading(true);
     setError(null);
 
     Promise.all([
-      fetch(`/api/price/search?route=${selectedRoute}`).then((r) => r.json()),
-      fetch(`/api/price/predict?route=${selectedRoute}`).then((r) => r.json()),
+      fetch(`/api/price/search?route=${encodeURIComponent(selectedRoute)}`, { signal: controller.signal }).then((r) => r.json()),
+      fetch(`/api/price/predict?route=${encodeURIComponent(selectedRoute)}`, { signal: controller.signal }).then((r) => r.json()),
     ])
       .then(([searchData, predData]) => {
-        if ((searchData as any).error) {
-          setError((searchData as any).error);
+        const s = searchData as { history: PricePoint[]; error?: string };
+        if (s.error) {
+          setError(s.error);
         } else {
-          const s = searchData as { history: PricePoint[] };
           setHistory(s.history || []);
         }
-        if (!(predData as any).error) {
-          setPrediction(predData as PredictionResult);
+        const p = predData as PredictionResult & { error?: string };
+        if (!p.error) {
+          setPrediction(p);
         }
       })
-      .catch(() => setError("Failed to load data"))
+      .catch((err) => {
+        if (err instanceof DOMException && err.name === "AbortError") return;
+        setError("Failed to load data");
+      })
       .finally(() => setLoading(false));
+
+    return () => controller.abort();
   }, [selectedRoute]);
 
   const filteredHistory = history.filter((h) => {
@@ -126,7 +134,7 @@ export default function PricePage() {
     price: h.price,
   }));
 
-  const targetPriceNum = alertPrice ? parseInt(alertPrice) : null;
+  const targetPriceNum = alertPrice ? Number(alertPrice) : null;
   const currentPrice = prediction?.current || null;
 
   async function handleAlertSubmit(e: React.FormEvent) {

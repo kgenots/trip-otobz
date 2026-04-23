@@ -2,15 +2,24 @@ import { NextRequest, NextResponse } from "next/server";
 import pool from "@/lib/db";
 
 export async function POST(req: NextRequest) {
+  const key = req.nextUrl.searchParams.get("key");
+  if (!process.env.PUSH_API_KEY || key !== process.env.PUSH_API_KEY) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   const body = await req.json();
   const { subscription, userId, routeCode } = body as {
-    subscription: any;
+    subscription: { endpoint: string; keys: { p256dh: string; auth: string } };
     userId: string;
     routeCode?: string;
   };
 
   if (!subscription || !userId) {
     return NextResponse.json({ error: "Missing subscription or userId" }, { status: 400 });
+  }
+
+  if (userId.length > 100) {
+    return NextResponse.json({ error: "userId too long" }, { status: 400 });
   }
 
   try {

@@ -3,6 +3,11 @@ import webpush from "web-push";
 import pool from "@/lib/db";
 
 export async function POST(req: NextRequest) {
+  const key = req.nextUrl.searchParams.get("key");
+  if (!process.env.PUSH_API_KEY || key !== process.env.PUSH_API_KEY) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+
   const publicKey = process.env.VAPID_PUBLIC_KEY;
   const privateKey = process.env.VAPID_PRIVATE_KEY;
   if (publicKey && privateKey) {
@@ -15,6 +20,10 @@ export async function POST(req: NextRequest) {
     targetPrice: number;
   };
 
+  if (!routeCode || typeof price !== "number" || typeof targetPrice !== "number") {
+    return NextResponse.json({ error: "Missing or invalid required fields" }, { status: 400 });
+  }
+
   try {
     const subs = await pool.query(
       `SELECT endpoint, p256dh, auth FROM push_subscriptions
@@ -23,7 +32,7 @@ export async function POST(req: NextRequest) {
     );
 
     const results = await Promise.all(
-      subs.rows.map(async (sub: any) => {
+      subs.rows.map(async (sub: { endpoint: string; p256dh: string; auth: string }) => {
         try {
           await webpush.sendNotification(
             { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
