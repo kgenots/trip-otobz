@@ -6,6 +6,7 @@ import type { City } from "@/data/cities";
 import { getMylinkId, accommodationUrl, klookSearchUrl } from "@/lib/affiliate";
 import BookingBar from "@/components/BookingBar";
 import SmartCTA from "@/components/SmartCTA";
+import PriceWidget from "@/components/PriceWidget";
 import { readGeoCookie, toRegion, type Region } from "@/lib/region";
 
 interface Activity {
@@ -258,6 +259,13 @@ export default function CityClient({ city, relatedPosts = [] }: { city: City; re
           <p className="text-[#6a6a6a] text-lg max-w-2xl">
             {city.cityKo}에서 꼭 해봐야 할 투어, 액티비티, 체험을 한눈에 비교하세요.
           </p>
+        </div>
+      </section>
+
+      {/* 항공권 최저가 위젯 */}
+      <section>
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4">
+          <PriceWidget cityEn={city.cityEn} />
         </div>
       </section>
 

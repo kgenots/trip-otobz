@@ -43,6 +43,12 @@ export default async function Home() {
               도시 탐색
             </a>
             <Link
+              href="/new/price"
+              className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors"
+            >
+              Price Pulse
+            </Link>
+            <Link
               href="/blog"
               className="text-sm text-[#6a6a6a] hover:text-sky-500 transition-colors"
             >

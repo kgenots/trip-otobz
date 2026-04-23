@@ -38,8 +38,9 @@ interface PredictionResult {
 }
 
 interface AlertResult {
-  alert: { id: number; route_code: string; user_email: string; user_name: string | null; target_price: number; is_active: boolean };
-  message: string;
+  alert?: { id: number; route_code: string; user_email: string; user_name: string | null; target_price: number; is_active: boolean };
+  message?: string;
+  error?: string;
 }
 
 const ROUTES: RouteInfo[] = [
@@ -153,11 +154,14 @@ export default function PricePage() {
       const reg = await navigator.serviceWorker.ready;
       const subscription = await reg.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(vapidKey),
+        applicationServerKey: urlBase64ToUint8Array(vapidKey) as unknown as ArrayBufferView<ArrayBuffer>,
       });
 
-      const p256dh = btoa(String.fromCharCode(...new Uint8Array(subscription.getKey("p256dh"))));
-      const auth = btoa(String.fromCharCode(...new Uint8Array(subscription.getKey("auth"))));
+      const p256dhKey = subscription.getKey("p256dh");
+      const authKey = subscription.getKey("auth");
+      if (!p256dhKey || !authKey) return;
+      const p256dh = btoa(String.fromCharCode(...new Uint8Array(p256dhKey)));
+      const auth = btoa(String.fromCharCode(...new Uint8Array(authKey)));
 
       await fetch(`/api/push/register?key=${key}`, {
         method: "POST",

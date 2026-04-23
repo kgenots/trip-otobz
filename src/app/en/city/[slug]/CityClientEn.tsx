@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { City } from "@/data/cities";
 import BookingBar from "@/components/BookingBar";
 import SmartCTA from "@/components/SmartCTA";
+import PriceWidget from "@/components/PriceWidget";
 
 interface RelatedPost {
   slug: string;
@@ -64,6 +65,13 @@ export default function CityClientEn({
           <p className="text-[#6a6a6a] text-lg max-w-2xl">
             Compare hotel deals, find the best tours, and book flights to {city.cityEn} — all in one place.
           </p>
+        </div>
+      </section>
+
+      {/* 항공권 최저가 위젯 */}
+      <section>
+        <div className="max-w-6xl mx-auto px-4 sm:px-8 py-4">
+          <PriceWidget cityEn={city.cityEn} />
         </div>
       </section>
 
