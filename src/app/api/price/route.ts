@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import pool from "@/lib/db";
+import pool, { ensurePricePulseTables } from "@/lib/db";
 
 const ROUTE_TO_CITY: Record<string, string> = {
   BKK: "bangkok",
@@ -16,6 +16,7 @@ const ROUTE_TO_CITY: Record<string, string> = {
 
 export async function GET(req: NextRequest) {
   try {
+    await ensurePricePulseTables();
     const routes = await pool.query(
       `SELECT arr_city, arr_code, display_name, sort_order
        FROM price_routes
