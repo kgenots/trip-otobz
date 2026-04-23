@@ -72,7 +72,7 @@ export async function ensurePricePulseTables() {
       id SERIAL PRIMARY KEY,
       dep_city VARCHAR(50) NOT NULL DEFAULT 'Seoul',
       arr_city VARCHAR(50) NOT NULL,
-      arr_code VARCHAR(10) NOT NULL,
+      arr_code VARCHAR(10) NOT NULL UNIQUE,
       display_name VARCHAR(100) NOT NULL,
       is_active BOOLEAN NOT NULL DEFAULT true,
       sort_order INTEGER NOT NULL DEFAULT 0,
