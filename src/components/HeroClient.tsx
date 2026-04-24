@@ -8,9 +8,41 @@ type LocationState =
   | { status: "ready"; detected?: City }
   | { status: "korea" };
 
+type TopDeal = {
+  routeCode: string;
+  slug: string;
+  cityKo: string;
+  emoji: string;
+  minPrice: number;
+  period: number;
+};
+
+type HeroSummary = {
+  top3: TopDeal[];
+  stats: { activeAlerts: number; trackedRoutes: number };
+};
+
+function fmtKrw(n: number) {
+  return "₩" + n.toLocaleString("ko-KR");
+}
+
 export default function HeroClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState<LocationState>({ status: "ready" });
+  const [summary, setSummary] = useState<HeroSummary | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/price/hero-summary")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data) setSummary(data);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   useEffect(() => {
     if (!navigator.geolocation) return;
@@ -97,6 +129,23 @@ export default function HeroClient() {
         </>
       )}
 
+      {/* 실측 소셜 배지 */}
+      {summary && (summary.stats.activeAlerts > 0 || summary.stats.trackedRoutes > 0) && (
+        <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-[#6a6a6a] mb-4">
+          {summary.stats.trackedRoutes > 0 && (
+            <span className="inline-flex items-center gap-1.5 bg-[#FAFAFA] px-3 py-1 rounded-full border border-gray-100">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              {summary.stats.trackedRoutes}개 노선 가격 추적 중
+            </span>
+          )}
+          {summary.stats.activeAlerts > 0 && (
+            <span className="inline-flex items-center gap-1.5 bg-[#FAFAFA] px-3 py-1 rounded-full border border-gray-100">
+              🔔 알림 {summary.stats.activeAlerts.toLocaleString("ko-KR")}건
+            </span>
+          )}
+        </div>
+      )}
+
       {/* 검색바 */}
       <div className="max-w-md mx-auto relative mt-4">
         <input
@@ -137,6 +186,39 @@ export default function HeroClient() {
           </div>
         )}
       </div>
+
+      {/* 이번 주 최저가 TOP3 */}
+      {summary && summary.top3.length > 0 && (
+        <div className="max-w-4xl mx-auto mt-8">
+          <p className="text-xs uppercase tracking-wider text-[#6a6a6a] mb-3 font-semibold">
+            이번 주 최저가 TOP {summary.top3.length}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            {summary.top3.map((d, i) => (
+              <Link
+                key={d.routeCode}
+                href={`/city/${d.slug}`}
+                className="group relative bg-white rounded-xl border border-gray-200 hover:border-sky-400 hover:shadow-md transition-all p-4 text-left"
+              >
+                <span className="absolute top-3 right-3 text-[10px] font-bold text-white bg-rose-500 rounded-full px-2 py-0.5">
+                  #{i + 1}
+                </span>
+                <div className="text-2xl mb-1">{d.emoji}</div>
+                <div className="text-sm font-semibold text-[#222222] group-hover:text-sky-600">
+                  {d.cityKo}
+                </div>
+                <div className="mt-2 flex items-baseline gap-1.5">
+                  <span className="text-lg font-bold text-rose-500">{fmtKrw(d.minPrice)}</span>
+                  <span className="text-xs text-[#6a6a6a]">부터</span>
+                </div>
+                <div className="text-[11px] text-[#999] mt-0.5">
+                  인천 출발 · {d.period}일 기준
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

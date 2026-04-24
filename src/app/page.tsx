@@ -2,6 +2,11 @@ import Link from "next/link";
 import { cities } from "@/data/cities";
 import { getMergedBlogPosts } from "@/data/blog";
 import HeroClient from "@/components/HeroClient";
+import { computeHeroSummary } from "@/lib/hero-summary";
+
+function fmtKrw(n: number) {
+  return "₩" + n.toLocaleString("ko-KR");
+}
 
 const POPULAR_SLUGS = [
   "tokyo", "osaka", "bangkok", "danang", "cebu",
@@ -25,7 +30,10 @@ const cityBySlug = Object.fromEntries(cities.map((c) => [c.slug, c]));
 export const dynamic = "force-dynamic";
 
 export default async function Home() {
-  const blogPosts = await getMergedBlogPosts();
+  const [blogPosts, summary] = await Promise.all([
+    getMergedBlogPosts(),
+    computeHeroSummary(),
+  ]);
   const recentPosts = blogPosts.slice(0, 3);
   return (
     <main className="min-h-screen bg-white">
@@ -77,6 +85,7 @@ export default async function Home() {
               {POPULAR_SLUGS.map((slug) => {
                 const c = cityBySlug[slug];
                 if (!c) return null;
+                const deal = summary.bySlug[slug];
                 return (
                   <Link
                     key={slug}
@@ -88,6 +97,13 @@ export default async function Home() {
                       {c.cityKo}
                     </div>
                     <div className="text-xs text-[#6a6a6a] mt-0.5">{c.countryKo}</div>
+                    {deal ? (
+                      <div className="mt-2 text-[11px] font-semibold text-rose-500">
+                        {fmtKrw(deal.minPrice)}~
+                      </div>
+                    ) : (
+                      <div className="mt-2 text-[11px] text-[#bbb]">가격 업데이트 예정</div>
+                    )}
                   </Link>
                 );
               })}
