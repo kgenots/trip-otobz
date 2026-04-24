@@ -3,6 +3,18 @@ import { AGODA_CITY_SLUG, SLUG_ISO } from "@/lib/slug-iso";
 
 const TP_MARKER = process.env.NEXT_PUBLIC_TP_MARKER || "";
 
+// impact.com 승인 후 env 주입 시 자동 래핑
+// IMPACT_SKYSCANNER_URL 예: "https://goto.walnut.impact.com/c/{CAMPAIGN_ID}/{AD_ID}/{PUBLISHER_ID}"
+const IMPACT_SKYSCANNER_URL = process.env.NEXT_PUBLIC_IMPACT_SKYSCANNER_URL || "";
+const IMPACT_SUBID_PARAM = process.env.NEXT_PUBLIC_IMPACT_SUBID_PARAM || "subId1";
+
+function wrapImpact(target: string, campaign: string): string {
+  if (!IMPACT_SKYSCANNER_URL) return target;
+  const u = encodeURIComponent(target);
+  const sep = IMPACT_SKYSCANNER_URL.includes("?") ? "&" : "?";
+  return `${IMPACT_SKYSCANNER_URL}${sep}u=${u}&${IMPACT_SUBID_PARAM}=${encodeURIComponent(campaign)}`;
+}
+
 export type OutboundInput = {
   slug: string;
   arrCode?: string; // IATA 공항 코드
@@ -59,7 +71,9 @@ export function flightOutbound(input: OutboundInput): string | null {
     utm_content: "flight-kr",
   };
   if (label) params.label = label;
-  return appendParams(url, params);
+  const direct = appendParams(url, params);
+  // impact.com 승인 후 env 있으면 래핑 (없으면 direct + TP label fallback)
+  return wrapImpact(direct, campaign);
 }
 
 /**
