@@ -110,16 +110,9 @@ export default function RootLayout({
           src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-8619591050588950"
           crossOrigin="anonymous"
         />
-        {/* Travelpayouts 트래커 */}
-        <script
-          data-noptimize="1"
-          data-cfasync="false"
-          data-wpfc-render="false"
-          data-no-defer="1"
-          dangerouslySetInnerHTML={{
-            __html: `(function () { var script = document.createElement("script"); script.async = 1; script.src = 'https://tpembars.com/NzIxNDk1.js?t=721495'; document.head.appendChild(script); })();`,
-          }}
-        />
+        {/* Travelpayouts passive tracker 제거됨 — publisher entrypoint_config 403/404 이슈.
+            Deeplink label=tp-{marker}-* 파라미터는 어필 체인에서 partner-side 인식.
+            TP 승인 완료 후 재활성화 검토. */}
       </head>
       <body className="antialiased">
         <GoogleAnalytics />
