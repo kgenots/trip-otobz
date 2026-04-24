@@ -117,7 +117,7 @@ export default function RootLayout({
           data-wpfc-render="false"
           data-no-defer="1"
           dangerouslySetInnerHTML={{
-            __html: `(function () { var script = document.createElement("script"); script.async = 1; script.src = 'https://tpembars.com/NTIxMzk5.js?t=521399'; document.head.appendChild(script); })();`,
+            __html: `(function () { var script = document.createElement("script"); script.async = 1; script.src = 'https://tpembars.com/NzIxNDk1.js?t=721495'; document.head.appendChild(script); })();`,
           }}
         />
       </head>

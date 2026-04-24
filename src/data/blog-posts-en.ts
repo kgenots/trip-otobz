@@ -32,7 +32,7 @@ Google Maps, translation, photo uploads — you need data throughout your Japan 
 
 Top eSIM providers:
 - **[Klook eSIM Japan](https://www.klook.com/search/?query=japan+esim&aid=118698&utm_source=trip-otobz&utm_medium=affiliate&utm_campaign=klook&utm_content=esim-japan)** — multilingual support + 24/7 help
-- **[Airalo Japan eSIM](https://www.airalo.com/japan-esim?label=tp-521399-esim-japan-global)** — global standard, 190+ countries
+- **[Airalo Japan eSIM](https://www.airalo.com/japan-esim?label=tp-721495-esim-japan-global)** — global standard, 190+ countries
 - **Holafly** — unlimited data option (premium pricing)
 
 ### 2. Pocket WiFi — Groups and laptops
