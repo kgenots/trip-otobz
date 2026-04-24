@@ -2,6 +2,7 @@ import Link from "next/link";
 import { cities } from "@/data/cities";
 import { getMergedBlogPosts } from "@/data/blog";
 import HeroClient from "@/components/HeroClient";
+import CuratorWidget from "@/components/CuratorWidget";
 import { computeHeroSummary } from "@/lib/hero-summary";
 
 function fmtKrw(n: number) {
@@ -75,6 +76,9 @@ export default async function Home() {
 
       {/* 히어로 (클라이언트) */}
       <HeroClient />
+
+      {/* AI 큐레이터 위젯 */}
+      <CuratorWidget />
 
       {/* 인기 여행지 카드 */}
       <section id="explore" className="bg-[#FAFAFA]">
