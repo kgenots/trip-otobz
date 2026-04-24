@@ -90,12 +90,18 @@ export default async function Home() {
                 const c = cityBySlug[slug];
                 if (!c) return null;
                 const deal = summary.bySlug[slug];
+                const isHot = deal?.dropPct !== null && deal?.dropPct !== undefined && deal.dropPct <= -15;
                 return (
                   <Link
                     key={slug}
                     href={`/city/${slug}`}
-                    className="bg-white rounded-xl px-4 py-4 text-center border border-gray-100 hover:border-sky-300 hover:shadow-sm transition-all group"
+                    className="relative bg-white rounded-xl px-4 py-4 text-center border border-gray-100 hover:border-sky-300 hover:shadow-sm transition-all group"
                   >
+                    {isHot && (
+                      <span className="absolute top-1.5 right-1.5 text-[9px] font-bold text-white bg-orange-500 rounded-full px-1.5 py-0.5">
+                        🔥
+                      </span>
+                    )}
                     <div className="text-2xl mb-1">{c.emoji}</div>
                     <div className="text-base font-semibold text-[#222222] group-hover:text-sky-600 transition-colors">
                       {c.cityKo}

@@ -15,6 +15,8 @@ type TopDeal = {
   emoji: string;
   minPrice: number;
   period: number;
+  dropPct: number | null;
+  daysAgo: number;
 };
 
 type HeroSummary = {
@@ -194,28 +196,43 @@ export default function HeroClient() {
             이번 주 최저가 TOP {summary.top3.length}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            {summary.top3.map((d, i) => (
-              <Link
-                key={d.slug}
-                href={`/city/${d.slug}`}
-                className="group relative bg-white rounded-xl border border-gray-200 hover:border-sky-400 hover:shadow-md transition-all p-4 text-left"
-              >
-                <span className="absolute top-3 right-3 text-[10px] font-bold text-white bg-rose-500 rounded-full px-2 py-0.5">
-                  #{i + 1}
-                </span>
-                <div className="text-2xl mb-1">{d.emoji}</div>
-                <div className="text-sm font-semibold text-[#222222] group-hover:text-sky-600">
-                  {d.cityKo}
-                </div>
-                <div className="mt-2 flex items-baseline gap-1.5">
-                  <span className="text-lg font-bold text-rose-500">{fmtKrw(d.minPrice)}</span>
-                  <span className="text-xs text-[#6a6a6a]">부터</span>
-                </div>
-                <div className="text-[11px] text-[#999] mt-0.5">
-                  인천 출발 · {d.period}일 기준
-                </div>
-              </Link>
-            ))}
+            {summary.top3.map((d, i) => {
+              const isHot = d.dropPct !== null && d.dropPct <= -15;
+              const freshLabel = d.daysAgo === 0
+                ? "오늘 기준"
+                : d.daysAgo === 1
+                  ? "어제 기준"
+                  : `${d.daysAgo}일 전 기준`;
+              return (
+                <Link
+                  key={d.slug}
+                  href={`/city/${d.slug}`}
+                  className="group relative bg-white rounded-xl border border-gray-200 hover:border-sky-400 hover:shadow-md transition-all p-4 text-left"
+                >
+                  <span className="absolute top-3 right-3 flex items-center gap-1">
+                    {isHot && (
+                      <span className="text-[10px] font-bold text-white bg-orange-500 rounded-full px-2 py-0.5">
+                        🔥 급락
+                      </span>
+                    )}
+                    <span className="text-[10px] font-bold text-white bg-rose-500 rounded-full px-2 py-0.5">
+                      #{i + 1}
+                    </span>
+                  </span>
+                  <div className="text-2xl mb-1">{d.emoji}</div>
+                  <div className="text-sm font-semibold text-[#222222] group-hover:text-sky-600">
+                    {d.cityKo}
+                  </div>
+                  <div className="mt-2 flex items-baseline gap-1.5">
+                    <span className="text-lg font-bold text-rose-500">{fmtKrw(d.minPrice)}</span>
+                    <span className="text-xs text-[#6a6a6a]">부터</span>
+                  </div>
+                  <div className="text-[11px] text-[#999] mt-0.5">
+                    인천 출발 · {d.period}일 · {freshLabel}
+                  </div>
+                </Link>
+              );
+            })}
           </div>
         </div>
       )}

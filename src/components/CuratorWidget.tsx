@@ -15,6 +15,8 @@ type Pick = {
     minPrice: number;
     period: number;
     collectedAt: string;
+    dropPct: number | null;
+    daysAgo: number;
   };
   reason: string;
   score: number;
