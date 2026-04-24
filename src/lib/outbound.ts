@@ -1,4 +1,5 @@
 import { cityBySlug } from "@/data/cities";
+import { AGODA_CITY_SLUG, SLUG_ISO } from "@/lib/slug-iso";
 
 const TP_MARKER = process.env.NEXT_PUBLIC_TP_MARKER || "";
 
@@ -62,19 +63,31 @@ export function flightOutbound(input: OutboundInput): string | null {
 }
 
 /**
- * Agoda 호텔 검색
- * https://www.agoda.com/ko-kr/search?q={city}&checkIn=...&checkOut=...
+ * Agoda 도시 호텔 페이지
+ * https://www.agoda.com/ko-kr/city/{agoda-slug}-{iso-lower}.html?checkIn=...&checkOut=...
+ * - agoda-slug/iso 맵 없으면 Booking fallback
  */
 export function hotelOutbound(input: OutboundInput): string | null {
   const city = cityBySlug[input.slug];
   if (!city) return null;
+  const agodaSlug = AGODA_CITY_SLUG[input.slug];
+  const iso = SLUG_ISO[input.slug];
   const cityEnSlug = city.cityEn.toLowerCase().replace(/\s+/g, "-");
   const campaign = `hotel-${cityEnSlug}-kr`;
   const label = tpLabel(campaign);
 
-  const baseUrl = "https://www.agoda.com/ko-kr/search";
+  if (!agodaSlug || !iso) {
+    return hotelOutboundBooking(input);
+  }
+
+  // Agoda city URL은 city slug에 국가 suffix 이미 포함된 경우 있음 (fukuoka, hawaii-us 등)
+  // iso suffix 중복 방지: agodaSlug가 "-{iso-lower}" 또는 "-{iso-lower}-" 포함 시 그대로
+  const isoLower = iso.toLowerCase();
+  const hasIso = agodaSlug.includes(`-${isoLower}`);
+  const citySegment = hasIso ? agodaSlug : `${agodaSlug}-${isoLower}`;
+  const baseUrl = `https://www.agoda.com/ko-kr/city/${citySegment}.html`;
+
   const params: Record<string, string> = {
-    q: city.cityEn,
     utm_source: "trip-otobz",
     utm_medium: "affiliate",
     utm_campaign: "agoda",

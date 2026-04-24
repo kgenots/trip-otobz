@@ -275,7 +275,7 @@ export default function HeroClient() {
                       <span className="text-xs text-[#6a6a6a]">부터</span>
                     </div>
                     <div className="text-[11px] text-[#999] mt-0.5">
-                      인천 출발 · {d.period}일 · {freshLabel}
+                      인천 출발 · {d.period}일 왕복 · {freshLabel}
                     </div>
                   </Link>
                   <div className="mt-3 grid grid-cols-2 gap-1.5">
@@ -299,6 +299,9 @@ export default function HeroClient() {
                         🏨 호텔 검색
                       </a>
                     )}
+                  </div>
+                  <div className="mt-1.5 text-[10px] text-[#999] text-center">
+                    선택한 날짜로 실시간 검색
                   </div>
                 </div>
               );
