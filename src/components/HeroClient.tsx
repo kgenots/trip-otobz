@@ -3,6 +3,8 @@
 import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { cities, isKorea, type City } from "@/data/cities";
+import { flightOutbound, hotelOutbound } from "@/lib/outbound";
+import { defaultDates, loadDates, saveDates, type TripDates } from "@/lib/trip-prefs";
 
 type LocationState =
   | { status: "ready"; detected?: City }
@@ -32,6 +34,23 @@ export default function HeroClient() {
   const [searchQuery, setSearchQuery] = useState("");
   const [location, setLocation] = useState<LocationState>({ status: "ready" });
   const [summary, setSummary] = useState<HeroSummary | null>(null);
+  const [dates, setDates] = useState<TripDates>(defaultDates);
+
+  useEffect(() => {
+    // client-only localStorage sync on mount (SSR fallback = defaultDates)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setDates(loadDates());
+  }, []);
+
+  function updateDates(next: Partial<TripDates>) {
+    setDates((prev) => {
+      const merged = { ...prev, ...next };
+      // guard: return must be ≥ depart
+      if (merged.return < merged.depart) merged.return = merged.depart;
+      saveDates(merged);
+      return merged;
+    });
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -189,9 +208,35 @@ export default function HeroClient() {
         )}
       </div>
 
+      {/* 날짜 선택 */}
+      {summary && summary.top3.length > 0 && (
+        <div className="max-w-4xl mx-auto mt-8 mb-3 flex flex-wrap items-center justify-center gap-2 text-xs">
+          <label className="text-[#6a6a6a]">출발
+            <input
+              type="date"
+              value={dates.depart}
+              min={new Date().toISOString().split("T")[0]}
+              onChange={(e) => updateDates({ depart: e.target.value })}
+              className="ml-1.5 px-2 py-1 rounded-lg border border-gray-200 bg-white text-[#222222] focus:outline-none focus:border-sky-400"
+            />
+          </label>
+          <span className="text-[#bbb]">→</span>
+          <label className="text-[#6a6a6a]">귀국
+            <input
+              type="date"
+              value={dates.return}
+              min={dates.depart}
+              onChange={(e) => updateDates({ return: e.target.value })}
+              className="ml-1.5 px-2 py-1 rounded-lg border border-gray-200 bg-white text-[#222222] focus:outline-none focus:border-sky-400"
+            />
+          </label>
+          <span className="text-[11px] text-[#999]">(예약 검색에 자동 반영)</span>
+        </div>
+      )}
+
       {/* 이번 주 최저가 TOP3 */}
       {summary && summary.top3.length > 0 && (
-        <div className="max-w-4xl mx-auto mt-8">
+        <div className="max-w-4xl mx-auto mt-4">
           <p className="text-xs uppercase tracking-wider text-[#6a6a6a] mb-3 font-semibold">
             이번 주 최저가 TOP {summary.top3.length}
           </p>
@@ -203,11 +248,12 @@ export default function HeroClient() {
                 : d.daysAgo === 1
                   ? "어제 기준"
                   : `${d.daysAgo}일 전 기준`;
+              const flight = flightOutbound({ slug: d.slug, depart: dates.depart, return: dates.return });
+              const hotel = hotelOutbound({ slug: d.slug, depart: dates.depart, return: dates.return });
               return (
-                <Link
+                <div
                   key={d.slug}
-                  href={`/city/${d.slug}`}
-                  className="group relative bg-white rounded-xl border border-gray-200 hover:border-sky-400 hover:shadow-md transition-all p-4 text-left"
+                  className="group relative bg-white rounded-xl border border-gray-200 hover:border-sky-400 hover:shadow-md transition-all p-4 text-left flex flex-col"
                 >
                   <span className="absolute top-3 right-3 flex items-center gap-1">
                     {isHot && (
@@ -219,18 +265,42 @@ export default function HeroClient() {
                       #{i + 1}
                     </span>
                   </span>
-                  <div className="text-2xl mb-1">{d.emoji}</div>
-                  <div className="text-sm font-semibold text-[#222222] group-hover:text-sky-600">
-                    {d.cityKo}
+                  <Link href={`/city/${d.slug}`} className="block">
+                    <div className="text-2xl mb-1">{d.emoji}</div>
+                    <div className="text-sm font-semibold text-[#222222] group-hover:text-sky-600">
+                      {d.cityKo}
+                    </div>
+                    <div className="mt-2 flex items-baseline gap-1.5">
+                      <span className="text-lg font-bold text-rose-500">{fmtKrw(d.minPrice)}</span>
+                      <span className="text-xs text-[#6a6a6a]">부터</span>
+                    </div>
+                    <div className="text-[11px] text-[#999] mt-0.5">
+                      인천 출발 · {d.period}일 · {freshLabel}
+                    </div>
+                  </Link>
+                  <div className="mt-3 grid grid-cols-2 gap-1.5">
+                    {flight && (
+                      <a
+                        href={flight}
+                        target="_blank"
+                        rel="nofollow noopener sponsored"
+                        className="text-[11px] font-semibold text-white bg-rose-500 hover:bg-rose-600 rounded-lg py-1.5 text-center transition-colors"
+                      >
+                        🛫 항공 검색
+                      </a>
+                    )}
+                    {hotel && (
+                      <a
+                        href={hotel}
+                        target="_blank"
+                        rel="nofollow noopener sponsored"
+                        className="text-[11px] font-semibold text-sky-600 hover:bg-sky-50 border border-sky-300 rounded-lg py-1.5 text-center transition-colors"
+                      >
+                        🏨 호텔 검색
+                      </a>
+                    )}
                   </div>
-                  <div className="mt-2 flex items-baseline gap-1.5">
-                    <span className="text-lg font-bold text-rose-500">{fmtKrw(d.minPrice)}</span>
-                    <span className="text-xs text-[#6a6a6a]">부터</span>
-                  </div>
-                  <div className="text-[11px] text-[#999] mt-0.5">
-                    인천 출발 · {d.period}일 · {freshLabel}
-                  </div>
-                </Link>
+                </div>
               );
             })}
           </div>

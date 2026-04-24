@@ -1,7 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { flightOutbound, hotelOutbound } from "@/lib/outbound";
+import { loadDates, defaultDates, type TripDates } from "@/lib/trip-prefs";
+
+const PREFS_KEY = "trip.curator";
 
 type Companion = "solo" | "friends";
 type Budget = "budget" | "mid" | "premium";
@@ -55,6 +59,19 @@ export default function CuratorWidget() {
   const [result, setResult] = useState<Result | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [dates, setDates] = useState<TripDates>(defaultDates);
+
+  useEffect(() => {
+    setDates(loadDates());
+    try {
+      const raw = window.localStorage.getItem(PREFS_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed?.companion) setCompanion(parsed.companion);
+      if (parsed?.budget) setBudget(parsed.budget);
+      if (parsed?.duration) setDuration(parsed.duration);
+    } catch {}
+  }, []);
 
   const canSubmit = companion && budget && duration && !loading;
 
@@ -63,6 +80,12 @@ export default function CuratorWidget() {
     setLoading(true);
     setError(null);
     try {
+      try {
+        window.localStorage.setItem(
+          PREFS_KEY,
+          JSON.stringify({ companion, budget, duration })
+        );
+      } catch {}
       const res = await fetch("/api/curate", {
         method: "POST",
         headers: { "content-type": "application/json" },
@@ -174,26 +197,53 @@ export default function CuratorWidget() {
               맞춤 추천 TOP {result.picks.length}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
-              {result.picks.map((p, i) => (
-                <Link
-                  key={p.deal.slug}
-                  href={`/city/${p.deal.slug}`}
-                  className="group relative bg-white rounded-xl border border-gray-200 hover:border-rose-400 hover:shadow-md transition-all p-4 text-left"
-                >
-                  <span className="absolute top-3 right-3 text-[10px] font-bold text-white bg-rose-500 rounded-full px-2 py-0.5">
-                    #{i + 1}
-                  </span>
-                  <div className="text-2xl mb-1">{p.deal.emoji}</div>
-                  <div className="text-sm font-semibold text-[#222222] group-hover:text-rose-600">
-                    {p.deal.cityKo}
+              {result.picks.map((p, i) => {
+                const flight = flightOutbound({ slug: p.deal.slug, depart: dates.depart, return: dates.return });
+                const hotel = hotelOutbound({ slug: p.deal.slug, depart: dates.depart, return: dates.return });
+                return (
+                  <div
+                    key={p.deal.slug}
+                    className="group relative bg-white rounded-xl border border-gray-200 hover:border-rose-400 hover:shadow-md transition-all p-4 text-left flex flex-col"
+                  >
+                    <span className="absolute top-3 right-3 text-[10px] font-bold text-white bg-rose-500 rounded-full px-2 py-0.5">
+                      #{i + 1}
+                    </span>
+                    <Link href={`/city/${p.deal.slug}`} className="block">
+                      <div className="text-2xl mb-1">{p.deal.emoji}</div>
+                      <div className="text-sm font-semibold text-[#222222] group-hover:text-rose-600">
+                        {p.deal.cityKo}
+                      </div>
+                      <div className="mt-2 flex items-baseline gap-1.5">
+                        <span className="text-lg font-bold text-rose-500">{fmtKrw(p.deal.minPrice)}</span>
+                        <span className="text-xs text-[#6a6a6a]">부터</span>
+                      </div>
+                      <p className="text-[11px] text-[#6a6a6a] mt-2 leading-snug">{p.reason}</p>
+                    </Link>
+                    <div className="mt-3 grid grid-cols-2 gap-1.5">
+                      {flight && (
+                        <a
+                          href={flight}
+                          target="_blank"
+                          rel="nofollow noopener sponsored"
+                          className="text-[11px] font-semibold text-white bg-rose-500 hover:bg-rose-600 rounded-lg py-1.5 text-center transition-colors"
+                        >
+                          🛫 항공
+                        </a>
+                      )}
+                      {hotel && (
+                        <a
+                          href={hotel}
+                          target="_blank"
+                          rel="nofollow noopener sponsored"
+                          className="text-[11px] font-semibold text-sky-600 hover:bg-sky-50 border border-sky-300 rounded-lg py-1.5 text-center transition-colors"
+                        >
+                          🏨 호텔
+                        </a>
+                      )}
+                    </div>
                   </div>
-                  <div className="mt-2 flex items-baseline gap-1.5">
-                    <span className="text-lg font-bold text-rose-500">{fmtKrw(p.deal.minPrice)}</span>
-                    <span className="text-xs text-[#6a6a6a]">부터</span>
-                  </div>
-                  <p className="text-[11px] text-[#6a6a6a] mt-2 leading-snug">{p.reason}</p>
-                </Link>
-              ))}
+                );
+              })}
             </div>
             <button
               onClick={reset}
