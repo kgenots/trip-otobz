@@ -9,7 +9,7 @@ type LocationState =
   | { status: "korea" };
 
 type TopDeal = {
-  routeCode: string;
+  arrCode: string;
   slug: string;
   cityKo: string;
   emoji: string;
@@ -19,7 +19,7 @@ type TopDeal = {
 
 type HeroSummary = {
   top3: TopDeal[];
-  stats: { activeAlerts: number; trackedRoutes: number };
+  stats: { activeAlerts: number; trackedCities: number };
 };
 
 function fmtKrw(n: number) {
@@ -130,12 +130,12 @@ export default function HeroClient() {
       )}
 
       {/* 실측 소셜 배지 */}
-      {summary && (summary.stats.activeAlerts > 0 || summary.stats.trackedRoutes > 0) && (
+      {summary && (summary.stats.activeAlerts > 0 || summary.stats.trackedCities > 0) && (
         <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-[#6a6a6a] mb-4">
-          {summary.stats.trackedRoutes > 0 && (
+          {summary.stats.trackedCities > 0 && (
             <span className="inline-flex items-center gap-1.5 bg-[#FAFAFA] px-3 py-1 rounded-full border border-gray-100">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              {summary.stats.trackedRoutes}개 노선 가격 추적 중
+              {summary.stats.trackedCities}개 도시 가격 추적 중
             </span>
           )}
           {summary.stats.activeAlerts > 0 && (
@@ -196,7 +196,7 @@ export default function HeroClient() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {summary.top3.map((d, i) => (
               <Link
-                key={d.routeCode}
+                key={d.slug}
                 href={`/city/${d.slug}`}
                 className="group relative bg-white rounded-xl border border-gray-200 hover:border-sky-400 hover:shadow-md transition-all p-4 text-left"
               >
