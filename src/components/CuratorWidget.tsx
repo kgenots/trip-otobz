@@ -182,9 +182,8 @@ export default function CuratorWidget() {
           </div>
         ) : result.picks.length === 0 ? (
           <div className="text-center py-8">
-            <p className="text-sm text-[#6a6a6a] mb-4">
-              조건에 맞는 추천이 없어요. 다른 조건으로 시도해보세요.
-            </p>
+            <p className="text-sm text-[#6a6a6a] mb-2">조건에 맞는 추천이 없어요.</p>
+            <p className="text-xs text-[#999] mb-4">예산을 한 단계 올리거나 기간을 다르게 선택해보세요.</p>
             <button
               onClick={reset}
               className="text-sm text-sky-500 hover:text-sky-600 font-semibold"

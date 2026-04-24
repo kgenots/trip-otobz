@@ -90,6 +90,10 @@ export async function curate(input: CurateInput): Promise<CurateResult> {
     const companionScore = COMPANION_BONUS[input.companion][deal.slug] ?? 0;
     const durationScore = DURATION_BONUS[input.duration](deal.slug);
 
+    // 기간 hard filter — 선택한 기간 그룹에 해당 도시 속하지 않으면 제외
+    // (단거리 선택 = 장거리 추천 금지, 장거리 선택 = 단거리 추천 금지)
+    if (durationScore === 0) continue;
+
     // 가격 정규화 — 싸면 플러스 (cap 대비)
     const priceScore = cap === Number.MAX_SAFE_INTEGER
       ? 0
