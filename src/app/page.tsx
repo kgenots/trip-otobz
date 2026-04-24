@@ -84,9 +84,16 @@ export default async function Home() {
       <section id="explore" className="bg-[#FAFAFA]">
         <div className="max-w-6xl mx-auto px-4 sm:px-8 py-10 sm:py-14">
           <div className="mb-10">
-            <h3 className="text-lg font-bold text-[#222222] mb-5">인기 여행지</h3>
+            <div className="flex items-baseline justify-between mb-5">
+              <h3 className="text-lg font-bold text-[#222222]">인기 여행지</h3>
+              <span className="text-xs text-[#6a6a6a]">저렴한 순</span>
+            </div>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
-              {POPULAR_SLUGS.map((slug) => {
+              {[...POPULAR_SLUGS].sort((a, b) => {
+                const pa = summary.bySlug[a]?.minPrice ?? Number.MAX_SAFE_INTEGER;
+                const pb = summary.bySlug[b]?.minPrice ?? Number.MAX_SAFE_INTEGER;
+                return pa - pb;
+              }).map((slug) => {
                 const c = cityBySlug[slug];
                 if (!c) return null;
                 const deal = summary.bySlug[slug];
