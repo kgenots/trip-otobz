@@ -13,6 +13,7 @@ type Duration = "short" | "mid" | "long";
 
 type Pick = {
   deal: {
+    arrCode: string;
     slug: string;
     cityKo: string;
     emoji: string;
@@ -198,7 +199,7 @@ export default function CuratorWidget() {
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-4">
               {result.picks.map((p, i) => {
-                const flight = flightOutbound({ slug: p.deal.slug, depart: dates.depart, return: dates.return });
+                const flight = flightOutbound({ slug: p.deal.slug, arrCode: p.deal.arrCode, depart: dates.depart, return: dates.return });
                 const hotel = hotelOutbound({ slug: p.deal.slug, depart: dates.depart, return: dates.return });
                 return (
                   <div

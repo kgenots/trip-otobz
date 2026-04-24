@@ -248,7 +248,7 @@ export default function HeroClient() {
                 : d.daysAgo === 1
                   ? "어제 기준"
                   : `${d.daysAgo}일 전 기준`;
-              const flight = flightOutbound({ slug: d.slug, depart: dates.depart, return: dates.return });
+              const flight = flightOutbound({ slug: d.slug, arrCode: d.arrCode, depart: dates.depart, return: dates.return });
               const hotel = hotelOutbound({ slug: d.slug, depart: dates.depart, return: dates.return });
               return (
                 <div
