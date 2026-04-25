@@ -8,6 +8,7 @@ import SmartCTA from "@/components/SmartCTA";
 import BookingBar from "@/components/BookingBar";
 import CoupangAffiliateBox from "@/components/CoupangAffiliateBox";
 import AdsenseSlot from "@/components/AdsenseSlot";
+import TravelInsuranceBox from "@/components/TravelInsuranceBox";
 
 export const dynamic = "force-dynamic";
 
@@ -377,6 +378,20 @@ export default async function BlogPostPage({ params }: Props) {
             <CoupangAffiliateBox
               cityKo={primary?.cityKo}
               countryKo={primary?.countryKo}
+            />
+          );
+        })()}
+
+        {/* 여행 의료 보험 박스 (SafetyWing — 글로벌) */}
+        {(() => {
+          const rc = getRelatedCities(post);
+          const primary = rc[0];
+          return (
+            <TravelInsuranceBox
+              cityKo={primary?.cityKo}
+              cityEn={primary?.cityEn}
+              countryKo={primary?.countryKo}
+              lang="ko"
             />
           );
         })()}

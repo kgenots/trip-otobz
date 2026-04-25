@@ -7,6 +7,7 @@ import { renderMarkdown } from "@/lib/markdown";
 import SmartCTA from "@/components/SmartCTA";
 import BookingBar from "@/components/BookingBar";
 import AdsenseSlot from "@/components/AdsenseSlot";
+import TravelInsuranceBox from "@/components/TravelInsuranceBox";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -222,6 +223,15 @@ export default async function BlogPostPageEn({ params }: Props) {
               limit={3}
             />
           </div>
+        )}
+
+        {primary && (
+          <TravelInsuranceBox
+            cityKo={primary.cityKo}
+            cityEn={primary.cityEn}
+            countryKo={primary.countryKo}
+            lang="en"
+          />
         )}
 
         {adSlotBottomEn && (
