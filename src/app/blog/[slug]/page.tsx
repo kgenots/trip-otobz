@@ -3,7 +3,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { getMergedBlogPosts, getMergedPostBySlug, getMergedSlugs } from "@/data/blog";
 import { cities } from "@/data/cities";
-import { blogPostEnBySlug } from "@/data/blog-posts-en";
 import SmartCTA from "@/components/SmartCTA";
 import BookingBar from "@/components/BookingBar";
 import CoupangAffiliateBox from "@/components/CoupangAffiliateBox";
@@ -26,7 +25,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const post = await getMergedPostBySlug(slug);
   if (!post) return {};
 
-  const hasEn = !!blogPostEnBySlug[slug];
+  const hasEn = !!(await getMergedPostBySlug(slug, "en"));
   return {
     title: post.title,
     description: post.description,

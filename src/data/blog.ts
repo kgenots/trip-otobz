@@ -1,11 +1,18 @@
 import { blogPosts as staticPosts, type BlogPost } from "./blog-posts";
+import { blogPostsEn as staticPostsEn } from "./blog-posts-en";
 import { getAllPublishedPosts, getPostBySlug, getAllSlugs } from "@/lib/blog";
 
+function staticPool(lang: "ko" | "en"): BlogPost[] {
+  return lang === "en" ? staticPostsEn : staticPosts;
+}
+
 // Merge static posts with DB posts. DB posts take precedence for same slug.
-export async function getMergedBlogPosts(): Promise<BlogPost[]> {
+export async function getMergedBlogPosts(
+  lang: "ko" | "en" = "ko",
+): Promise<BlogPost[]> {
   let dbPosts: BlogPost[] = [];
   try {
-    const rows = await getAllPublishedPosts();
+    const rows = await getAllPublishedPosts(lang);
     dbPosts = rows.map((r) => ({
       slug: r.slug,
       title: r.title,
@@ -22,17 +29,18 @@ export async function getMergedBlogPosts(): Promise<BlogPost[]> {
   }
 
   const dbSlugs = new Set(dbPosts.map((p) => p.slug));
-  const staticOnly = staticPosts.filter((p) => !dbSlugs.has(p.slug));
+  const staticOnly = staticPool(lang).filter((p) => !dbSlugs.has(p.slug));
   return [...dbPosts, ...staticOnly].sort(
     (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
   );
 }
 
 export async function getMergedPostBySlug(
-  slug: string
+  slug: string,
+  lang: "ko" | "en" = "ko",
 ): Promise<BlogPost | undefined> {
   try {
-    const row = await getPostBySlug(slug);
+    const row = await getPostBySlug(slug, lang);
     if (row) {
       return {
         slug: row.slug,
@@ -49,13 +57,15 @@ export async function getMergedPostBySlug(
   } catch {
     // fall through to static
   }
-  return staticPosts.find((p) => p.slug === slug);
+  return staticPool(lang).find((p) => p.slug === slug);
 }
 
-export async function getMergedSlugs(): Promise<string[]> {
-  const staticSlugs = staticPosts.map((p) => p.slug);
+export async function getMergedSlugs(
+  lang: "ko" | "en" = "ko",
+): Promise<string[]> {
+  const staticSlugs = staticPool(lang).map((p) => p.slug);
   try {
-    const dbSlugs = await getAllSlugs();
+    const dbSlugs = await getAllSlugs(lang);
     return [...new Set([...dbSlugs, ...staticSlugs])];
   } catch {
     return staticSlugs;

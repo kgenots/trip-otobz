@@ -1,7 +1,8 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { cities, cityBySlug } from "@/data/cities";
-import { blogPostsEn } from "@/data/blog-posts-en";
+import { getMergedBlogPosts } from "@/data/blog";
+import type { BlogPost } from "@/data/blog";
 import CityClientEn from "./CityClientEn";
 import BreadcrumbJsonLd from "@/components/BreadcrumbJsonLd";
 
@@ -93,8 +94,9 @@ function CityJsonLdEn({
   );
 }
 
-function getRelatedPostsEn(cityEn: string, cityKo: string) {
-  return blogPostsEn
+async function getRelatedPostsEn(cityEn: string, cityKo: string): Promise<BlogPost[]> {
+  const posts = await getMergedBlogPosts("en");
+  return posts
     .filter((p) => {
       const text = `${p.title} ${p.keywords.join(" ")} ${p.content}`.toLowerCase();
       return (
@@ -110,7 +112,7 @@ export default async function CityPageEn({ params }: Props) {
   const city = cityBySlug[slug];
   if (!city) notFound();
 
-  const relatedPosts = getRelatedPostsEn(city.cityEn, city.cityKo).map((p) => ({
+  const relatedPosts = (await getRelatedPostsEn(city.cityEn, city.cityKo)).map((p) => ({
     slug: p.slug,
     title: p.title,
     description: p.description,

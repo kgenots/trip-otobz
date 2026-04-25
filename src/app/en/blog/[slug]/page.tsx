@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { blogPostEnBySlug, blogPostsEn } from "@/data/blog-posts-en";
+import { getMergedBlogPosts, getMergedPostBySlug, getMergedSlugs } from "@/data/blog";
 import { cities } from "@/data/cities";
 import { renderMarkdown } from "@/lib/markdown";
 import SmartCTA from "@/components/SmartCTA";
@@ -13,13 +13,16 @@ interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return blogPostsEn.map((p) => ({ slug: p.slug }));
+export const dynamic = "force-dynamic";
+
+export async function generateStaticParams() {
+  const slugs = await getMergedSlugs("en");
+  return slugs.map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = blogPostEnBySlug[slug];
+  const post = await getMergedPostBySlug(slug, "en");
   if (!post) return {};
 
   return {
@@ -76,7 +79,7 @@ const adSlotBottomEn = process.env.ADSENSE_SLOT_BOTTOM || "";
 
 export default async function BlogPostPageEn({ params }: Props) {
   const { slug } = await params;
-  const post = blogPostEnBySlug[slug];
+  const post = await getMergedPostBySlug(slug, "en");
   if (!post) notFound();
 
   const wordCount = post.content.split(/\s+/).filter(Boolean).length;

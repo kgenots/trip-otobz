@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { blogPostsEn } from "@/data/blog-posts-en";
+import { getMergedBlogPosts } from "@/data/blog";
 
 export const metadata: Metadata = {
   title: "Travel Blog",
@@ -26,10 +26,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function BlogListPageEn() {
-  const posts = [...blogPostsEn].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
+export const dynamic = "force-dynamic";
+
+export default async function BlogListPageEn() {
+  const posts = await getMergedBlogPosts("en");
 
   return (
     <main className="min-h-screen bg-white">

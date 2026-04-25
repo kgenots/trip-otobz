@@ -1,11 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAllPublishedPosts, upsertBlogPost } from "@/lib/blog";
 
-export async function GET() {
-  const posts = await getAllPublishedPosts();
+export async function GET(request: NextRequest) {
+  const lang = request.nextUrl.searchParams.get("lang") || "ko";
+  const posts = await getAllPublishedPosts(lang);
   return NextResponse.json({
     posts: posts.map(({ content, ...rest }) => rest),
     total: posts.length,
+    lang,
   });
 }
 
@@ -38,6 +40,7 @@ export async function POST(request: NextRequest) {
     cover_emoji: body.cover_emoji,
     content: body.content,
     status: body.status,
+    lang: body.lang,
   });
 
   return NextResponse.json({ ok: true, post }, { status: 201 });

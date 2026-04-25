@@ -47,7 +47,7 @@ export async function ensureBlogPostsTable() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS blog_posts (
       id SERIAL PRIMARY KEY,
-      slug VARCHAR(200) NOT NULL UNIQUE,
+      slug VARCHAR(200) NOT NULL,
       title TEXT NOT NULL,
       description TEXT NOT NULL,
       date DATE NOT NULL DEFAULT CURRENT_DATE,
@@ -57,11 +57,14 @@ export async function ensureBlogPostsTable() {
       cover_emoji VARCHAR(10) NOT NULL DEFAULT '',
       content TEXT NOT NULL,
       status VARCHAR(20) NOT NULL DEFAULT 'published',
+      lang VARCHAR(8) NOT NULL DEFAULT 'ko',
       created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+      updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+      UNIQUE (slug, lang)
     );
     CREATE INDEX IF NOT EXISTS idx_blog_posts_status ON blog_posts(status, date DESC);
     CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(slug);
+    CREATE INDEX IF NOT EXISTS idx_blog_posts_lang ON blog_posts(lang, status, date DESC);
   `);
 }
 

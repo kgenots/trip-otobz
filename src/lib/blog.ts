@@ -12,33 +12,39 @@ export interface BlogPostRow {
   cover_emoji: string;
   content: string;
   status: string;
+  lang: string;
   created_at: string;
   updated_at: string;
 }
 
-export async function getAllPublishedPosts(): Promise<BlogPostRow[]> {
+export async function getAllPublishedPosts(
+  lang: string = "ko",
+): Promise<BlogPostRow[]> {
   await ensureBlogPostsTable();
   const { rows } = await pool.query<BlogPostRow>(
-    `SELECT * FROM blog_posts WHERE status = 'published' ORDER BY date DESC`
+    `SELECT * FROM blog_posts WHERE status = 'published' AND lang = $1 ORDER BY date DESC`,
+    [lang],
   );
   return rows;
 }
 
 export async function getPostBySlug(
-  slug: string
+  slug: string,
+  lang: string = "ko",
 ): Promise<BlogPostRow | null> {
   await ensureBlogPostsTable();
   const { rows } = await pool.query<BlogPostRow>(
-    `SELECT * FROM blog_posts WHERE slug = $1 AND status = 'published' LIMIT 1`,
-    [slug]
+    `SELECT * FROM blog_posts WHERE slug = $1 AND lang = $2 AND status = 'published' LIMIT 1`,
+    [slug, lang],
   );
   return rows[0] || null;
 }
 
-export async function getAllSlugs(): Promise<string[]> {
+export async function getAllSlugs(lang: string = "ko"): Promise<string[]> {
   await ensureBlogPostsTable();
   const { rows } = await pool.query<{ slug: string }>(
-    `SELECT slug FROM blog_posts WHERE status = 'published' ORDER BY date DESC`
+    `SELECT slug FROM blog_posts WHERE status = 'published' AND lang = $1 ORDER BY date DESC`,
+    [lang],
   );
   return rows.map((r) => r.slug);
 }
@@ -54,12 +60,13 @@ export async function upsertBlogPost(post: {
   cover_emoji?: string;
   content: string;
   status?: string;
+  lang?: string;
 }): Promise<BlogPostRow> {
   await ensureBlogPostsTable();
   const { rows } = await pool.query<BlogPostRow>(
-    `INSERT INTO blog_posts (slug, title, description, date, keywords, cover_image, cover_gradient, cover_emoji, content, status)
-     VALUES ($1, $2, $3, COALESCE($4, CURRENT_DATE), COALESCE($5::text[], '{}'), $6, COALESCE($7, 'from-blue-400 to-purple-500'), COALESCE($8, ''), $9, COALESCE($10, 'published'))
-     ON CONFLICT (slug) DO UPDATE SET
+    `INSERT INTO blog_posts (slug, title, description, date, keywords, cover_image, cover_gradient, cover_emoji, content, status, lang)
+     VALUES ($1, $2, $3, COALESCE($4, CURRENT_DATE), COALESCE($5::text[], '{}'), $6, COALESCE($7, 'from-blue-400 to-purple-500'), COALESCE($8, ''), $9, COALESCE($10, 'published'), COALESCE($11, 'ko'))
+     ON CONFLICT (slug, lang) DO UPDATE SET
        title = EXCLUDED.title,
        description = EXCLUDED.description,
        keywords = EXCLUDED.keywords,
@@ -81,7 +88,8 @@ export async function upsertBlogPost(post: {
       post.cover_emoji || null,
       post.content,
       post.status || "published",
-    ]
+      post.lang || "ko",
+    ],
   );
   return rows[0];
 }
