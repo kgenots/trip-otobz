@@ -199,14 +199,34 @@ function inlineFormat(text: string): string {
     );
 }
 
-function getRelatedCities(post: { title: string; keywords: string[]; content: string }) {
+function getRelatedCities(post: {
+  slug?: string;
+  title: string;
+  keywords: string[];
+  content: string;
+}) {
+  const slug = post.slug || "";
   return cities
-    .filter((c) =>
-      post.title.includes(c.cityKo) ||
-      post.keywords.some((k) => k.includes(c.cityKo)) ||
-      post.content.includes(c.cityKo)
-    )
-    .slice(0, 4);
+    .map((c) => {
+      let score = 0;
+      // slug 매칭 = 글의 주제 도시 (가장 강한 신호)
+      if (slug === c.slug) score += 1000;
+      else if (slug.includes(`-${c.slug}-`) || slug.startsWith(`${c.slug}-`) || slug.endsWith(`-${c.slug}`)) score += 800;
+      // title 매칭 (강한 신호)
+      if (post.title.includes(c.cityKo)) score += 100;
+      // keywords 매칭
+      if (post.keywords.some((k) => k.includes(c.cityKo))) score += 30;
+      // 본문 매칭 (약한 신호 — 단순 언급 가능)
+      if (post.content.includes(c.cityKo)) {
+        const matches = post.content.split(c.cityKo).length - 1;
+        score += Math.min(matches, 20);
+      }
+      return { city: c, score };
+    })
+    .filter((x) => x.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4)
+    .map((x) => x.city);
 }
 
 function inferStage(post: { title: string; content: string }): "browse" | "plan" | "book" {
