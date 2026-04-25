@@ -12,7 +12,10 @@
  *   검색 URL 형식: https://www.coupang.com/np/search?q={keyword}&channel=auto&lptag=AF{partnerId}
  */
 
-const PARTNER_ID = process.env.NEXT_PUBLIC_COUPANG_PARTNER_ID || "";
+const PARTNER_ID =
+  process.env.NEXT_PUBLIC_COUPANG_PARTNER_ID ||
+  process.env.COUPANG_PARTNER_ID ||
+  "";
 
 const BASE_SEARCH = "https://www.coupang.com/np/search";
 

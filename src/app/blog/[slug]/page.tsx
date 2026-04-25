@@ -6,6 +6,7 @@ import { cities } from "@/data/cities";
 import { blogPostEnBySlug } from "@/data/blog-posts-en";
 import SmartCTA from "@/components/SmartCTA";
 import BookingBar from "@/components/BookingBar";
+import CoupangAffiliateBox from "@/components/CoupangAffiliateBox";
 
 export const dynamic = "force-dynamic";
 
@@ -324,6 +325,18 @@ export default async function BlogPostPage({ params }: Props) {
         })()}
 
         <div className="prose-custom">{renderMarkdown(post.content)}</div>
+
+        {/* 쿠팡 어필리에이트 박스 — 여행 준비 필수템 */}
+        {(() => {
+          const rc = getRelatedCities(post);
+          const primary = rc[0];
+          return (
+            <CoupangAffiliateBox
+              cityKo={primary?.cityKo}
+              countryKo={primary?.countryKo}
+            />
+          );
+        })()}
 
         {/* 본문 하단 CTA — 호텔 집중 (primary city 기준) */}
         {(() => {
