@@ -1,4 +1,5 @@
 import React from "react";
+import { replaceAffiliateTokens } from "./coupang";
 
 function inlineFormat(text: string): string {
   return text
@@ -10,7 +11,9 @@ function inlineFormat(text: string): string {
 }
 
 export function renderMarkdown(content: string): React.ReactNode[] {
-  const lines = content.split("\n");
+  // [AFFILIATE:tag] → 쿠팡 검색 URL 로 치환 (blog 본문 어필리에이트)
+  const resolved = replaceAffiliateTokens(content);
+  const lines = resolved.split("\n");
   const elements: React.ReactNode[] = [];
   let i = 0;
 
