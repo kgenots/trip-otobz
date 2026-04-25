@@ -7,6 +7,7 @@ import { blogPostEnBySlug } from "@/data/blog-posts-en";
 import SmartCTA from "@/components/SmartCTA";
 import BookingBar from "@/components/BookingBar";
 import CoupangAffiliateBox from "@/components/CoupangAffiliateBox";
+import AdsenseSlot from "@/components/AdsenseSlot";
 
 export const dynamic = "force-dynamic";
 
@@ -241,6 +242,10 @@ export default async function BlogPostPage({ params }: Props) {
   const post = await getMergedPostBySlug(slug);
   if (!post) notFound();
 
+  const adSlotTop = process.env.ADSENSE_SLOT_TOP || "";
+  const adSlotMid = process.env.ADSENSE_SLOT_MID || "";
+  const adSlotBottom = process.env.ADSENSE_SLOT_BOTTOM || "";
+
   const wordCount = post.content.split(/\s+/).filter(Boolean).length;
   const articleJsonLd = {
     "@context": "https://schema.org",
@@ -324,6 +329,13 @@ export default async function BlogPostPage({ params }: Props) {
           {post.title}
         </h1>
 
+        {/* 상단 광고 슬롯 (in-feed 형식) */}
+        {adSlotTop && (
+          <div className="my-6 min-h-[100px]">
+            <AdsenseSlot slot={adSlotTop} format="auto" />
+          </div>
+        )}
+
         {/* 상단 CTA — intent-aware. plan/book 단계면 바로 예약 바 */}
         {(() => {
           const rc = getRelatedCities(post);
@@ -345,6 +357,17 @@ export default async function BlogPostPage({ params }: Props) {
         })()}
 
         <div className="prose-custom">{renderMarkdown(post.content)}</div>
+
+        {/* 본문 직후 광고 슬롯 (in-article 형식 권장) */}
+        {adSlotMid && (
+          <div className="my-8 min-h-[120px]">
+            <AdsenseSlot
+              slot={adSlotMid}
+              format="fluid"
+              layout="in-article"
+            />
+          </div>
+        )}
 
         {/* 쿠팡 어필리에이트 박스 — 여행 준비 필수템 */}
         {(() => {
@@ -404,6 +427,13 @@ export default async function BlogPostPage({ params }: Props) {
             </div>
           );
         })()}
+
+        {/* 하단 광고 슬롯 (multiplex/auto 형식) */}
+        {adSlotBottom && (
+          <div className="mt-10 min-h-[200px]">
+            <AdsenseSlot slot={adSlotBottom} format="auto" />
+          </div>
+        )}
 
         <div className="mt-12 pt-6 border-t border-gray-100">
           <Link

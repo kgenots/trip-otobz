@@ -6,6 +6,7 @@ import { cities } from "@/data/cities";
 import { renderMarkdown } from "@/lib/markdown";
 import SmartCTA from "@/components/SmartCTA";
 import BookingBar from "@/components/BookingBar";
+import AdsenseSlot from "@/components/AdsenseSlot";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -67,6 +68,10 @@ function inferStage(post: { title: string; content: string }): "browse" | "plan"
   if (/itinerary|3 days|4 days|budget|guide|compare|vs|days? guide/i.test(text)) return "plan";
   return "browse";
 }
+
+const adSlotTopEn = process.env.ADSENSE_SLOT_TOP || "";
+const adSlotMidEn = process.env.ADSENSE_SLOT_MID || "";
+const adSlotBottomEn = process.env.ADSENSE_SLOT_BOTTOM || "";
 
 export default async function BlogPostPageEn({ params }: Props) {
   const { slug } = await params;
@@ -174,6 +179,12 @@ export default async function BlogPostPageEn({ params }: Props) {
           {post.title}
         </h1>
 
+        {adSlotTopEn && (
+          <div className="my-6 min-h-[100px]">
+            <AdsenseSlot slot={adSlotTopEn} format="auto" />
+          </div>
+        )}
+
         {primary && stage !== "browse" && (
           <div className="mb-8">
             <BookingBar
@@ -189,6 +200,16 @@ export default async function BlogPostPageEn({ params }: Props) {
 
         <div className="prose-custom">{renderMarkdown(post.content)}</div>
 
+        {adSlotMidEn && (
+          <div className="my-8 min-h-[120px]">
+            <AdsenseSlot
+              slot={adSlotMidEn}
+              format="fluid"
+              layout="in-article"
+            />
+          </div>
+        )}
+
         {primary && (
           <div className="mt-10">
             <SmartCTA
@@ -200,6 +221,12 @@ export default async function BlogPostPageEn({ params }: Props) {
               lang="en"
               limit={3}
             />
+          </div>
+        )}
+
+        {adSlotBottomEn && (
+          <div className="mt-10 min-h-[200px]">
+            <AdsenseSlot slot={adSlotBottomEn} format="auto" />
           </div>
         )}
 
