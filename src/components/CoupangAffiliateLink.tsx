@@ -39,7 +39,7 @@ export default function CoupangAffiliateLink({
       target="_blank"
       rel="nofollow sponsored noopener"
       onClick={handleClick}
-      className="flex items-center gap-2.5 p-3 bg-white rounded-xl border border-orange-100 hover:border-orange-300 hover:shadow-sm transition-all"
+      className="flex items-center gap-2.5 p-3 bg-white rounded-xl border border-sky-100 hover:border-sky-300 hover:shadow-sm transition-all"
     >
       <span className="text-2xl shrink-0">{emoji}</span>
       <span className="text-sm font-medium text-[#333] leading-tight">

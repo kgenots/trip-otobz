@@ -54,7 +54,7 @@ export default function TravelInsuranceBox({
         };
 
   return (
-    <section className="mt-10 p-6 bg-emerald-50 rounded-2xl border border-emerald-100">
+    <section className="mt-10 p-6 bg-sky-50 rounded-2xl border border-sky-100">
       <h3 className="font-bold text-[#222] text-base sm:text-lg">
         {copy.title}
       </h3>

@@ -37,7 +37,7 @@ export default function TravelInsuranceLink({
       target="_blank"
       rel="nofollow sponsored noopener"
       onClick={handleClick}
-      className="inline-flex items-center mt-3 px-4 py-2.5 bg-emerald-500 text-white rounded-xl text-sm font-semibold hover:bg-emerald-600 transition-colors"
+      className="inline-flex items-center mt-3 px-4 py-2.5 bg-sky-600 text-white rounded-xl text-sm font-semibold hover:bg-sky-700 transition-colors"
     >
       {cta}
     </a>

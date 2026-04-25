@@ -87,7 +87,7 @@ export default function CoupangAffiliateBox({
   }
 
   return (
-    <section className="mt-10 p-5 sm:p-6 bg-orange-50 rounded-2xl border border-orange-100">
+    <section className="mt-10 p-5 sm:p-6 bg-sky-50 rounded-2xl border border-sky-100">
       <h3 className="font-bold text-[#222] text-base sm:text-lg flex items-center gap-2">
         <span>🎒</span>
         <span>여행 준비할 때 챙기면 좋은 것</span>
