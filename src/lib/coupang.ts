@@ -22,7 +22,10 @@ const BASE_SEARCH = "https://www.coupang.com/np/search";
 export function coupangSearchUrl(keyword: string, utmContent?: string): string {
   const q = encodeURIComponent(keyword);
   let url = `${BASE_SEARCH}?q=${q}&channel=auto`;
-  if (PARTNER_ID) url += `&lptag=AF${PARTNER_ID}`;
+  if (PARTNER_ID) {
+    const lptag = PARTNER_ID.startsWith("AF") ? PARTNER_ID : `AF${PARTNER_ID}`;
+    url += `&lptag=${lptag}`;
+  }
   if (utmContent) url += `&utm_content=${encodeURIComponent(utmContent)}`;
   return url;
 }
