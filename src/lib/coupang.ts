@@ -17,6 +17,13 @@ const PARTNER_ID =
   process.env.COUPANG_PARTNER_ID ||
   "";
 
+if (typeof window === "undefined" && !PARTNER_ID) {
+  console.warn(
+    "[coupang] PARTNER_ID 미설정 — affiliate 박스 클릭 시 lptag 없는 URL 생성 (트래킹 누락). " +
+      "Infisical /worker/coupang/COUPANG_PARTNER_ID 또는 NEXT_PUBLIC_COUPANG_PARTNER_ID env 확인 필요.",
+  );
+}
+
 const BASE_SEARCH = "https://www.coupang.com/np/search";
 
 export function coupangSearchUrl(keyword: string, utmContent?: string): string {
