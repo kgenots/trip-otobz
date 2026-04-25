@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import JsonLd from "@/components/JsonLd";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import Footer from "@/components/Footer";
+import CookieConsent from "@/components/CookieConsent";
 import "./globals.css";
 
 const SITE_URL = "https://trip.otobz.com";
@@ -119,6 +120,7 @@ export default function RootLayout({
         <JsonLd />
         {children}
         <Footer />
+        <CookieConsent lang="auto" />
       </body>
     </html>
   );
