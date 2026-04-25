@@ -4,19 +4,26 @@
  */
 
 let _mylinkId = "";
-let _fetched = false;
+let _inflight: Promise<string> | null = null;
 
 export async function getMylinkId(): Promise<string> {
-  if (_fetched) return _mylinkId;
-  try {
-    const res = await fetch("/api/config");
-    const data = await res.json();
-    _mylinkId = data.mylinkId || "";
-  } catch {
-    _mylinkId = "";
-  }
-  _fetched = true;
-  return _mylinkId;
+  if (_mylinkId) return _mylinkId;
+  if (_inflight) return _inflight;
+  _inflight = (async () => {
+    try {
+      const res = await fetch("/api/config");
+      if (!res.ok) return "";
+      const data = await res.json();
+      const id = (data.mylinkId as string) || "";
+      if (id) _mylinkId = id;
+      return id;
+    } catch {
+      return "";
+    } finally {
+      _inflight = null;
+    }
+  })();
+  return _inflight;
 }
 
 export function appendAffiliate(

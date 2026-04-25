@@ -35,9 +35,13 @@ export default function PriceWidget({ cityEn }: { cityEn: string }) {
   const [error, setError] = useState(false);
   const [userLocation, setUserLocation] = useState<"korea" | "overseas" | "unknown">("unknown");
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem("price-widget-confirmed")) return;
+    if (localStorage.getItem("price-widget-confirmed")) {
+      setConfirmed(true);
+      return;
+    }
     if (!navigator.geolocation) return;
 
     navigator.geolocation.getCurrentPosition(
@@ -88,11 +92,12 @@ export default function PriceWidget({ cityEn }: { cityEn: string }) {
   const routeCode = CITY_TO_ROUTE[cityEn];
   if (!routeCode || error) return null;
 
-  const isOverseas = userLocation === "overseas";
-  const showPrice = !isOverseas || !showConfirmModal;
+  const needsConfirm = userLocation === "overseas" && !confirmed;
+  const showPrice = !needsConfirm;
 
   const handleConfirm = () => {
     localStorage.setItem("price-widget-confirmed", "1");
+    setConfirmed(true);
     setShowConfirmModal(false);
   };
 
@@ -147,7 +152,7 @@ export default function PriceWidget({ cityEn }: { cityEn: string }) {
         가격 추이 + 알림 설정 →
       </Link>
 
-      {isOverseas && (
+      {needsConfirm && showConfirmModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" onClick={() => setShowConfirmModal(false)}>
           <div
             className="bg-white rounded-xl p-6 max-w-sm mx-4 shadow-xl"

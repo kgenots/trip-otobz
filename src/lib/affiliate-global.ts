@@ -171,7 +171,7 @@ export function buildUrl(provider: AffiliateProvider, ctx: AffiliateCtx): string
     }
     case "tripcom": {
       const url = ctx.product === "flight"
-        ? `https://www.trip.com/flights/showfarefirst?dcity=&acity=${encodeURIComponent(ctx.cityEn)}`
+        ? `https://www.trip.com/flights/showfarefirst?dcity=icn&acity=${encodeURIComponent(ctx.cityEn)}`
         : `https://www.trip.com/hotels/list?city=${encodeURIComponent(ctx.cityEn)}`;
       const deeplink = `${url}&${utm}`;
       const campaign = `city-${cityEnSlug}-${ctx.region}`;
