@@ -11,7 +11,7 @@ const PUBLIC_BASE_URL =
 const DASHBOARD_BASE_URL =
   process.env.DASHBOARD_BASE_URL || "http://obot-dashboard.worker.svc.cluster.local:3000";
 const DASHBOARD_INTERNAL_KEY =
-  process.env.DASHBOARD_INTERNAL_KEY || "openclaw-internal-2026";
+  process.env.INTERNAL_API_KEY || process.env.DASHBOARD_INTERNAL_KEY || "";
 
 function slugSafe(value: string): string {
   return value.replace(/[^a-z0-9-]/gi, "").slice(0, 60);
@@ -65,7 +65,8 @@ async function saveImage(
 
 export async function POST(request: NextRequest) {
   const internalKey = request.headers.get("x-internal-key");
-  if (internalKey !== "openclaw-internal-2026") {
+  const expected = DASHBOARD_INTERNAL_KEY;
+  if (!expected || internalKey !== expected) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
