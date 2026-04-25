@@ -1,4 +1,5 @@
 import { coupangSearchUrl, COUPANG_DISCLAIMER } from "@/lib/coupang";
+import CoupangAffiliateLink from "./CoupangAffiliateLink";
 
 interface Item {
   tag: string;
@@ -98,18 +99,15 @@ export default function CoupangAffiliateBox({
       </p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
         {items.map((it) => (
-          <a
+          <CoupangAffiliateLink
             key={it.tag}
             href={coupangSearchUrl(it.keyword, `affiliate-box-${it.tag}`)}
-            target="_blank"
-            rel="nofollow sponsored noopener"
-            className="flex items-center gap-2.5 p-3 bg-white rounded-xl border border-orange-100 hover:border-orange-300 hover:shadow-sm transition-all"
-          >
-            <span className="text-2xl shrink-0">{it.emoji}</span>
-            <span className="text-sm font-medium text-[#333] leading-tight">
-              {it.label}
-            </span>
-          </a>
+            tag={it.tag}
+            emoji={it.emoji}
+            label={it.label}
+            cityKo={cityKo}
+            countryKo={countryKo}
+          />
         ))}
       </div>
       <p className="text-[11px] text-[#888] mt-4 leading-tight italic">
