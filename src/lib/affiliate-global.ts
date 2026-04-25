@@ -3,6 +3,7 @@ import type { Region } from "./region";
 export type Product = "hotel" | "tour" | "flight" | "activity";
 
 export type AffiliateProvider =
+  | "hotellook" | "aviasales"
   | "agoda" | "booking" | "hotels" | "expedia" | "rakuten"
   | "klook" | "kkday" | "getyourguide" | "viator" | "tripcom"
   | "skyscanner" | "kayak";
@@ -25,7 +26,8 @@ const AIDS = {
 // Travelpayouts 통합 네트워크 (Booking/Agoda/Skyscanner/Trip.com 일원화)
 // Passive 트래커(<head> 스크립트)가 클릭 자동 캡처 + 명시 deeplink로 이중 방어
 const TP = {
-  marker: process.env.NEXT_PUBLIC_TP_MARKER || "",
+  // 721495 = trip-otobz Travelpayouts marker (이미 블로그 esim 링크에 사용 중)
+  marker: process.env.NEXT_PUBLIC_TP_MARKER || "721495",
   // Travelpayouts 내부 program IDs (https://www.travelpayouts.com/ dashboard > Programs)
   // 미설정 시 tp.media 래핑 건너뛰고 직접 URL + label 파라미터만 사용 (트래커가 캡처)
   pBooking: process.env.NEXT_PUBLIC_TP_P_BOOKING || "",
@@ -59,13 +61,16 @@ function appendTPLabel(url: string, campaign: string): string {
 const UTM = (region: Region, p: AffiliateProvider, product: Product) =>
   `utm_source=trip-otobz&utm_medium=affiliate&utm_campaign=${p}&utm_content=${product}-${region}`;
 
+// Single-gate TP integration for hotel/flight (Hotellook & Aviasales are TP-owned,
+// commission tracked via marker only — no per-program approval needed).
+// Tour/activity keep direct AIDs (Klook/KKday/Viator/GYG).
 export const CHAIN: Record<Region, Record<Product, AffiliateProvider[]>> = {
-  kr:     { hotel: ["agoda", "booking"],            tour: ["klook", "kkday"],          flight: ["skyscanner", "tripcom"],  activity: ["klook", "kkday"] },
-  jp:     { hotel: ["agoda", "rakuten", "booking"], tour: ["kkday", "klook", "viator"],flight: ["skyscanner"],              activity: ["kkday", "klook"] },
-  sea:    { hotel: ["agoda", "booking"],            tour: ["klook", "viator"],         flight: ["tripcom", "skyscanner"],  activity: ["klook", "viator"] },
-  us:     { hotel: ["booking", "expedia", "hotels"],tour: ["viator", "getyourguide"],  flight: ["skyscanner", "kayak"],    activity: ["viator", "getyourguide"] },
-  eu:     { hotel: ["booking", "agoda"],            tour: ["getyourguide", "viator"],  flight: ["skyscanner", "kayak"],    activity: ["getyourguide", "viator"] },
-  global: { hotel: ["booking", "agoda"],            tour: ["viator", "klook"],         flight: ["skyscanner"],              activity: ["viator", "klook"] },
+  kr:     { hotel: ["hotellook"], tour: ["klook", "kkday"],         flight: ["aviasales"], activity: ["klook", "kkday"] },
+  jp:     { hotel: ["hotellook"], tour: ["kkday", "klook", "viator"], flight: ["aviasales"], activity: ["kkday", "klook"] },
+  sea:    { hotel: ["hotellook"], tour: ["klook", "viator"],         flight: ["aviasales"], activity: ["klook", "viator"] },
+  us:     { hotel: ["hotellook"], tour: ["viator", "getyourguide"],  flight: ["aviasales"], activity: ["viator", "getyourguide"] },
+  eu:     { hotel: ["hotellook"], tour: ["getyourguide", "viator"],  flight: ["aviasales"], activity: ["getyourguide", "viator"] },
+  global: { hotel: ["hotellook"], tour: ["viator", "klook"],         flight: ["aviasales"], activity: ["viator", "klook"] },
 };
 
 export interface AffiliateCtx {
@@ -91,6 +96,24 @@ export function buildUrl(provider: AffiliateProvider, ctx: AffiliateCtx): string
   const utm = UTM(ctx.region, provider, ctx.product);
 
   switch (provider) {
+    case "hotellook": {
+      // TP-owned hotel meta-search. Marker alone is enough — no program approval needed.
+      const url = `https://search.hotellook.com/?destination=${encodeURIComponent(ctx.cityEn)}`;
+      const params: Record<string, string> = {};
+      if (TP.marker) params.marker = TP.marker;
+      const campaign = `city-${cityEnSlug}-${ctx.region}`;
+      params.sub_id = campaign;
+      return ensure(url, params) + `&${utm}`;
+    }
+    case "aviasales": {
+      // TP-owned flight meta-search. Marker alone is enough.
+      const url = `https://www.aviasales.com/search?destination=${encodeURIComponent(ctx.cityEn)}`;
+      const params: Record<string, string> = {};
+      if (TP.marker) params.marker = TP.marker;
+      const campaign = `city-${cityEnSlug}-${ctx.region}`;
+      params.sub_id = campaign;
+      return ensure(url, params) + `&${utm}`;
+    }
     case "klook": {
       const url = ctx.product === "flight"
         ? `https://www.klook.com/search/?query=${encodeURIComponent(ctx.cityEn + " flight")}`
@@ -218,6 +241,8 @@ export function bestProviders(
 }
 
 export const PROVIDER_LABEL: Record<AffiliateProvider, string> = {
+  hotellook: "호텔 비교",
+  aviasales: "항공권 비교",
   agoda: "Agoda",
   booking: "Booking.com",
   hotels: "Hotels.com",
