@@ -13,7 +13,7 @@ function buildSafetyWingUrl(campaign: string, lang: "ko" | "en"): string {
   const refId = process.env.SAFETYWING_REF_ID || "";
   const url = new URL(SAFETYWING_BASE);
   if (refId) url.searchParams.set("referenceID", refId);
-  url.searchParams.set("utm_source", "trip-otobz");
+  url.searchParams.set("utm_source", "otobz-trip");
   url.searchParams.set("utm_medium", "affiliate");
   url.searchParams.set("utm_campaign", campaign);
   url.searchParams.set("utm_content", lang);

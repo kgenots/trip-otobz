@@ -14,16 +14,16 @@ jobs:
       - name: Build image with latest tag
         run: |
           sudo nerdctl --address /run/k3s/containerd/containerd.sock build \
-            -t trip-otobz:latest .
-          sudo nerdctl --address /run/k3s/containerd/containerd.sock save trip-otobz:latest \
+            -t otobz-trip:latest .
+          sudo nerdctl --address /run/k3s/containerd/containerd.sock save otobz-trip:latest \
             | sudo k3s ctr images import -
 
       - name: Rollout restart
         run: |
-          KUBECONFIG=$HOME/.kube/config sudo kubectl rollout restart deployment/trip-otobz -n worker
-          KUBECONFIG=$HOME/.kube/config sudo kubectl rollout status deployment/trip-otobz -n worker --timeout=300s
+          KUBECONFIG=$HOME/.kube/config sudo kubectl rollout restart deployment/otobz-trip -n worker
+          KUBECONFIG=$HOME/.kube/config sudo kubectl rollout status deployment/otobz-trip -n worker --timeout=300s
 
       - name: Verify
         run: |
-          KUBECONFIG=$HOME/.kube/config sudo kubectl get pods -n worker -l app=trip-otobz
-          echo "✅ trip-otobz deployed"
+          KUBECONFIG=$HOME/.kube/config sudo kubectl get pods -n worker -l app=otobz-trip
+          echo "✅ otobz-trip deployed"

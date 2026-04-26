@@ -65,7 +65,7 @@ export function flightOutbound(input: OutboundInput): string | null {
   }
 
   const params: Record<string, string> = {
-    utm_source: "trip-otobz",
+    utm_source: "otobz-trip",
     utm_medium: "affiliate",
     utm_campaign: "skyscanner",
     utm_content: "flight-kr",
@@ -102,7 +102,7 @@ export function hotelOutbound(input: OutboundInput): string | null {
   const baseUrl = `https://www.agoda.com/ko-kr/city/${citySegment}.html`;
 
   const params: Record<string, string> = {
-    utm_source: "trip-otobz",
+    utm_source: "otobz-trip",
     utm_medium: "affiliate",
     utm_campaign: "agoda",
     utm_content: "hotel-kr",
@@ -127,7 +127,7 @@ export function hotelOutboundBooking(input: OutboundInput): string | null {
   const baseUrl = "https://www.booking.com/searchresults.ko.html";
   const params: Record<string, string> = {
     ss: city.cityEn,
-    utm_source: "trip-otobz",
+    utm_source: "otobz-trip",
     utm_medium: "affiliate",
     utm_campaign: "booking",
     utm_content: "hotel-kr",

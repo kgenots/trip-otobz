@@ -26,7 +26,7 @@ const AIDS = {
 // Travelpayouts 통합 네트워크 (Booking/Agoda/Skyscanner/Trip.com 일원화)
 // Passive 트래커(<head> 스크립트)가 클릭 자동 캡처 + 명시 deeplink로 이중 방어
 const TP = {
-  // 721495 = trip-otobz Travelpayouts marker (이미 블로그 esim 링크에 사용 중)
+  // 721495 = otobz-trip Travelpayouts marker (이미 블로그 esim 링크에 사용 중)
   marker: process.env.NEXT_PUBLIC_TP_MARKER || "721495",
   // Travelpayouts 내부 program IDs (https://www.travelpayouts.com/ dashboard > Programs)
   // 미설정 시 tp.media 래핑 건너뛰고 직접 URL + label 파라미터만 사용 (트래커가 캡처)
@@ -59,7 +59,7 @@ function appendTPLabel(url: string, campaign: string): string {
 }
 
 const UTM = (region: Region, p: AffiliateProvider, product: Product) =>
-  `utm_source=trip-otobz&utm_medium=affiliate&utm_campaign=${p}&utm_content=${product}-${region}`;
+  `utm_source=otobz-trip&utm_medium=affiliate&utm_campaign=${p}&utm_content=${product}-${region}`;
 
 // Single-gate TP integration for hotel/flight (Hotellook & Aviasales are TP-owned,
 // commission tracked via marker only — no per-program approval needed).

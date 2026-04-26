@@ -1,4 +1,4 @@
-# TODOS — trip-otobz
+# TODOS — otobz-trip
 
 ## [PRICE-PULSE-1] Price chart screen reader data table fallback
 
