@@ -9,7 +9,7 @@ const UPLOAD_DIR = process.env.BLOG_UPLOAD_DIR || "/app/uploads";
 const PUBLIC_BASE_URL =
   process.env.PUBLIC_BASE_URL || "https://trip.otobz.com";
 const DASHBOARD_BASE_URL =
-  process.env.DASHBOARD_BASE_URL || "http://obot-dashboard.worker.svc.cluster.local:3000";
+  process.env.DASHBOARD_BASE_URL || "http://otobz-dashboard.worker.svc.cluster.local:3000";
 const DASHBOARD_INTERNAL_KEY =
   process.env.INTERNAL_API_KEY || process.env.DASHBOARD_INTERNAL_KEY || "";
 
