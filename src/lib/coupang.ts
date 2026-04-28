@@ -108,7 +108,7 @@ const TOKEN_RE = /\[AFFILIATE:([a-z0-9-]+)\]/gi;
 export function replaceAffiliateTokens(content: string): string {
   return content.replace(TOKEN_RE, (match, tag) => {
     const url = resolveCoupangToken(String(tag));
-    return url ? url : match;
+    return url ? `[👉 쿠팡 보기](${url})` : match;
   });
 }
 

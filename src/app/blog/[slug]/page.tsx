@@ -8,6 +8,7 @@ import BookingBar from "@/components/BookingBar";
 import CoupangAffiliateBox from "@/components/CoupangAffiliateBox";
 import AdsenseSlot from "@/components/AdsenseSlot";
 import TravelInsuranceBox from "@/components/TravelInsuranceBox";
+import { replaceAffiliateTokens } from "@/lib/coupang";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +64,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 }
 
 function renderMarkdown(content: string) {
-  const lines = content.split("\n");
+  const lines = replaceAffiliateTokens(content).split("\n");
   const elements: React.ReactNode[] = [];
   let i = 0;
 
